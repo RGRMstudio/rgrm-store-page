@@ -10,42 +10,57 @@ const PRODUCTS = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white font-[family-name:var(--font-geist-sans)]">
-      {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-8 py-20">
-        <header className="flex flex-col items-center mb-16 text-center">
+      <main className="max-w-6xl mx-auto px-8 py-20 flex flex-col items-center">
+        {/* Header Section */}
+        <header className="mb-16 text-center">
           <h1 className="text-6xl font-black tracking-tighter uppercase italic mb-4">
             RGRM<span className="text-zinc-500">STORE</span>
           </h1>
-          <p className="text-zinc-400 font-mono text-sm tracking-widest uppercase">
-            Elevated Essentials // Collection 01
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <span className="h-px w-8 bg-zinc-800"></span>
+            <p className="text-zinc-400 font-mono text-xs tracking-[0.3em] uppercase">
+              Collection 01 // 2025
+            </p>
+            <span className="h-px w-8 bg-zinc-800"></span>
+          </div>
         </header>
 
         {/* 2. Product Grid Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full">
           {PRODUCTS.map((product) => (
-            <div key={product.id} className="group border border-zinc-800 p-6 rounded-2xl hover:bg-zinc-900 transition-all">
-              <div className="aspect-square bg-zinc-800 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+            <div key={product.id} className="group flex flex-col items-center">
+              <div className="relative aspect-[3/4] w-full bg-zinc-900 rounded-2xl mb-6 flex items-center justify-center overflow-hidden border border-zinc-800 transition-colors group-hover:border-zinc-500">
                 <Image 
                   src={product.image} 
                   alt={product.name} 
-                  width={80} 
-                  height={80} 
-                  className="opacity-50 group-hover:scale-110 transition-transform"
+                  width={100} 
+                  height={100} 
+                  className="opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 invert"
                 />
+                <div className="absolute bottom-4 left-4">
+                  <span className="text-[10px] bg-white text-black px-2 py-1 rounded font-bold uppercase tracking-widest">
+                    New
+                  </span>
+                </div>
               </div>
-              <h3 className="font-bold text-lg uppercase tracking-tight">{product.name}</h3>
-              <p className="text-zinc-500 font-mono">{product.price}</p>
-              <button className="mt-4 w-full py-2 border border-white text-white text-xs font-bold uppercase rounded-full hover:bg-white hover:text-black transition-colors">
-                Coming Soon
-              </button>
+              
+              <div className="text-center w-full">
+                <h3 className="font-bold text-xl uppercase tracking-tighter mb-1">{product.name}</h3>
+                <p className="text-zinc-500 font-mono text-sm mb-6">{product.price}</p>
+                <button className="w-full py-3 bg-white text-black text-xs font-black uppercase rounded-full hover:bg-zinc-300 transition-colors tracking-widest">
+                  Coming Soon
+                </button>
+              </div>
             </div>
           ))}
         </section>
       </main>
 
-      <footer className="py-10 text-center text-zinc-600 border-t border-zinc-900">
-        <p className="text-[10px] uppercase tracking-widest">© 2025 RGRM STUDIO</p>
+      {/* Footer */}
+      <footer className="py-20 text-center border-t border-zinc-900">
+        <p className="text-[10px] text-zinc-600 uppercase tracking-[0.5em]">
+          © RGRM STUDIO // Global Essentials
+        </p>
       </footer>
     </div>
   );
