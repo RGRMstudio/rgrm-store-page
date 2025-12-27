@@ -1,67 +1,53 @@
-import Image from "next/image";
-
-// 1. Define your product data
-const PRODUCTS = [
-  { id: 1, name: "Essential Tee", price: "$45", image: "/window.svg" },
-  { id: 2, name: "Studio Hoodie", price: "$85", image: "/window.svg" },
-  { id: 3, name: "Canvas Tote", price: "$30", image: "/window.svg" },
-];
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-black text-white font-[family-name:var(--font-geist-sans)]">
-      <main className="max-w-6xl mx-auto px-8 py-20 flex flex-col items-center">
-        {/* Header Section */}
-        <header className="mb-16 text-center">
-          <h1 className="text-6xl font-black tracking-tighter uppercase italic mb-4">
-            RGRM<span className="text-zinc-500">STORE</span>
-          </h1>
-          <div className="flex items-center justify-center gap-2">
-            <span className="h-px w-8 bg-zinc-800"></span>
-            <p className="text-zinc-400 font-mono text-xs tracking-[0.3em] uppercase">
-              Collection 01 // 2025
-            </p>
-            <span className="h-px w-8 bg-zinc-800"></span>
-          </div>
-        </header>
+    <main className="min-h-screen bg-white text-black font-sans">
+      {/* GEOMETRIC NAVIGATION */}
+      <nav className="flex justify-between border-b-4 border-black p-6 items-center">
+        <h1 className="text-4xl font-black tracking-tighter uppercase">RaGuiRoMo</h1>
+        <div className="space-x-8 hidden md:flex font-bold uppercase tracking-widest text-sm">
+          <a href="#vision" className="hover:bg-yellow-400 px-2 transition-colors">Vision</a>
+          <a href="#about" className="hover:bg-red-500 hover:text-white px-2 transition-colors">About</a>
+          <a href="#products" className="hover:bg-blue-600 hover:text-white px-2 transition-colors">Menu</a>
+        </div>
+      </nav>
 
-        {/* 2. Product Grid Section */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full">
-          {PRODUCTS.map((product) => (
-            <div key={product.id} className="group flex flex-col items-center">
-              <div className="relative aspect-[3/4] w-full bg-zinc-900 rounded-2xl mb-6 flex items-center justify-center overflow-hidden border border-zinc-800 transition-colors group-hover:border-zinc-500">
-                <Image 
-                  src={product.image} 
-                  alt={product.name} 
-                  width={100} 
-                  height={100} 
-                  className="opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 invert"
-                />
-                <div className="absolute bottom-4 left-4">
-                  <span className="text-[10px] bg-white text-black px-2 py-1 rounded font-bold uppercase tracking-widest">
-                    New
-                  </span>
-                </div>
-              </div>
-              
-              <div className="text-center w-full">
-                <h3 className="font-bold text-xl uppercase tracking-tighter mb-1">{product.name}</h3>
-                <p className="text-zinc-500 font-mono text-sm mb-6">{product.price}</p>
-                <button className="w-full py-3 bg-white text-black text-xs font-black uppercase rounded-full hover:bg-zinc-300 transition-colors tracking-widest">
-                  Coming Soon
-                </button>
-              </div>
-            </div>
-          ))}
-        </section>
-      </main>
+      {/* FUTURISTIC HERO SECTION */}
+      <section className="grid grid-cols-1 md:grid-cols-2 h-[80vh] border-b-4 border-black">
+        <div className="flex flex-col justify-center p-12 bg-white">
+          <h2 className="text-8xl font-black leading-none uppercase mb-6">
+            Future <br /> <span className="text-red-600">Wear</span>
+          </h2>
+          <p className="text-xl max-w-md font-medium leading-relaxed">
+            Minimalistic function meets geometric joy. Designed by us, printed for you.
+          </p>
+          <button className="mt-8 bg-black text-white px-10 py-4 font-bold uppercase tracking-widest hover:bg-blue-600 transition-all self-start">
+            Shop the Collection
+          </button>
+        </div>
+        
+        {/* ANIMATED PRODUCT DISPLAY AREA */}
+        <div className="bg-yellow-400 border-l-4 border-black flex items-center justify-center relative overflow-hidden">
+          <div className="w-64 h-64 bg-red-600 animate-bounce transition-all duration-1000"></div>
+          <div className="absolute top-10 right-10 w-32 h-32 border-4 border-black rounded-full animate-spin-slow"></div>
+          {/* We will replace these with Printful Product Images later */}
+        </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="py-20 text-center border-t border-zinc-900">
-        <p className="text-[10px] text-zinc-600 uppercase tracking-[0.5em]">
-          © RGRM STUDIO // Global Essentials
-        </p>
-      </footer>
-    </div>
+      {/* VISION & MISSION BLOCKS */}
+      <section id="vision" className="grid grid-cols-1 md:grid-cols-3 border-b-4 border-black">
+        <div className="p-12 border-r-4 border-black bg-blue-600 text-white">
+          <h3 className="text-2xl font-black uppercase mb-4">Vision</h3>
+          <p>Defining the aesthetics of the next decade through functional art.</p>
+        </div>
+        <div className="p-12 border-r-4 border-black">
+          <h3 className="text-2xl font-black uppercase mb-4">Mission</h3>
+          <p>Sustainably produced, high-quality prints that spark joy in every delivery.</p>
+        </div>
+        <div className="p-12 bg-white">
+          <h3 className="text-2xl font-black uppercase mb-4">FAQ</h3>
+          <p>Curious about shipping? Check our process below.</p>
+        </div>
+      </section>
+    </main>
   );
 }
