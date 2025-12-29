@@ -1,28 +1,33 @@
 'use server';
-import Stripe from 'stripe';
+import { stripe } from '@/lib/stripe';
 import { redirect } from 'next/navigation';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function createCheckoutSession(formData: FormData) {
-  const productName = formData.get('name') as string;
+  const productId = formData.get('productId') as string;
   const storeSource = formData.get('storeSource') as string;
 
   const session = await stripe.checkout.sessions.create({
+    // EXPLICIT V2 PREVIEW VERSIONING
+    stripeVersion: '2025-12-15.preview',
     line_items: [
       {
         price_data: {
           currency: 'usd',
           product_data: { 
-            name: productName,
-            metadata: { storeSource } // Tagging which Printful store this came from
+            name: `RGRM Asset: ${productId}`,
+            metadata: { 
+              storeSource,
+              // V2 INTEROP: Tagging for account-level visibility
+              customer_account: storeSource 
+            }
           },
-          unit_amount: 2500, // Replace with dynamic price from your Printful service
+          unit_amount: 3000, 
         },
         quantity: 1,
       },
     ],
     mode: 'payment',
+    // RGRM BLUEPRINT REDIRECTS
     success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
     cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
   });
