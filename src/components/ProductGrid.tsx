@@ -3,6 +3,17 @@ import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 
 export default function ProductGrid({ products }: any) {
+  // 1. ADD THIS GUARD CLAUSE TO PREVENT THE CRASH
+  if (!products || !Array.isArray(products)) {
+    return (
+      <section className="px-8 py-20 bg-white">
+        <div className="animate-pulse font-mono text-xs text-gray-400">
+          INITIALIZING RGRM ASSETS...
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="px-8 py-20 bg-white">
       <motion.div 
@@ -18,7 +29,6 @@ export default function ProductGrid({ products }: any) {
       {/* Asymmetrical Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[300px]">
         {products.map((product: any, index: number) => {
-          // Logic to alternate sizes for the "Fine Arts" gallery look
           const isLarge = index === 0 || index === 5;
           const isTall = index === 2 || index === 6;
 
