@@ -1,16 +1,16 @@
 /**
  * RaGuiRoMo Store: Dual-Printful Account Engine
- * This file handles fulfillment routing between Store A001 and A002.
+ * Handles fulfillment routing between Store A001 and A002.
  */
 
 export const getPrintfulToken = (storeId: string): string => {
-  // Retrieve the appropriate secret key from Vercel Environment Variables
+  // Dynamically selects the correct server-side secret
   const token = storeId === "A002" 
     ? process.env.PRINTFUL_STORE_A002_KEY 
     : process.env.PRINTFUL_STORE_A001_KEY;
 
   if (!token) {
-    throw new Error(`Critical Error: Printful API key for ${storeId} is missing.`);
+    throw new Error(`Critical Error: Printful API key for ${storeId} is missing in Vercel.`);
   }
 
   return token;
@@ -18,7 +18,7 @@ export const getPrintfulToken = (storeId: string): string => {
 
 /**
  * Universal Printful Request Wrapper
- * Uses the storeId to authenticate with the correct account.
+ * Authenticates with the specific account required for the order.
  */
 export const printfulRequest = async (storeId: string, endpoint: string, options: RequestInit = {}) => {
   const token = getPrintfulToken(storeId);
