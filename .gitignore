@@ -1,41 +1,22 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Security: Protect RGRM Studio Keys
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Dependencies
+node_modules/
 
-# testing
-/coverage
+# Next.js Build Output
+.next/
+out/
 
-# next.js
-/.next/
-/out/
+# Production Build Logs
+build/
+dist/
 
-# production
-/build
-
-# misc
+# System Files
 .DS_Store
-*.pem
+*.log
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
