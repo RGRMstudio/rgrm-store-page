@@ -1,21 +1,41 @@
-const STORE_KEYS: Record<string, string | undefined> = {
-  'RGRMStoreA001': process.env.PRINTFUL_STORE_A001_KEY,
-  'RGRMStoreA002': process.env.PRINTFUL_STORE_A002_KEY,
+/**
+ * RaGuiRoMo Store: Dual-Printful Account Engine
+ * This file handles fulfillment routing between Store A001 and A002.
+ */
+
+export const getPrintfulToken = (storeId: string): string => {
+  // Retrieve the appropriate secret key from Vercel Environment Variables
+  const token = storeId === "A002" 
+    ? process.env.PRINTFUL_STORE_A002_KEY 
+    : process.env.PRINTFUL_STORE_A001_KEY;
+
+  if (!token) {
+    throw new Error(`Critical Error: Printful API key for ${storeId} is missing.`);
+  }
+
+  return token;
 };
 
-export async function createPrintfulOrder(storeSource: string, orderData: any) {
-  const apiKey = STORE_KEYS[storeSource];
+/**
+ * Universal Printful Request Wrapper
+ * Uses the storeId to authenticate with the correct account.
+ */
+export const printfulRequest = async (storeId: string, endpoint: string, options: RequestInit = {}) => {
+  const token = getPrintfulToken(storeId);
   
-  if (!apiKey) throw new Error(`API Key for ${storeSource} not found.`);
-
-  const response = await fetch('https://api.printful.com/orders', {
-    method: 'POST',
+  const response = await fetch(`https://api.printful.com/${endpoint}`, {
+    ...options,
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+      ...options.headers,
     },
-    body: JSON.stringify(orderData),
   });
 
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Printful API Error (${storeId}): ${errorData.error?.message || response.statusText}`);
+  }
+
   return response.json();
-}
+};
