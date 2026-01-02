@@ -1,52 +1,46 @@
-"use client";
-import { motion } from 'framer-motion';
-import ProductCard from './ProductCard';
+import Image from 'next/image';
+import Link from 'next/link';
 
-export default function ProductGrid({ products }: any) {
-  // 1. ADD THIS GUARD CLAUSE TO PREVENT THE CRASH
-  if (!products || !Array.isArray(products)) {
+interface Product {
+  id: string;
+  name: string;
+  price: string;
+  image: string;
+}
+
+export default function ProductGrid({ products }: { products: Product[] }) {
+  // --- THE GUARD CLAUSE ---
+  // This prevents build errors if the product array is undefined or empty.
+  if (!products || products.length === 0) {
     return (
-      <section className="px-8 py-20 bg-white">
-        <div className="animate-pulse font-mono text-xs text-gray-400">
-          INITIALIZING RGRM ASSETS...
-        </div>
-      </section>
+      <div className="flex flex-col items-center justify-center p-20 text-center">
+        <p className="text-zinc-500 font-mono">SIGNAL LOST: SYNCING ARCHIVE...</p>
+      </div>
     );
   }
 
   return (
-    <section className="px-8 py-20 bg-white">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mb-12 border-l-4 border-rgrm-blue pl-6"
-      >
-        <h2 className="font-display text-4xl uppercase tracking-tighter">Current Drops</h2>
-        <p className="font-mono text-xs text-gray-400 uppercase tracking-widest mt-2">Collection 01: The Origin</p>
-      </motion.div>
-
-      {/* Asymmetrical Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[300px]">
-        {products.map((product: any, index: number) => {
-          const isLarge = index === 0 || index === 5;
-          const isTall = index === 2 || index === 6;
-
-          return (
-            <div 
-              key={product.id} 
-              className={`${isLarge ? 'md:col-span-2 md:row-span-2' : isTall ? 'md:row-span-2' : ''}`}
-            >
-              <ProductCard 
-                title={product.name} 
-                price="45.00" 
-                image={product.thumbnail_url}
-                color={index % 3 === 0 ? 'blue' : index % 3 === 1 ? 'red' : 'yellow'}
-              />
-            </div>
-          );
-        })}
-      </div>
-    </section>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-6">
+      {products.map((product) => (
+        <Link 
+          key={product.id} 
+          href={`/product/${product.id}`}
+          className="group block bg-black border border-zinc-800 hover:border-yellow-400 transition-all duration-300"
+        >
+          <div className="relative aspect-square overflow-hidden">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100"
+            />
+          </div>
+          <div className="p-4 flex justify-between items-center font-mono">
+            <h3 className="text-white text-sm uppercase tracking-widest">{product.name}</h3>
+            <p className="text-yellow-400 text-sm">{product.price}</p>
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 }
