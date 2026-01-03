@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-// API version '2025-02-24.acacia' is required by your current environment
+// API version '2025-02-24.acacia' is required to match your Vercel environment types
 export const stripeA001 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia' as any,
   typescript: true,
