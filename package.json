@@ -1,12 +1,17 @@
-import Stripe from 'stripe';
-
-// API version '2025-02-24.acacia' is required by your current environment
-export const stripeA001 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia' as any,
-  typescript: true,
-});
-
-export const stripeA002 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia' as any,
-  typescript: true,
-});
+{
+  "name": "rgrm-store-page",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "15.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^17.5.0"
+  }
+}
