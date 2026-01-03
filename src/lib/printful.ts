@@ -4,22 +4,17 @@
  */
 
 export const getPrintfulToken = (storeId: string): string => {
-  // Dynamically selects the correct server-side secret
   const token = storeId === "A002" 
     ? process.env.PRINTFUL_STORE_A002_KEY 
     : process.env.PRINTFUL_STORE_A001_KEY;
 
   if (!token) {
-    throw new Error(`Critical Error: Printful API key for ${storeId} is missing in Vercel.`);
+    throw new Error(`Critical Error: Printful API key for ${storeId} is missing.`);
   }
 
   return token;
 };
 
-/**
- * Universal Printful Request Wrapper
- * Authenticates with the specific account required for the order.
- */
 export const printfulRequest = async (storeId: string, endpoint: string, options: RequestInit = {}) => {
   const token = getPrintfulToken(storeId);
   
