@@ -1,46 +1,19 @@
-import Image from 'next/image';
-import Link from 'next/link';
-
-interface Product {
-  id: string;
-  name: string;
-  price: string;
-  image: string;
-}
-
-export default function ProductGrid({ products }: { products: Product[] }) {
-  // --- THE GUARD CLAUSE ---
-  // This prevents build errors if the product array is undefined or empty.
-  if (!products || products.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center p-20 text-center">
-        <p className="text-zinc-500 font-mono">SIGNAL LOST: SYNCING ARCHIVE...</p>
-      </div>
-    );
-  }
-
+// Example for src/components/ProductGrid.tsx
+export const ProductGrid = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-6">
-      {products.map((product) => (
-        <Link 
-          key={product.id} 
-          href={`/product/${product.id}`}
-          className="group block bg-black border border-zinc-800 hover:border-yellow-400 transition-all duration-300"
-        >
-          <div className="relative aspect-square overflow-hidden">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100"
-            />
-          </div>
-          <div className="p-4 flex justify-between items-center font-mono">
-            <h3 className="text-white text-sm uppercase tracking-widest">{product.name}</h3>
-            <p className="text-yellow-400 text-sm">{product.price}</p>
-          </div>
-        </Link>
-      ))}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-t-4 border-l-4 border-black">
+      <div className="md:col-span-2 p-10 bg-bauhaus-blue text-white bauhaus-border flex flex-col justify-end h-96">
+        <h3 className="text-6xl font-black uppercase">Featured Drop</h3>
+      </div>
+      <div className="p-10 bg-bauhaus-yellow bauhaus-border h-96">
+        <div className="geometric-card bg-white p-4">
+          <p className="font-bold uppercase">New Items</p>
+        </div>
+      </div>
+      <div className="p-10 bg-white bauhaus-border h-96">
+         {/* Product info here */}
+      </div>
     </div>
   );
-}
+};
+
