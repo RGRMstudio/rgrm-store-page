@@ -1,26 +1,34 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --bauhaus-blue: #0066FF;
+  --bauhaus-red: #FF0000;
+  --bauhaus-yellow: #FFCC00;
+  --off-white: #F9F7F2;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--off-white);
+  color: black;
+  font-family: 'Inter', sans-serif; /* High-end, clean sans-serif */
+}
+
+/* Bauhaus "Chic" Utility Classes */
+@layer components {
+  .bauhaus-border {
+    @apply border-4 border-black;
+  }
+  
+  .bauhaus-button {
+    @apply bauhaus-border px-8 py-3 uppercase font-black tracking-tighter 
+           transition-all duration-300 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
+  }
+
+  /* Interactive shape hover effect */
+  .geometric-card {
+    @apply bauhaus-border aspect-square flex items-center justify-center 
+           transition-all duration-500 hover:rounded-full overflow-hidden;
+  }
 }
