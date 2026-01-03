@@ -1,14 +1,9 @@
-# Dependencies
 node_modules
 .next
 out
-
-# Environment Variables (IMPORTANT: Git must ignore these)
+.vercel
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Vercel
-.vercel
