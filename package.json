@@ -1,23 +1,12 @@
-{
-  "name": "rgrm-store-page",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "next": "15.1.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "stripe": "^17.5.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.17.10",
-    "@types/react": "^19.0.1",
-    "@types/react-dom": "^19.0.2",
-    "typescript": "^5.7.2"
-  }
-}
+import Stripe from 'stripe';
+
+// API version '2025-02-24.acacia' is required by your current environment
+export const stripeA001 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-02-24.acacia' as any,
+  typescript: true,
+});
+
+export const stripeA002 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-02-24.acacia' as any,
+  typescript: true,
+});
