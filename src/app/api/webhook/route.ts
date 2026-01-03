@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { stripeA001, stripeA002 } from '@/lib/stripe';
+import { stripeA001 } from '@/lib/stripe';
 import { printfulRequest } from '@/lib/printful';
 import { sendDiscordNotification } from '@/lib/discord';
 
@@ -11,24 +11,26 @@ export async function POST(req: Request) {
   let event;
 
   try {
-    // 1. Verify that the event actually came from Stripe
+    // 1. Verify the event authenticity
     event = stripeA001.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET_A001!
     );
   } catch (err: any) {
-    console.error(`Webhook Signature Verification Failed: ${err.message}`);
+    console.error(`Webhook Signature Error: ${err.message}`);
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
-  // 2. Handle the "Payment Success" Event
+  // 2. Handle successful checkout
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as any;
-    const storeId = session.metadata?.storeId || 'A001'; // Default to A001 if missing
+    
+    // Determine which Printful store to use from Stripe metadata
+    const storeId = session.metadata?.storeId || 'A001';
 
     try {
-      // 3. Create Fulfillment in the correct Printful Account
+      // 3. Trigger Printful Fulfillment
       await printfulRequest(storeId, 'orders', {
         method: 'POST',
         body: JSON.stringify({
@@ -44,19 +46,19 @@ export async function POST(req: Request) {
         }),
       });
 
-      // 4. Send Success Notification to Discord
+      // 4. Alert Discord of success
       await sendDiscordNotification(
-        "Order Successful!",
-        `✅ **Store ${storeId}** just received an order for **$${(session.amount_total / 100).toFixed(2)}**.\nCustomer: ${session.customer_details?.email}`,
-        0x00FF00 // Success Green
+        "Order Processed Successfully",
+        `✅ **Store ${storeId}** order confirmed for **$${(session.amount_total / 100).toFixed(2)}**.\nCustomer: ${session.customer_details?.email}`,
+        0x22c55e // Green
       );
 
-    } catch (fulfillmentError: any) {
-      // Alert Discord if Printful fails while Stripe succeeded
+    } catch (error: any) {
+      // Alert Discord if fulfillment fails
       await sendDiscordNotification(
-        "Fulfillment ERROR",
-        `⚠️ Payment was successful, but Printful order failed for **Store ${storeId}**.\nError: ${fulfillmentError.message}`,
-        0xFF0000 // Error Red
+        "Fulfillment Failure",
+        `⚠️ Stripe payment succeeded, but Printful order failed for **Store ${storeId}**.\nError: ${error.message}`,
+        0xef4444 // Red
       );
     }
   }
