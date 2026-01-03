@@ -1,69 +1,71 @@
 import React from 'react';
-import Image from 'next/image';
 
 /**
- * RaGuiRoMo Store: Bauhaus Product Grid
- * Features: Asymmetrical layout, thick borders, and high-contrast primary colors.
+ * RaGuiRoMo Store: Bauhaus Geometric Grid Component
+ * Designed for minimalism, clean lines, and dynamic user interaction.
  */
 
 const ProductGrid = () => {
-  // Mock data - This will eventually be replaced by your Printful API fetch
-  const products = [
-    { id: 1, name: "Geometric Tee", price: "$35", color: "bg-bauhaus-blue" },
-    { id: 2, name: "Abstract Print", price: "$25", color: "bg-bauhaus-red" },
-    { id: 3, name: "Identity Hoodie", price: "$65", color: "bg-bauhaus-yellow" },
+  // These categories represent the primary "chic" navigation blocks of your store
+  const categories = [
+    { 
+      title: "Apparel", 
+      color: "bg-[#0066FF]", // Bauhaus Blue
+      size: "md:col-span-2 h-[450px]", 
+      shape: "rounded-full" 
+    }, 
+    { 
+      title: "Art", 
+      color: "bg-[#FF0000]", // Bauhaus Red
+      size: "h-[450px]", 
+      shape: "rotate-45" 
+    }, 
+    { 
+      title: "Object", 
+      color: "bg-[#FFCC00]", // Bauhaus Yellow
+      size: "md:col-span-3 h-[300px]", 
+      shape: "w-full" 
+    },
   ];
 
   return (
-    <section className="border-t-4 border-black">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-0">
-        
-        {/* Large Featured "Chic" Tile */}
-        <div className="md:col-span-2 h-[500px] bg-bauhaus-blue p-10 flex flex-col justify-between border-b-4 md:border-b-0 md:border-r-4 border-black group cursor-pointer overflow-hidden relative">
-          <div className="z-10">
-            <span className="bg-black text-white px-3 py-1 text-sm font-black uppercase">Featured</span>
-            <h3 className="text-7xl font-black text-white uppercase leading-none mt-4 tracking-tighter">
-              New <br /> Drop
-            </h3>
-          </div>
-          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-bauhaus-yellow rounded-full transition-transform duration-700 group-hover:scale-150" />
-          <button className="z-10 w-fit bg-black text-white px-8 py-3 font-black uppercase hover:bg-white hover:text-black transition-colors">
-            Shop Collection
-          </button>
-        </div>
-
-        {/* Dynamic Product Column */}
-        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2">
-          {products.map((product) => (
-            <div 
-              key={product.id} 
-              className="h-[250px] p-6 border-b-4 border-black sm:border-r-4 last:border-r-0 flex flex-col justify-between group cursor-pointer hover:bg-black transition-colors duration-300"
-            >
-              <div className="flex justify-between items-start">
-                <div className={`w-12 h-12 rounded-full border-4 border-black ${product.color} group-hover:rounded-none transition-all duration-500`} />
-                <span className="font-black text-2xl group-hover:text-white">{product.price}</span>
-              </div>
-              <div>
-                <h4 className="font-black uppercase text-xl group-hover:text-white leading-tight">
-                  {product.name}
-                </h4>
-                <p className="text-sm font-bold uppercase group-hover:text-bauhaus-yellow">View Details →</p>
-              </div>
+    <section className="bg-[#F9F7F2] p-6 md:p-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {categories.map((cat, index) => (
+          <div 
+            key={index} 
+            className={`group relative overflow-hidden border-4 border-black transition-all duration-500 hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 cursor-pointer ${cat.color} ${cat.size}`}
+          >
+            {/* Minimalist Bauhaus Label */}
+            <div className="absolute top-8 left-8 z-10">
+              <h3 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mix-blend-difference group-hover:scale-110 transition-transform duration-500">
+                {cat.title}
+              </h3>
             </div>
-          ))}
 
-          {/* Minimalist "Identity" Block */}
-          <div className="h-[250px] bg-bauhaus-yellow p-6 border-b-4 border-black flex items-center justify-center text-center">
-             <p className="text-sm font-black uppercase tracking-widest leading-relaxed">
-               Inspired by <br /> Bauhaus <br /> & Identity
-             </p>
+            {/* Interactive Decorative Shapes inspired by your Logo */}
+            <div className={`absolute -bottom-12 -right-12 w-64 h-64 bg-black opacity-20 transition-all duration-700 group-hover:scale-150 group-hover:opacity-40 ${cat.shape}`} />
+            
+            {/* Dynamic "Chic" Call to Action */}
+            <div className="absolute bottom-8 left-8 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+              <span className="bg-white text-black px-6 py-2 font-black uppercase tracking-widest border-2 border-black">
+                Explore +
+              </span>
+            </div>
           </div>
-        </div>
+        ))}
 
+        {/* Dynamic Identity Statement Block */}
+        <div className="md:col-span-3 border-8 border-black p-16 flex items-center justify-center bg-white hover:bg-[#F9F7F2] transition-colors duration-500">
+          <p className="text-4xl md:text-6xl font-black uppercase text-center leading-[0.9] tracking-tighter italic">
+            Modern <span className="text-[#0066FF]">Design</span> <br /> 
+            Meets <span className="text-[#FF0000]">Pure</span> <br /> 
+            <span className="text-[#FFCC00]">Identity</span>
+          </p>
+        </div>
       </div>
     </section>
   );
 };
 
 export default ProductGrid;
-
