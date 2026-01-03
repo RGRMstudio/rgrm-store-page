@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
-// The clean, modern typeface for RaGuiRoMo Store
+// RaGuiRoMo Brand Typography
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     siteName: "RaGuiRoMo",
     images: [
       {
-        url: "/raguiromo-og.png", // Your brand logo for link previews
+        url: "/raguiromo-og.png", 
         width: 1200,
         height: 630,
       },
@@ -36,15 +37,16 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} bg-[#F9F7F2] text-black antialiased`}>
         
-        {/* RaGuiRoMo Global Frame: A permanent 8px architectural border */}
+        {/* RaGuiRoMo Architectural Frame */}
         <div className="min-h-screen flex flex-col border-8 border-black m-2 md:m-4">
           <main className="flex-grow">
             {children}
           </main>
         </div>
 
-        {/* Real-time Insights for RaGuiRoMo Store */}
+        {/* Performance & Visitor Tracking */}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
