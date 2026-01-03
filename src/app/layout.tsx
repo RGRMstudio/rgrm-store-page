@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 
-// Clean, high-end sans-serif font for the Bauhaus aesthetic
+// Professional sans-serif font for the Bauhaus aesthetic
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     siteName: "RaGuiRoMo",
     images: [
       {
-        url: "/og-image.png", // Ensure you add your Bauhaus logo here in /public
+        url: "/og-image.png", // Your Bauhaus logo for social sharing
         width: 1200,
         height: 630,
       },
@@ -35,7 +35,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} bg-[#F9F7F2] text-black antialiased`}>
-        {/* Global Structural Frame */}
+        
+        {/* Bauhaus Structural Frame: A permanent geometric border around the entire site */}
         <div className="min-h-screen flex flex-col border-8 border-black m-2 md:m-4">
           <main className="flex-grow">
             {children}
@@ -48,4 +49,3 @@ export default function RootLayout({
     </html>
   );
 }
-
