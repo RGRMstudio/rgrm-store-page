@@ -1,6 +1,6 @@
 /**
  * RaGuiRoMo Store: Dual-Printful Account Engine
- * Handles fulfillment routing between Store A001 and A002.
+ * Dynamically routes fulfillment based on Store ID.
  */
 
 export const getPrintfulToken = (storeId: string): string => {
