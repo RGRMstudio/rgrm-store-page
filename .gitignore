@@ -1,10 +1,9 @@
-# General
+# Dependencies
 node_modules
 .next
 out
-build
 
-# Environment Variables (Keep these secret!)
+# Environment Variables (IMPORTANT: Git must ignore these)
 .env
 .env.local
 .env.development.local
