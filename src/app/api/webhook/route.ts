@@ -1,66 +1,64 @@
-import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import Stripe from 'stripe';
-
-const stripeA001 = new Stripe(process.env.STRIPE_SECRET_KEY_A001!, { apiVersion: '2025-12-15.preview' as any });
-const stripeA002 = new Stripe(process.env.STRIPE_SECRET_KEY_A002!, { apiVersion: '2025-12-15.preview' as any });
+import { NextResponse } from 'next/server';
+import { stripeA001, stripeA002 } from '@/lib/stripe';
+import { printfulRequest } from '@/lib/printful';
+import { sendDiscordNotification } from '@/lib/discord';
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const sig = (await headers()).get('Stripe-Signature') as string;
-  let event: Stripe.Event | null = null;
-  let activeStore = '';
+  const signature = (await headers()).get('Stripe-Signature') as string;
 
-  const accounts = [
-    { secret: process.env.STRIPE_WEBHOOK_SECRET_A001!, id: 'A001', client: stripeA001 },
-    { secret: process.env.STRIPE_WEBHOOK_SECRET_A002!, id: 'A002', client: stripeA002 },
-  ];
+  let event;
 
-  for (const acc of accounts) {
-    try {
-      event = acc.client.webhooks.constructEvent(body, sig, acc.secret);
-      activeStore = acc.id;
-      break; 
-    } catch (err) { continue; }
+  try {
+    // 1. Verify that the event actually came from Stripe
+    event = stripeA001.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET_A001!
+    );
+  } catch (err: any) {
+    console.error(`Webhook Signature Verification Failed: ${err.message}`);
+    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
-  if (!event) return NextResponse.json({ error: 'RGRM Security: Invalid Signature' }, { status: 400 });
-
+  // 2. Handle the "Payment Success" Event
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    
-    // EMAIL & DATA CAPTURE
-    const customerEmail = session.customer_details?.email;
-    const customerName = session.customer_details?.name;
-    const productId = session.metadata?.productId || 'Unknown Asset';
+    const session = event.data.object as any;
+    const storeId = session.metadata?.storeId || 'A001'; // Default to A001 if missing
 
-    console.log(`📩 RGRM LEADS: Captured email ${customerEmail} for Store ${activeStore}`);
+    try {
+      // 3. Create Fulfillment in the correct Printful Account
+      await printfulRequest(storeId, 'orders', {
+        method: 'POST',
+        body: JSON.stringify({
+          recipient: {
+            name: session.shipping_details?.name,
+            address1: session.shipping_details?.address?.line1,
+            city: session.shipping_details?.address?.city,
+            state_code: session.shipping_details?.address?.state,
+            country_code: session.shipping_details?.address?.country,
+            zip: session.shipping_details?.address?.postal_code,
+          },
+          items: session.metadata?.items ? JSON.parse(session.metadata.items) : [],
+        }),
+      });
 
-    // DISCORD ALERT with Email
-    await fetch(process.env.DISCORD_WEBHOOK_URL!, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `⬛️🟨🟥 **NEW RGRM ACQUISITION** 🟥🟨⬛️`,
-        embeds: [{
-          title: `RGRM Store ${activeStore} Success`,
-          description: `**Collector:** ${customerName} (${customerEmail})\n**Asset:** ${productId}\n**Status:** Fulfillment Dispatched`,
-          color: activeStore === 'A001' ? 0xFFFF00 : 0xFF0000 
-        }]
-      })
-    });
+      // 4. Send Success Notification to Discord
+      await sendDiscordNotification(
+        "Order Successful!",
+        `✅ **Store ${storeId}** just received an order for **$${(session.amount_total / 100).toFixed(2)}**.\nCustomer: ${session.customer_details?.email}`,
+        0x00FF00 // Success Green
+      );
 
-    // PRINTFUL DISPATCH
-    const printfulKey = activeStore === 'A001' ? process.env.PRINTFUL_STORE_A001_KEY : process.env.PRINTFUL_STORE_A002_KEY;
-    await fetch('https://api.printful.com/orders', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${printfulKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipient: { name: customerName, email: customerEmail, address1: session.shipping_details?.address?.line1, city: session.shipping_details?.address?.city, country_code: session.shipping_details?.address?.country, zip: session.shipping_details?.address?.postal_code },
-        items: [{ external_id: productId, quantity: 1 }],
-        confirm: false 
-      })
-    });
+    } catch (fulfillmentError: any) {
+      // Alert Discord if Printful fails while Stripe succeeded
+      await sendDiscordNotification(
+        "Fulfillment ERROR",
+        `⚠️ Payment was successful, but Printful order failed for **Store ${storeId}**.\nError: ${fulfillmentError.message}`,
+        0xFF0000 // Error Red
+      );
+    }
   }
 
   return NextResponse.json({ received: true });
