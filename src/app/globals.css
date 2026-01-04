@@ -1,10 +1,10 @@
+/* 1. Use the new v4 import style */
 @import "tailwindcss";
 
-/* If you have custom styles using @apply, use them like this: */
+/* 2. Wrap custom global styles in @layer base */
 @layer base {
   * {
-    /* Use standard classes directly. In v4, @apply is more strict. */
-    @apply border-black; 
+    /* v4 is strict: if @apply fails here, ensure @import is above it */
+    @apply border-black;
   }
 }
-
