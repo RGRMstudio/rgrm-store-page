@@ -1,34 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --bauhaus-blue: #0066FF;
-  --bauhaus-red: #FF0000;
-  --bauhaus-yellow: #FFCC00;
-  --off-white: #F9F7F2;
-}
-
-body {
-  background-color: var(--off-white);
-  color: black;
-  font-family: 'Inter', sans-serif; /* High-end, clean sans-serif */
-}
-
-/* Bauhaus "Chic" Utility Classes */
-@layer components {
-  .bauhaus-border {
-    @apply border-4 border-black;
-  }
-  
-  .bauhaus-button {
-    @apply bauhaus-border px-8 py-3 uppercase font-black tracking-tighter 
-           transition-all duration-300 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
-  }
-
-  /* Interactive shape hover effect */
-  .geometric-card {
-    @apply bauhaus-border aspect-square flex items-center justify-center 
-           transition-all duration-500 hover:rounded-full overflow-hidden;
+/* If you have custom styles using @apply, use them like this: */
+@layer base {
+  * {
+    /* Use standard classes directly. In v4, @apply is more strict. */
+    @apply border-black; 
   }
 }
+
