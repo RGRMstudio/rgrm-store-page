@@ -1,65 +1,46 @@
-import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { stripeA001 } from '@/lib/stripe';
-import { printfulRequest } from '@/lib/printful';
-import { sendDiscordNotification } from '@/lib/discord';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2023-10-16', // Ensures compatibility with the latest Stripe features
+});
+
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = (await headers()).get('Stripe-Signature') as string;
+  const signature = req.headers.get('stripe-signature')!;
 
-  let event;
+  let event: Stripe.Event;
 
   try {
-    // 1. Verify the event authenticity
-    event = stripeA001.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET_A001!
-    );
+    // Verify the event came from Stripe to prevent fraudulent requests
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
-    console.error(`Webhook Signature Error: ${err.message}`);
-    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+    console.error(`Webhook signature verification failed: ${err.message}`);
+    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
   }
 
-  // 2. Handle successful checkout
+  // Handle the successful checkout event for RaGuiRoMo Store
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as any;
-    
-    // Determine which Printful store to use from Stripe metadata
-    const storeId = session.metadata?.storeId || 'A001';
+    const session = event.data.object as Stripe.Checkout.Session;
 
-    try {
-      // 3. Trigger Printful Fulfillment
-      await printfulRequest(storeId, 'orders', {
-        method: 'POST',
-        body: JSON.stringify({
-          recipient: {
-            name: session.shipping_details?.name,
-            address1: session.shipping_details?.address?.line1,
-            city: session.shipping_details?.address?.city,
-            state_code: session.shipping_details?.address?.state,
-            country_code: session.shipping_details?.address?.country,
-            zip: session.shipping_details?.address?.postal_code,
-          },
-          items: session.metadata?.items ? JSON.parse(session.metadata.items) : [],
-        }),
-      });
-
-      // 4. Alert Discord of success
-      await sendDiscordNotification(
-        "Order Processed Successfully",
-        `✅ **Store ${storeId}** order confirmed for **$${(session.amount_total / 100).toFixed(2)}**.\nCustomer: ${session.customer_details?.email}`,
-        0x22c55e // Green
-      );
-
-    } catch (error: any) {
-      // Alert Discord if fulfillment fails
-      await sendDiscordNotification(
-        "Fulfillment Failure",
-        `⚠️ Stripe payment succeeded, but Printful order failed for **Store ${storeId}**.\nError: ${error.message}`,
-        0xef4444 // Red
-      );
+    // Organic Marketing: Post real-time sales alert to Discord
+    if (process.env.DISCORD_WEBHOOK_URL) {
+      try {
+        await fetch(process.env.DISCORD_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `🚀 **New Identity Acquisition!**\n` +
+                     `Total: **$${(session.amount_total! / 100).toFixed(2)}**\n` +
+                     `Customer: ${session.customer_details?.email || 'Anonymous'}\n` +
+                     `View Dashboard: https://dashboard.stripe.com/payments/${session.payment_intent}`,
+          }),
+        });
+      } catch (discordError) {
+        console.error('Failed to send Discord notification:', discordError);
+      }
     }
   }
 
