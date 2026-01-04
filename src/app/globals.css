@@ -1,8 +1,32 @@
 @import "tailwindcss";
 
+/* 1. Theme Configuration (Replaces tailwind.config.js logic) */
+@theme {
+  --color-brand: #000000;
+  /* Add other custom variables here */
+}
+
+/* 2. Base Styles & Global Resets */
 @layer base {
   * {
-    /* If @apply still fails, use @reference below */
+    /* Standardizes all borders to black to fix your 'unknown utility' crash */
     @apply border-black;
   }
+
+  body {
+    @apply bg-white text-black antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+}
+
+/* 3. Custom Global Utilities */
+@utility container-custom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 4. Preflight & Specific Element Resets */
+@layer components {
+  /* Your custom component styles go here */
 }
