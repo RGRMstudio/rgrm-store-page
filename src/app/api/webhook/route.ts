@@ -1,43 +1,39 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { Resend } from 'resend';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
-  const body = await req.text();
-  const signature = req.headers.get('stripe-signature')!;
-  let event: Stripe.Event;
-
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
-  }
+    const data = await req.json();
+    
+    // 1. Extract the data sent by your storefront or Stripe
+    const { email, firstName, certificateUrl, orderNumber } = data;
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const customerEmail = session.customer_details?.email;
+    // 2. Fire the Transactional Email via Loops
+    const response = await fetch('https://app.loops.so/api/v1/transactional', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        transactionalId: "PASTE_YOUR_TRANSACTIONAL_ID_HERE", // Found on the 'Publish' page in Loops
+        email: email,
+        dataVariables: {
+          firstName: firstName,          // Matches {DATA_VARIABLE:firstName} in your template
+          certificateLink: certificateUrl, // Matches {DATA_VARIABLE:certificateLink} 
+          orderNumber: orderNumber       // Matches {DATA_VARIABLE:orderNumber}
+        },
+      }),
+    });
 
-    // 1. Send the "Identity Certificate" via Resend
-    if (customerEmail) {
-      await resend.emails.send({
-        from: 'RaGuiRoMo Store <studio@raguiromo.store>',
-        to: customerEmail,
-        subject: 'Certificate of Identity // Acquisition Confirmed',
-        html: `<h1>CERTIFICATE OF IDENTITY</h1><p>This document confirms your acquisition of a limited-run object from the inaugural collection.</p>`
-      });
+    const result = await response.json();
+
+    if (result.success) {
+      return NextResponse.json({ message: 'Certificate email sent!' }, { status: 200 });
+    } else {
+      console.error('Loops Error:', result.message);
+      return NextResponse.json({ error: result.message }, { status: 400 });
     }
-
-    // 2. Alert Discord
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: `🚀 **New Identity Acquisition!** Total: $${(session.amount_total! / 100).toFixed(2)}` }),
-      });
-    }
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-  return NextResponse.json({ received: true });
 }
