@@ -1,33 +1,37 @@
+import { createCheckoutSession } from './actions/checkout';
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#F9F7F2] text-black font-sans">
-      {/* Dynamic Navigation */}
-      <nav className="p-8 flex justify-between items-center border-b-4 border-black">
-        <h1 className="text-4xl font-black tracking-tighter uppercase">RaGuiRoMo</h1>
-        <div className="space-x-8 font-bold uppercase tracking-widest">
-          <a href="/shop" className="hover:text-[#0066FF]">Shop</a>
-          <a href="/cart" className="hover:text-[#FF0000]">Cart</a>
-        </div>
-      </nav>
+    <div className="max-w-4xl mx-auto px-6 py-20 text-center">
+      <h1 className="text-4xl md:text-6xl font-light tracking-tighter mb-6">
+        The Identity <span className="text-[#D4AF37]">Registry</span>
+      </h1>
+      <p className="text-gray-400 text-sm max-w-lg mx-auto mb-12 leading-relaxed">
+        Secure your bespoke digital certificate. Authenticated, archived, and delivered to your doorstep.
+      </p>
 
-      {/* Bauhaus Hero Section */}
-      <section className="relative h-[80vh] flex items-center px-12 overflow-hidden">
-        <div className="z-10 max-w-2xl">
-          <h2 className="text-8xl font-black leading-none uppercase mb-6">
-            Design <br /> <span className="text-[#0066FF]">Meets</span> <br /> Identity.
-          </h2>
-          <button className="bg-black text-white px-10 py-4 font-bold uppercase hover:bg-[#FFCC00] hover:text-black transition-colors">
-            Explore Collection
+      {/* Primary Action: Stripe Checkout */}
+      <form action={createCheckoutSession} className="mb-20">
+        <button type="submit" className="btn-gold">
+          Acquire Certificate
+        </button>
+      </form>
+
+      {/* Secondary Action: Registry/Newsletter */}
+      <div className="border-t border-gray-900 pt-20">
+        <h2 className="text-xs uppercase tracking-[0.3em] mb-8 text-gray-500">Join the Archive</h2>
+        <form className="flex flex-col md:flex-row gap-4 justify-center max-w-md mx-auto">
+          <input 
+            type="email" 
+            placeholder="EMAIL ADDRESS" 
+            className="bg-transparent border-b border-gray-800 p-2 text-xs focus:border-[#D4AF37] outline-none"
+            required
+          />
+          <button className="text-[10px] uppercase tracking-widest hover:text-[#D4AF37] transition-colors">
+            Register
           </button>
-        </div>
-
-        {/* Dynamic Abstract Shapes (Logo Inspiration) */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-full hidden lg:block">
-          <div className="absolute w-64 h-64 bg-[#0066FF] rounded-full top-10 right-20 animate-pulse" />
-          <div className="absolute w-80 h-80 bg-[#FF0000] top-40 right-40 rotate-12" />
-          <div className="absolute w-96 h-48 bg-[#FFCC00] bottom-20 right-10" />
-        </div>
-      </section>
-    </main>
+        </form>
+      </div>
+    </div>
   );
 }
