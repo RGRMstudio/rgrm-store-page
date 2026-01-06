@@ -1,20 +1,14 @@
 export async function sendNotification(message: string) {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  
-  if (!webhookUrl) {
-    console.warn('Discord Webhook URL is missing. Skipping notification.');
-    return;
-  }
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url) return;
 
   try {
-    await fetch(webhookUrl, {
+    await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `🔔 **Boutique Alert:** ${message}`,
-      }),
+      body: JSON.stringify({ content: `🔔 **Boutique Update:** ${message}` }),
     });
   } catch (error) {
-    console.error('Failed to send Discord notification:', error);
+    console.error('Discord Notification Failed:', error);
   }
 }
