@@ -1,5 +1,9 @@
 {
-  "installCommand": "npm install --legacy-peer-deps",
+  "version": 2,
   "framework": "nextjs",
-  "crons": []
+  "regions": ["iad1"],
+  "cleanUrls": true,
+  "github": {
+    "silent": true
+  }
 }
