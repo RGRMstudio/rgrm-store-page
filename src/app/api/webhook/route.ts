@@ -1,4 +1,5 @@
 import { stripe } from '@/lib/stripe';
+import { sendNotification } from '@/lib/discord';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +10,11 @@ export async function POST(req: Request) {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(
+      body, 
+      signature, 
+      process.env.STRIPE_WEBHOOK_SECRET!
+    );
   } catch (err: any) {
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
@@ -17,6 +22,10 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as any;
 
+    // 1. Notify you on Discord
+    await sendNotification(`💰 Sale! ${session.customer_details.email} purchased a Certificate.`);
+
+    // 2. Trigger Loops Transactional Email
     await fetch('https://app.loops.so/api/v1/transactional', {
       method: 'POST',
       headers: {
@@ -27,7 +36,7 @@ export async function POST(req: Request) {
         transactionalId: process.env.LOOPS_TRANSACTIONAL_ID,
         email: session.customer_details.email,
         dataVariables: {
-          firstName: session.customer_details.name.split(' ')[0],
+          firstName: session.customer_details.name?.split(' ')[0] || 'Customer',
           orderNumber: session.id.slice(-8).toUpperCase(),
         },
       }),
