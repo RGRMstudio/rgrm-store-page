@@ -1,35 +1,15 @@
-// src/components/Lookbook.tsx
-import React from 'react';
-
-export default function Lookbook() {
-  const lookbookItems = [
-    { title: "Pure Identity", subtitle: "The Tee", color: "bg-[#0066FF]", text: "text-white" },
-    { title: "Modern Design", subtitle: "The Print", color: "bg-[#FF0000]", text: "text-white" },
-    { title: "Geometric Soul", subtitle: "The Object", color: "bg-[#FFCC00]", text: "text-black" },
-  ];
+export default function LookBook() {
+  const images = [1, 2, 3, 4]; // Placeholders for your product shots
 
   return (
-    <section className="h-screen overflow-y-scroll snap-y snap-mandatory border-t-8 border-black">
-      {lookbookItems.map((item, index) => (
-        <div 
-          key={index} 
-          className={`h-screen w-full snap-start flex flex-col items-center justify-center p-12 relative ${item.color} ${item.text}`}
-        >
-          <div className="border-8 border-black p-8 md:p-16 flex flex-col items-center bg-white/10 backdrop-blur-sm">
-            <span className="text-xl font-black uppercase tracking-[0.3em] mb-4">{item.subtitle}</span>
-            <h2 className="text-6xl md:text-9xl font-black uppercase tracking-tighter text-center leading-none">
-              {item.title}
-            </h2>
+    <section className="py-24 px-4 bg-white">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        {images.map((id) => (
+          <div key={id} className="aspect-[3/4] bg-gray-50 flex items-center justify-center border border-gray-100 hover:border-black transition-colors overflow-hidden">
+             <span className="text-[10px] uppercase tracking-widest text-gray-300">Artifact 00{id}</span>
           </div>
-          
-          {/* Brand Signature Decoration */}
-          <div className="absolute bottom-12 right-12">
-            <p className="text-2xl font-black uppercase rotate-90 origin-bottom-right tracking-widest opacity-30">
-              RaGuiRoMo Store // 2026
-            </p>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
   );
 }
