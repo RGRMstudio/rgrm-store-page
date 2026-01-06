@@ -1,32 +1,23 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* 1. Theme Configuration (Replaces tailwind.config.js logic) */
-@theme {
-  --color-brand: #000000;
-  /* Add other custom variables here */
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --accent-gold: #D4AF37;
 }
 
-/* 2. Base Styles & Global Resets */
-@layer base {
-  * {
-    /* Standardizes all borders to black to fix your 'unknown utility' crash */
-    @apply border-black;
-  }
-
-  body {
-    @apply bg-white text-black antialiased;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 3. Custom Global Utilities */
-@utility container-custom {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-/* 4. Preflight & Specific Element Resets */
-@layer components {
-  /* Your custom component styles go here */
+/* Custom Gold Button Styling */
+.btn-gold {
+  @apply border border-[--accent-gold] text-[--accent-gold] px-8 py-3 
+         uppercase tracking-widest text-xs transition-all duration-300
+         hover:bg-[--accent-gold] hover:text-black;
 }
