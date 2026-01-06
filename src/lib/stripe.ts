@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
 
+// This ensures the app fails early if you forgot to add the key to Vercel
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is missing from environment variables');
+  throw new Error('STRIPE_SECRET_KEY is missing. Add it to Vercel Environment Variables.');
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
