@@ -1,20 +1,21 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
       colors: {
-        bauhaus: {
-          blue: "#0066FF",
-          red: "#FF0000",
-          yellow: "#FFCC00",
-          white: "#F9F7F2",
-        },
+        background: "var(--background)",
+        foreground: "var(--foreground)",
       },
-      borderWidth: {
-        '4': '4px',
-        '8': '8px',
+      fontFamily: {
+        // High-end serif for certificates, clean sans for UI
+        serif: ['var(--font-serif)', 'serif'],
+        sans: ['var(--font-sans)', 'sans-serif'],
       },
     },
   },
