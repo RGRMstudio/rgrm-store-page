@@ -1,9 +1,9 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "regions": ["iad1"],
   "cleanUrls": true,
   "github": {
     "silent": true
-  }
+  },
+  "regions": ["iad1"]
 }
