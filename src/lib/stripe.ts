@@ -1,17 +1,10 @@
 import Stripe from 'stripe';
 
-/**
- * RaGuiRoMo Store: Stripe Engine
- * Optimized for API version '2025-02-24.acacia'
- */
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY is missing from environment variables');
+}
 
-// We use 'as any' to satisfy strict TypeScript version pinning in Vercel
-export const stripeA001 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia' as any,
-  typescript: true,
-});
-
-export const stripeA002 = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia' as any,
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: '2024-12-18.acacia', // Latest stable version
   typescript: true,
 });
