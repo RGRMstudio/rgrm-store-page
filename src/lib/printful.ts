@@ -1,18 +1,6 @@
-/**
- * Printful API Library for RGRM Boutique
- * Handles automated fulfillment for physical certificates.
- */
-
 const PRINTFUL_API_URL = 'https://api.printful.com';
 
-if (!process.env.PRINTFUL_ACCESS_TOKEN) {
-  console.warn('PRINTFUL_ACCESS_TOKEN is missing from environment variables.');
-}
-
 export const printful = {
-  /**
-   * Sends a request to the Printful API
-   */
   async request(endpoint: string, method = 'GET', body?: any) {
     const response = await fetch(`${PRINTFUL_API_URL}${endpoint}`, {
       method,
@@ -26,33 +14,25 @@ export const printful = {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(`Printful API Error: ${data.error?.message || response.statusText}`);
+      throw new Error(`Printful Error: ${data.error?.message || response.statusText}`);
     }
 
     return data.result;
   },
 
-  /**
-   * Creates a draft order in Printful
-   * This is usually triggered by your Stripe Webhook after a successful sale.
-   */
-  async createOrder(customerData: any, itemVariantId: number) {
+  // Example: Use this in your webhook to automate fulfillment
+  async createOrder(customer: any, variantId: number) {
     return this.request('/orders', 'POST', {
       recipient: {
-        name: customerData.name,
-        email: customerData.email,
-        address1: customerData.address.line1,
-        city: customerData.address.city,
-        state_code: customerData.address.state,
-        country_code: customerData.address.country,
-        zip: customerData.address.postal_code,
+        name: customer.name,
+        email: customer.email,
+        address1: customer.address.line1,
+        city: customer.address.city,
+        country_code: customer.address.country,
+        zip: customer.address.postal_code,
       },
-      items: [
-        {
-          variant_id: itemVariantId,
-          quantity: 1,
-        },
-      ],
+      items: [{ variant_id: variantId, quantity: 1 }],
     });
-  },
+  }
 };
+
