@@ -13,7 +13,9 @@ import ContactSection from '@/components/ContactSection';
 import SocialGallery from '@/components/SocialGallery';
 import IdentityPop from '@/components/IdentityPop';
 
-gsap.registerPlugin(ScrollTrigger);
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function Home() {
   useEffect(() => {
