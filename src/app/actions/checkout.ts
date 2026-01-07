@@ -1,19 +1,28 @@
-'use server'
+'use server';
 
-import { stripe } from '@/lib/stripe'; 
-import { headers } from 'next/headers';
+import { stripe } from '@/lib/stripe'; // Use the verified lib instance
 import { redirect } from 'next/navigation';
 
 export async function createCheckoutSession() {
-  const priceId = process.env.STRIPE_PRICE_ID; 
-  const origin = (await headers()).get('origin');
+  try {
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          // Ensure this Price ID matches your Stripe Dashboard exactly
+          price: process.env.STRIPE_PRICE_ID, 
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
+    });
 
-  const session = await stripe.checkout.sessions.create({
-    line_items: [{ price: priceId, quantity: 1 }],
-    mode: 'payment',
-    success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/`,
-  });
-
-  redirect(session.url!);
+    if (session.url) {
+      redirect(session.url);
+    }
+  } catch (error: any) {
+    console.error('Checkout Error:', error.message);
+    throw new Error('Failed to create checkout session.');
+  }
 }
