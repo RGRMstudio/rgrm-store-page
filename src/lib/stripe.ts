@@ -1,45 +1,41 @@
 import Stripe from 'stripe';
 
 /**
- * PRODUCTION STRIPE CONFIGURATION
- * * This file initializes the Stripe SDK using the Secret Key 
- * provided in your Vercel Environment Variables.
+ * PRODUCTION STRIPE INITIALIZATION
+ * This file pulls the Secret Key from your Vercel Environment Variables.
  */
 
-// 1. Extract the Secret Key from environment variables
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
-// 2. Strict Validation: If the key is missing, the app will log a clear error
+// Strict Validation: This ensures we catch missing keys during the build/runtime
 if (!stripeSecretKey) {
   console.error(
-    '❌ STRIPE ERROR: STRIPE_SECRET_KEY is missing. ' +
-    'Please add it to your Vercel Environment Variables.'
+    '❌ STRIPE CONFIGURATION ERROR: STRIPE_SECRET_KEY is missing. ' +
+    'Check your Vercel Environment Variables.'
   );
 }
 
-// 3. Initialize the Stripe instance
 export const stripe = new Stripe(stripeSecretKey || '', {
-  // Use the latest stable API version for your RGRM Boutique
+  // Utilizing the stable API version for the RGRM Boutique
   apiVersion: '2024-12-18.acacia',
   typescript: true,
   appInfo: {
-    name: "RGRM Boutique Store",
+    name: "RGRM Boutique",
     version: "1.0.0",
   },
 });
 
 /**
- * Diagnostic Helper: 
- * You can call this in your API routes to verify 
- * if your Vercel keys are actually connecting to Stripe.
+ * Diagnostic helper to verify the Stripe connection.
+ * Call this in your API routes to check connectivity in Vercel logs.
  */
 export async function verifyStripeConnection() {
   try {
     const account = await stripe.accounts.retrieve();
-    console.log('✅ Stripe Connection Verified:', account.id);
-    return { success: true, accountId: account.id };
+    console.log('✅ Stripe Connection Successful:', account.id);
+    return true;
   } catch (error: any) {
-    console.error('❌ Stripe Verification Failed:', error.message);
-    return { success: false, error: error.message };
+    console.error('❌ Stripe Connection Failed:', error.message);
+    return false;
   }
 }
