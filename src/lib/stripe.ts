@@ -1,25 +1,45 @@
-import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import Stripe from 'stripe';
 
-export async function POST(req: Request) {
+/**
+ * PRODUCTION STRIPE CONFIGURATION
+ * * This file initializes the Stripe SDK using the Secret Key 
+ * provided in your Vercel Environment Variables.
+ */
+
+// 1. Extract the Secret Key from environment variables
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+// 2. Strict Validation: If the key is missing, the app will log a clear error
+if (!stripeSecretKey) {
+  console.error(
+    '❌ STRIPE ERROR: STRIPE_SECRET_KEY is missing. ' +
+    'Please add it to your Vercel Environment Variables.'
+  );
+}
+
+// 3. Initialize the Stripe instance
+export const stripe = new Stripe(stripeSecretKey || '', {
+  // Use the latest stable API version for your RGRM Boutique
+  apiVersion: '2024-12-18.acacia',
+  typescript: true,
+  appInfo: {
+    name: "RGRM Boutique Store",
+    version: "1.0.0",
+  },
+});
+
+/**
+ * Diagnostic Helper: 
+ * You can call this in your API routes to verify 
+ * if your Vercel keys are actually connecting to Stripe.
+ */
+export async function verifyStripeConnection() {
   try {
-    const priceId = process.env.STRIPE_PRICE_ID;
-    
-    // Safety check: If this fails, look at your Vercel Env Variables
-    if (!priceId) {
-      throw new Error('STRIPE_PRICE_ID is not defined in Vercel settings');
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
-    });
-
-    return NextResponse.json({ url: session.url });
+    const account = await stripe.accounts.retrieve();
+    console.log('✅ Stripe Connection Verified:', account.id);
+    return { success: true, accountId: account.id };
   } catch (error: any) {
-    console.error('Stripe Error:', error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('❌ Stripe Verification Failed:', error.message);
+    return { success: false, error: error.message };
   }
 }
