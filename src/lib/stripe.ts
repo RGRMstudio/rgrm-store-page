@@ -1,35 +1,25 @@
-import Stripe from 'stripe';
+import { NextResponse } from 'next/server';
+import { stripe } from '@/lib/stripe';
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  console.error('CRITICAL: STRIPE_SECRET_KEY is missing from environment variables.');
-}
-
-export const stripe = new Stripe(stripeSecretKey || '', {
-  apiVersion: '2024-12-18.acacia',
-  typescript: true,
-  appInfo: {
-    name: "RGRM Boutique",
-    version: "1.0.0",
-  },
-});
-
-/**
- * Diagnostic helper to verify the Stripe connection
- * Check your Vercel logs to see the output of this function.
- */
-export async function verifyStripeConnection() {
+export async function POST(req: Request) {
   try {
-    const account = await stripe.accounts.retrieve();
-    console.log('✅ Stripe Connection Successful: Verified account', account.id);
-    return true;
-  } catch (error: any) {
-    console.error('❌ Stripe Connection Failed:', {
-      message: error.message,
-      type: error.type,
-      code: error.code,
+    const priceId = process.env.STRIPE_PRICE_ID;
+    
+    // Safety check: If this fails, look at your Vercel Env Variables
+    if (!priceId) {
+      throw new Error('STRIPE_PRICE_ID is not defined in Vercel settings');
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
     });
-    return false;
+
+    return NextResponse.json({ url: session.url });
+  } catch (error: any) {
+    console.error('Stripe Error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
