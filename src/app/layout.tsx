@@ -1,24 +1,18 @@
-import './globals.css';
-import { Inter } from 'next/font/google';
+import { Metadata } from 'next';
 
-const inter = Inter({ subsets: ['latin'] });
-
-export const metadata = {
-  title: 'RGRM Boutique | Bauhaus Registry',
-  description: 'Minimalist Digital & Physical Artifacts',
+export const metadata: Metadata = {
+  title: 'Checkout | RGRM Registry',
+  description: 'Secure Identity Registration',
 };
 
-export default function RootLayout({
+export default function CheckoutLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {/* CRITICAL: This variable renders your page content */}
-        {children}
-      </body>
-    </html>
+    <section className="bg-white min-h-screen">
+      {children}
+    </section>
   );
 }
