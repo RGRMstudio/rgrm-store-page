@@ -1,11 +1,8 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'RGRM Boutique | Bauhaus Registry',
-  description: 'Digital Registry and Physical Artifacts by RGRM Studio.',
+  title: 'RGRM Boutique',
+  description: 'Bauhaus Minimalist Registry',
 };
 
 export default function RootLayout({
@@ -15,8 +12,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {/* This renders the content of page.tsx */}
+      <body>
+        {/* If this variable is missing, the screen is white */}
         {children}
       </body>
     </html>
