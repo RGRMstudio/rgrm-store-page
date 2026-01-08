@@ -1,18 +1,19 @@
-import { Metadata } from 'next';
+import './globals.css';
+import { Inter } from 'next/font/google';
 
-export const metadata: Metadata = {
-  title: 'Checkout | RGRM Registry',
-  description: 'Secure Identity Registration',
-};
+const inter = Inter({ subsets: ['latin'] });
 
-export default function CheckoutLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white min-h-screen">
-      {children}
-    </section>
+    <html lang="en">
+      <body className={inter.className}>
+        {/* If children is missing here, the site stays white */}
+        {children}
+      </body>
+    </html>
   );
 }
