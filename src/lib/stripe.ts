@@ -1,8 +1,12 @@
 import Stripe from 'stripe';
 
-const key = process.env.STRIPE_SECRET_KEY || '';
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
-export const stripe = new Stripe(key, {
+if (!stripeSecretKey) {
+  console.error('❌ STRIPE_SECRET_KEY is missing in Environment Variables');
+}
+
+export const stripe = new Stripe(stripeSecretKey || '', {
   apiVersion: '2024-12-18.acacia',
   typescript: true,
 });
