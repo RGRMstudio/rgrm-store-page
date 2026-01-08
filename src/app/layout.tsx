@@ -1,33 +1,24 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import './globals.css';
+import { Inter } from 'next/font/google';
 
-export const metadata: Metadata = {
-  title: "Ragui Romo | Identity Registry",
-  description: "Bespoke digital identity certificates.",
-  icons: {
-    icon: "/icon.png",
-    apple: "/apple-icon.png",
-  },
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  title: 'RGRM Boutique | Bauhaus Registry',
+  description: 'Minimalist Digital & Physical Artifacts',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className="antialiased selection:bg-[#D4AF37] selection:text-black">
-        <header className="p-8 flex justify-center">
-          {/* Logo will load from /public/logo.png */}
-          <img src="/logo.png" alt="RGRM Logo" className="h-12 w-auto" />
-        </header>
-        <main>{children}</main>
-        <footer className="p-10 text-center opacity-40 text-[10px] tracking-[0.2em] uppercase">
-          © 2026 Ragui Romo Flagship
-        </footer>
+      <body className={inter.className}>
+        {/* CRITICAL: This variable renders your page content */}
+        {children}
       </body>
     </html>
   );
 }
-
