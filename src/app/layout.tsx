@@ -3,6 +3,11 @@ import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 
+export const metadata = {
+  title: 'RGRM Boutique | Bauhaus Registry',
+  description: 'Digital Registry and Physical Artifacts by RGRM Studio.',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -11,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* If children is missing here, the site stays white */}
+        {/* This renders the content of page.tsx */}
         {children}
       </body>
     </html>
