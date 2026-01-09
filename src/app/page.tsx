@@ -13,13 +13,14 @@ export default function Home() {
     setIsMounted(true);
 
     if (typeof window !== 'undefined') {
-      // Bauhaus Entrance Animation
-      gsap.fromTo('.hero-content', 
+      // Entrance Animation
+      const tl = gsap.timeline();
+      tl.fromTo('.hero-content', 
         { opacity: 0, y: 30 }, 
         { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.2 }
       );
 
-      // Subtle geometric floating effect
+      // Floating Bauhaus Shapes
       gsap.to('.bauhaus-shape', {
         y: 20,
         duration: 3,
@@ -31,7 +32,7 @@ export default function Home() {
     }
   }, []);
 
-  // Safety gate: Show a clean white background during initial mount
+  // Hydration Guard to prevent blank screen
   if (!isMounted) return <div className="min-h-screen bg-white" />;
 
   return (
@@ -41,10 +42,9 @@ export default function Home() {
 
       <section className="relative flex flex-col items-center justify-center min-h-screen text-center px-6">
         
-        {/* Animated Bauhaus Geometric Elements */}
+        {/* Background Decorative Elements */}
         <div className="bauhaus-shape absolute top-[15%] left-[10%] w-32 h-32 bg-[#e63946] rounded-full opacity-10 -z-10" />
         <div className="bauhaus-shape absolute bottom-[20%] right-[8%] w-56 h-14 bg-[#457b9d] opacity-10 -z-10" />
-        <div className="bauhaus-shape absolute top-[40%] right-[15%] w-0 h-0 border-l-[30px] border-l-transparent border-r-[30px] border-r-transparent border-b-[50px] border-b-[#ffd166] opacity-10 -z-10" />
 
         <div className="hero-content z-10 max-w-5xl">
           <h1 className="text-7xl md:text-[9rem] font-bold tracking-tighter uppercase leading-none mb-4">
