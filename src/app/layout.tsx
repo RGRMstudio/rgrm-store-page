@@ -1,19 +1,9 @@
 import './globals.css';
 
-export const metadata = {
-  title: 'RGRM Boutique',
-  description: 'Bauhaus Minimalist Registry',
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        {/* If this variable is missing, the screen is white */}
+      <body style={{ margin: 0, padding: 0, backgroundColor: 'white' }}>
         {children}
       </body>
     </html>
