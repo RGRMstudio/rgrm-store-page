@@ -47,7 +47,7 @@ export default function Home() {
 
       <section className="relative flex flex-col items-center justify-center min-h-screen text-center px-6">
         
-        {/* Background Geometric Elements */}
+        {/* Background Geometric Elements (Bauhaus Aesthetic) */}
         <div className="bauhaus-shape absolute top-[15%] left-[8%] w-32 h-32 bg-[#e63946] rounded-full opacity-10 -z-10" />
         <div className="bauhaus-shape absolute bottom-[25%] right-[5%] w-64 h-16 bg-[#457b9d] opacity-10 -z-10" />
 
