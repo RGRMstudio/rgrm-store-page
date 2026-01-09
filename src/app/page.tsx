@@ -7,55 +7,51 @@ import ProductGrid from '@/components/ProductGrid';
 import IdentityPop from '@/components/IdentityPop';
 
 export default function Home() {
-  const [isReady, setIsReady] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Open the gate once the browser is ready
-    setIsReady(true);
+    setIsMounted(true);
 
     if (typeof window !== 'undefined') {
-      const tl = gsap.timeline();
-      
-      // Bauhaus Fade-in
-      tl.from('.hero-content', {
-        opacity: 0,
-        y: 40,
-        duration: 1.2,
-        ease: 'power3.out'
-      });
+      // Bauhaus Entrance Animation
+      gsap.fromTo('.hero-content', 
+        { opacity: 0, y: 30 }, 
+        { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.2 }
+      );
 
-      // Subtle motion for background shapes
+      // Subtle geometric floating effect
       gsap.to('.bauhaus-shape', {
-        y: 15,
-        duration: 4,
+        y: 20,
+        duration: 3,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
-        stagger: 0.2
+        stagger: 0.3
       });
     }
   }, []);
 
-  // Show a clean white background during the initial "boot up"
-  if (!isReady) return <div className="min-h-screen bg-white" />;
+  // Safety gate: Show a clean white background during initial mount
+  if (!isMounted) return <div className="min-h-screen bg-white" />;
 
   return (
-    <main className="relative min-h-screen bg-white overflow-hidden">
+    <main className="relative min-h-screen bg-white overflow-hidden selection:bg-[#e63946] selection:text-white">
       <Navbar />
       <IdentityPop />
 
       <section className="relative flex flex-col items-center justify-center min-h-screen text-center px-6">
         
-        {/* Background Geometric Elements */}
+        {/* Animated Bauhaus Geometric Elements */}
         <div className="bauhaus-shape absolute top-[15%] left-[10%] w-32 h-32 bg-[#e63946] rounded-full opacity-10 -z-10" />
         <div className="bauhaus-shape absolute bottom-[20%] right-[8%] w-56 h-14 bg-[#457b9d] opacity-10 -z-10" />
+        <div className="bauhaus-shape absolute top-[40%] right-[15%] w-0 h-0 border-l-[30px] border-l-transparent border-r-[30px] border-r-transparent border-b-[50px] border-b-[#ffd166] opacity-10 -z-10" />
 
         <div className="hero-content z-10 max-w-5xl">
           <h1 className="text-7xl md:text-[9rem] font-bold tracking-tighter uppercase leading-none mb-4">
             RGRM<br />STUDIO
           </h1>
           <p className="text-[10px] uppercase tracking-[0.6em] text-gray-400 mb-20">
-            Digital Identity Registry — Edition 2026
+            Minimalist Digital Identity Registry — Edition 2026
           </p>
 
           <div className="w-full">
