@@ -1,47 +1,69 @@
-import { stripe } from '@/lib/stripe';
-import { sendNotification } from '@/lib/discord';
-import { headers } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
+
+// Initialize Stripe with your Secret Key (Pulled safely from Vercel/Env)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: "2024-12-18.acacia", // Updated to the latest stable API
+});
 
 export async function POST(req: Request) {
-  const body = await req.text();
-  const signature = (await headers()).get('stripe-signature') as string;
-
-  let event;
-
   try {
-    event = stripe.webhooks.constructEvent(
-      body, 
-      signature, 
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: any) {
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
-  }
+    // 1. Log the attempt to Discord for your own tracking
+    if (process.env.DISCORD_WEBHOOK_URL) {
+      await fetch(process.env.DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: "🚀 **Checkout Initiated**: A user has clicked 'Register Identity' on raguiromo.store"
+        }),
+      });
+    }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as any;
-
-    // 1. Notify you on Discord
-    await sendNotification(`💰 Sale! ${session.customer_details.email} purchased a Certificate.`);
-
-    // 2. Trigger Loops Transactional Email
-    await fetch('https://app.loops.so/api/v1/transactional', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        transactionalId: process.env.LOOPS_TRANSACTIONAL_ID,
-        email: session.customer_details.email,
-        dataVariables: {
-          firstName: session.customer_details.name?.split(' ')[0] || 'Customer',
-          orderNumber: session.id.slice(-8).toUpperCase(),
+    // 2. Create the Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      // The specific UI settings you configured in your Stripe Dashboard
+      payment_method_configuration: "pmc_1Sfje3DVc7z8RC9ISTPN7WcP",
+      
+      line_items: [
+        {
+          // Your Bauhaus Identity Registration Product
+          price: process.env.STRIPE_PRICE_ID,
+          quantity: 1,
         },
-      }),
+      ],
+      mode: "payment",
+      
+      // Dynamic URLs based on your environment (Local vs Vercel)
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
+      
+      // Metadata helps you identify the user in your Stripe Dashboard later
+      metadata: {
+        project: "RGRM-BAUHAUS-STORE",
+        action: "IDENTITY_REGISTRATION",
+      },
     });
-  }
 
-  return NextResponse.json({ received: true });
+    // 3. Return the URL to the frontend for redirection
+    return NextResponse.json({ url: session.url });
+
+  } catch (error: any) {
+    console.error("STRIKE CHECKOUT ERROR:", error);
+
+    // Alert Discord if the checkout fails (extremely helpful for debugging)
+    if (process.env.DISCORD_WEBHOOK_URL) {
+      await fetch(process.env.DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `❌ **Checkout Error**: ${error.message}`
+        }),
+      });
+    }
+
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 }
+    );
+  }
 }
