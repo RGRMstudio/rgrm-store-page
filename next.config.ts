@@ -1,21 +1,32 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Generates a self-contained production build for Node 22
+  // 1. Enable standalone output for high-performance Vercel hosting
   output: "standalone",
 
+  // 2. Configure TypeScript behavior
   typescript: {
-    // We keep this true so that minor type warnings don't block 
-    // the Bauhaus registry from going live.
-    ignoreBuildErrors: true,
+    // Keep this false for production to catch bugs before they go live
+    ignoreBuildErrors: false,
   },
 
-  // Note: The 'eslint' block is intentionally removed.
-  // Linting is now handled by the 'npm run lint' gate in package.json.
-  
+  // 3. Experimental features for the Bauhaus 2026 Edition
   experimental: {
-    // Optimizes GSAP and Lucide-React for faster Bauhaus animations
+    // Improves GSAP and Lucide-React load speeds
     optimizePackageImports: ["gsap", "lucide-react"],
+    
+    // Enables the React 19 Compiler for smoother animations
+    reactCompiler: true,
+  },
+
+  // 4. Image security for your Bauhaus assets
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'raguiromo.store',
+      },
+    ],
   },
 };
 
