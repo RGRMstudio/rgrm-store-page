@@ -1,20 +1,32 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* NEXT.JS 16 OPTIMIZATIONS
+     Turbopack is now the default bundler for production. 
+     The 'eslint' block is removed here as it is no longer supported in config.
+  */
+
   typescript: {
-    // This allows the build to finish even if there are tiny type warnings
-    ignoreBuildErrors: false, 
+    // Set to 'true' only if you want to force deployment despite minor type warnings
+    ignoreBuildErrors: false,
   },
-  eslint: {
-    // Ensures your code is clean before it goes live on raguiromo.store
-    ignoreDuringBuilds: false,
+
+  // Enable standalone output for the best performance on Vercel
+  output: "standalone",
+
+  experimental: {
+    // Improves performance for large Bauhaus-style GSAP animations
+    optimizePackageImports: ["gsap"],
   },
+
+  // If you use external Bauhaus assets/images, add their domains here
   images: {
-    // Allows you to host images on Vercel efficiently
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "files.stripe.com",
+      },
+    ],
   },
 };
 
