@@ -10,34 +10,48 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    // 1. requestAnimationFrame prevents the "Cascading Render" Error
+    const frame = requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
 
+    // 2. We only run animations if we are in the browser and mounted
     if (typeof window !== 'undefined') {
-      // Entrance Animation
-      const tl = gsap.timeline();
-      tl.fromTo('.hero-content', 
-        { opacity: 0, y: 30 }, 
-        { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.2 }
-      );
+      const ctx = gsap.context(() => {
+        // Entrance Animation
+        const tl = gsap.timeline();
+        tl.fromTo('.hero-content', 
+          { opacity: 0, y: 30 }, 
+          { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.2 }
+        );
 
-      // Floating Bauhaus Shapes
-      gsap.to('.bauhaus-shape', {
-        y: 20,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        stagger: 0.3
+        // Floating Bauhaus Shapes
+        gsap.to('.bauhaus-shape', {
+          y: 20,
+          duration: 3,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          stagger: 0.3
+        });
       });
+
+      // Cleanup function to prevent memory leaks or animation bugs
+      return () => {
+        cancelAnimationFrame(frame);
+        ctx.revert();
+      };
     }
   }, []);
 
-  // Hydration Guard to prevent blank screen
+  // Hydration Guard: Matches the server's empty state initially
   if (!isMounted) return <div className="min-h-screen bg-white" />;
 
   return (
     <main className="relative min-h-screen bg-white overflow-hidden selection:bg-[#e63946] selection:text-white">
       <Navbar />
+      
+      {/* Ensure IdentityPop is updated with the &apos; fix we did earlier */}
       <IdentityPop />
 
       <section className="relative flex flex-col items-center justify-center min-h-screen text-center px-6">
