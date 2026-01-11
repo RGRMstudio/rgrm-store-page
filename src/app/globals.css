@@ -13,22 +13,27 @@
 
 @layer base {
   body {
-    @apply bg-white text-black antialiased selection:bg-[var(--bauhaus-red)] selection:text-white;
+    @apply bg-white text-black antialiased;
+    /* Custom highlight color for the registry */
+    selection: bg-[var(--bauhaus-red)];
+    selection: text-white;
   }
 
-  h1, h2, h3 {
-    @apply tracking-tighter font-black uppercase;
+  h1, h2, h3, h4 {
+    @apply font-black uppercase tracking-tighter;
   }
 }
 
-/* Custom Bauhaus Component Classes */
 @layer components {
-  .bauhaus-border {
-    @apply border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
+  /* The signature heavy-border aesthetic */
+  .bauhaus-card {
+    @apply border-4 border-black bg-white p-6 
+           shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] 
+           transition-transform duration-200 hover:-translate-x-1 hover:-translate-y-1;
   }
 
   .bauhaus-btn {
-    @apply px-8 py-4 bg-black text-white font-bold uppercase tracking-widest 
-           hover:bg-[var(--bauhaus-red)] transition-colors duration-300;
+    @apply inline-block px-8 py-4 bg-black text-white font-bold uppercase 
+           hover:bg-[var(--bauhaus-red)] transition-all duration-300 cursor-pointer;
   }
 }
