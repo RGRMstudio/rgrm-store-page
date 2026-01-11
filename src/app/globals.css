@@ -3,21 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  --accent-gold: #D4AF37;
+  /* Bauhaus Primary Palette */
+  --bauhaus-red: #e63946;
+  --bauhaus-yellow: #ffb703;
+  --bauhaus-blue: #1d3557;
+  --bauhaus-black: #000000;
+  --bauhaus-white: #ffffff;
 }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  body {
+    @apply bg-white text-black antialiased selection:bg-[var(--bauhaus-red)] selection:text-white;
+  }
+
+  h1, h2, h3 {
+    @apply tracking-tighter font-black uppercase;
+  }
 }
 
-/* Custom Gold Button Styling */
-.btn-gold {
-  @apply border border-[--accent-gold] text-[--accent-gold] px-8 py-3 
-         uppercase tracking-widest text-xs transition-all duration-300
-         hover:bg-[--accent-gold] hover:text-black;
+/* Custom Bauhaus Component Classes */
+@layer components {
+  .bauhaus-border {
+    @apply border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)];
+  }
+
+  .bauhaus-btn {
+    @apply px-8 py-4 bg-black text-white font-bold uppercase tracking-widest 
+           hover:bg-[var(--bauhaus-red)] transition-colors duration-300;
+  }
 }
