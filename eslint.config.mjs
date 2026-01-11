@@ -1,17 +1,16 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import { defineConfig } from 'eslint/config';
+import nextVitals from 'eslint-config-next/core-web-vitals';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.url,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+export default defineConfig([
+  ...nextVitals,
   {
     rules: {
-      // Allows you to use 'any' in webhook responses if necessary
-      "@typescript-eslint/no-explicit-any": "off",
-    },
+      // Add custom Bauhaus strictness rules here
+      "@next/next/no-html-link-for-pages": "error",
+    }
   },
-];
-
-export default eslintConfig;
+  {
+    // Ensure build artifacts are never linted
+    ignores: [".next/*", "out/*", "build/*"]
+  }
+]);
