@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google"; // Using Mono for that industrial look
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-// 1. Configure the Bauhaus-style Monospace font
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-// 2. Official Metadata for raguiromo.store
 export const metadata: Metadata = {
-  title: "RGRM | Bauhaus Identity Registry",
-  description: "Official store for Bauhaus-standard identity registration and terminal assets.",
-  viewport: "width=device-width, initial-scale=1",
+  title: "RGRM | Bauhaus Digital Registry",
+  description: "Official store and design protocol for raguiromo.store",
 };
 
 export default function RootLayout({
@@ -24,22 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* 3. STRIPE BUY BUTTON SCRIPT
-          We load this with 'lazyOnload' so it doesn't block 
-          the initial render of your Bauhaus animations.
-        */}
-        <Script
-          src="https://js.stripe.com/v3/buy-button.js"
-          strategy="lazyOnload"
+        {/* Stripe Integration */}
+        <Script 
+          src="https://js.stripe.com/v3/" 
+          strategy="beforeInteractive" 
         />
       </head>
-      <body className={`${geistMono.variable} font-mono antialiased bg-white text-black`}>
-        {/* The 'grid' background effect can be added here globally 
-           to maintain the Bauhaus aesthetic across all pages. 
-        */}
-        <div className="min-h-screen relative overflow-x-hidden">
-          {children}
-        </div>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );
