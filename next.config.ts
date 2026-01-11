@@ -1,15 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* NEXT.JS 16 CLEANUP:
-     The 'eslint' key is removed. 
-     TypeScript ignoreBuildErrors is kept here to bypass minor type issues.
-  */
+  // In Next.js 16, linting is moved entirely to the package.json scripts
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true, 
   },
-  
-  // Recommended for Vercel performance
   output: "standalone",
 };
 
