@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // In Next.js 16, linting is moved entirely to the package.json scripts
+  // NEXT.JS 16: The 'eslint' block is no longer supported here.
+  // Linting must be run via scripts in package.json.
   typescript: {
     ignoreBuildErrors: true, 
   },
