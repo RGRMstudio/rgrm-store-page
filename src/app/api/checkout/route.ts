@@ -1,43 +1,45 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 
+/**
+ * RaGuiRoMo Bauhaus Checkout Route
+ * This handler creates a Stripe Checkout Session and links it
+ * to your primary Printful Store (Store 002) via metadata.
+ */
+
 export async function POST(req: Request) {
   try {
-    // 1. Ensure the Price ID is pulled from your Vercel Environment Variables
-    const priceId = process.env.STRIPE_PRICE_ID;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://raguiromo.store';
+    const { items } = await req.json();
 
-    if (!priceId) {
-      console.error('❌ CONFIG ERROR: STRIPE_PRICE_ID is missing in Vercel.');
-      return NextResponse.json(
-        { error: 'Store configuration error: Missing Price ID' },
-        { status: 500 }
-      );
+    if (!items || items.length === 0) {
+      return NextResponse.json({ error: 'No items provided' }, { status: 400 });
     }
 
-    // 2. Initiate the Stripe Checkout Session
+    // Create the Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: priceId, // Using the API ID from your Stripe Product Catalog
-          quantity: 1,
-        },
-      ],
+      payment_method_types: ['card'],
+      line_items: items.map((item: any) => ({
+        // price: your Stripe Price ID (e.g., price_1234...)
+        price: item.priceId || process.env.STRIPE_PRICE_ID,
+        quantity: item.quantity || 1,
+      })),
       mode: 'payment',
-      success_url: `${baseUrl}/success`,
-      cancel_url: `${baseUrl}/`,
-      // Collect shipping info so Printful can fulfill the physical item
-      shipping_address_collection: {
-        allowed_countries: ['US', 'CA', 'GB', 'FR', 'DE'], 
+      // Redirect URLs after payment
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
+      
+      // CRITICAL: This metadata tells the Webhook to route to Printful Store 002
+      metadata: {
+        printful_store_id: process.env.PRINTFUL_STORE_002_ID,
+        project_name: 'RaGuiRoMo Bauhaus Registry'
       },
     });
 
-    return NextResponse.json({ url: session.url });
-
-  } catch (error: any) {
-    console.error('❌ STRIPE API ERROR:', error.message);
+    return NextResponse.json({ id: session.id, url: session.url });
+  } catch (err: any) {
+    console.error('Checkout Error:', err.message);
     return NextResponse.json(
-      { error: `Checkout failed: ${error.message}` },
+      { error: 'Could not create checkout session' },
       { status: 500 }
     );
   }
