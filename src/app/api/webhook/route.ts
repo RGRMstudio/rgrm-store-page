@@ -1,69 +1,76 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
+import { stripe } from '@/lib/stripe';
 
-// Initialize Stripe with your Secret Key (Pulled safely from Vercel/Env)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2024-12-18.acacia", // Updated to the latest stable API
-});
+/**
+ * RaGuiRoMo Bauhaus Webhook Handler
+ * This listens for 'checkout.session.completed' from Stripe 
+ * and triggers the Printful fulfillment for Store 002.
+ */
 
 export async function POST(req: Request) {
+  // 1. Get the raw body for Stripe signature verification
+  const body = await req.text();
+  const signature = (await headers()).get('stripe-signature') as string;
+
+  let event;
+
   try {
-    // 1. Log the attempt to Discord for your own tracking
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: "🚀 **Checkout Initiated**: A user has clicked 'Register Identity' on raguiromo.store"
-        }),
-      });
-    }
-
-    // 2. Create the Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      // The specific UI settings you configured in your Stripe Dashboard
-      payment_method_configuration: "pmc_1Sfje3DVc7z8RC9ISTPN7WcP",
-      
-      line_items: [
-        {
-          // Your Bauhaus Identity Registration Product
-          price: process.env.STRIPE_PRICE_ID,
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      
-      // Dynamic URLs based on your environment (Local vs Vercel)
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
-      
-      // Metadata helps you identify the user in your Stripe Dashboard later
-      metadata: {
-        project: "RGRM-BAUHAUS-STORE",
-        action: "IDENTITY_REGISTRATION",
-      },
-    });
-
-    // 3. Return the URL to the frontend for redirection
-    return NextResponse.json({ url: session.url });
-
-  } catch (error: any) {
-    console.error("STRIKE CHECKOUT ERROR:", error);
-
-    // Alert Discord if the checkout fails (extremely helpful for debugging)
-    if (process.env.DISCORD_WEBHOOK_URL) {
-      await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: `❌ **Checkout Error**: ${error.message}`
-        }),
-      });
-    }
-
-    return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
-      { status: 500 }
+    // 2. Verify the event came from Stripe
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!
     );
+  } catch (err: any) {
+    console.error(`Webhook Signature Error: ${err.message}`);
+    return NextResponse.json({ error: 'Webhook signature failed' }, { status: 400 });
   }
+
+  // 3. Handle the successful payment event
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as any;
+    
+    // Retrieve the Store 002 ID we passed in the checkout metadata
+    const storeId = session.metadata?.printful_store_id || process.env.PRINTFUL_STORE_002_ID;
+
+    console.log(`--- Bauhaus Order Success ---`);
+    console.log(`Fulfilling via Printful Store: ${storeId}`);
+    console.log(`Customer: ${session.customer_details?.email}`);
+
+    try {
+      /**
+       * TRIGGER PRINTFUL ORDER
+       * Here you would fetch(https://api.printful.com/orders) 
+       * using your PRINTFUL_STORE_002_KEY.
+       */
+      const printfulResponse = await fetch('https://api.printful.com/orders', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.PRINTFUL_STORE_002_KEY}`,
+          'X-PF-Store-Id': storeId,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipient: {
+            name: session.shipping_details?.name,
+            address1: session.shipping_details?.address?.line1,
+            city: session.shipping_details?.address?.city,
+            state_code: session.shipping_details?.address?.state,
+            country_code: session.shipping_details?.address?.country,
+            zip: session.shipping_details?.address?.postal_code,
+          },
+          items: [], // You would map session items here
+        }),
+      });
+
+      if (!printfulResponse.ok) throw new Error('Printful order creation failed');
+
+    } catch (error: any) {
+      console.error(`Printful Sync Error: ${error.message}`);
+      // Even if Printful fails, we return 200 to Stripe so it stops retrying
+    }
+  }
+
+  return NextResponse.json({ received: true }, { status: 200 });
 }
