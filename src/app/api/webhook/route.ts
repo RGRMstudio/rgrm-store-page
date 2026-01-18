@@ -1,11 +1,15 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { LoopsClient } from "loops";
 
 /**
- * RGRMstore - Unified Fulfillment Webhook
- * Processes Stripe payments and automates Printful Store 002.
+ * RGRMstore - Unified Fulfillment & Communication Webhook
+ * 2026 Production Standard
  */
+
+// Initialize Loops with your secret API key
+const loops = new LoopsClient(process.env.LOOPS_API_KEY as string);
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -15,27 +19,29 @@ export async function POST(req: Request) {
   let event;
 
   try {
-    // Verify the event came from Stripe using your whsec_ secret
+    // 1. Verify the Stripe Signature
     event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
-    console.error(`[RGRM ERROR] Webhook Signature Verification Failed: ${err.message}`);
+    console.error(`[RGRM ERROR] Signature Verification Failed: ${err.message}`);
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
   }
 
-  // Handle successful checkout
+  // 2. Process Successful Checkout
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as any;
-    
-    // Store 002 Identification (17181557)
     const storeId = process.env.PRINTFUL_STORE_ID || '17181557';
+    
+    const customerEmail = session.customer_details?.email;
+    const customerName = session.customer_details?.name || 'RGRM Client';
 
-    console.log(`[RGRM INFO] Payment Verified. Syncing order with Printful Store ${storeId}`);
+    console.log(`[RGRM INFO] Processing Store 002 Order for: ${customerEmail}`);
 
     try {
+      // A. TRIGGER PRINTFUL (Store 002)
       const printfulResponse = await fetch('https://api.printful.com/orders', {
         method: 'POST',
         headers: {
@@ -45,27 +51,39 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           recipient: {
-            name: session.shipping_details?.name,
+            name: customerName,
             address1: session.shipping_details?.address?.line1,
             city: session.shipping_details?.address?.city,
             state_code: session.shipping_details?.address?.state,
             country_code: session.shipping_details?.address?.country,
             zip: session.shipping_details?.address?.postal_code,
           },
-          items: [], // Map your products from the session metadata here
-          draft: false, // Set to true if you want to manually approve orders in Printful
+          items: [], // Map your Registry Module SKU here
+          draft: false, 
         }),
       });
 
-      if (!printfulResponse.ok) {
-        const errorData = await printfulResponse.json();
-        throw new Error(`Printful API Error: ${errorData.error.message}`);
-      }
+      if (!printfulResponse.ok) throw new Error('Printful Sync Failed');
 
-      console.log(`[RGRM SUCCESS] Order successfully dispatched to Store 002.`);
+      // B. TRIGGER LOOPS EMAIL
+      // This sends the "Identity_Registered" event to your Loops dashboard
+      await loops.sendEvent({
+        email: customerEmail,
+        eventName: "Identity_Registered",
+        contactProperties: {
+          firstName: customerName.split(' ')[0],
+          userId: session.id, // Links the stripe session to the Loops contact
+        },
+        eventProperties: {
+          orderId: session.id,
+          registryNode: "17181557",
+        }
+      });
+
+      console.log(`[RGRM SUCCESS] Fulfillment and Communication Synced.`);
+
     } catch (err: any) {
-      console.error(`[RGRM ERROR] Fulfillment Sync Failed: ${err.message}`);
-      // Note: You can add an email notification trigger here
+      console.error(`[RGRM ERROR] Automation chain failed: ${err.message}`);
     }
   }
 
