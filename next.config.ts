@@ -27,7 +27,6 @@ const nextConfig: NextConfig = {
   },
 
   // 5. Image Security
-  // (Optional) Add your asset domains here if you use remote images
   images: {
     remotePatterns: [
       {
