@@ -1,39 +1,52 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
+import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/react";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Configure the primary font for RGRMstore
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+/**
+ * RGRMstore - Global Metadata Configuration
+ * This ensures your site is indexed correctly as RaGuiRoMo Store.
+ */
 export const metadata: Metadata = {
-  title: "RGRM | Bauhaus Digital Registry",
-  description: "Official store and design protocol for raguiromo.store",
+  title: {
+    default: "RaGuiRoMo Store",
+    template: "%s | RaGuiRoMo Store",
+  },
+  description: "Official RGRMstore Identity Registry - Authenticated Design Artifacts.",
+  icons: {
+    icon: "/favicon.ico", // Ensure you have a favicon in your /public folder
+  },
+  manifest: "/site.webmanifest",
+};
+
+/**
+ * Viewport configuration for mobile-first Bauhaus responsiveness
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <head>
-        {/* Stripe Integration */}
-        <Script 
-          src="https://js.stripe.com/v3/" 
-          strategy="beforeInteractive" 
-        />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" className={`${inter.variable} scroll-smooth`}>
+      <body className="antialiased bg-white text-black selection:bg-yellow-400">
+        {/* Main page content */}
         {children}
+
+        {/* Vercel Analytics: Tracking page views and visitors 
+          automatically on raguiromo.store 
+        */}
+        <Analytics />
       </body>
     </html>
   );
