@@ -1,25 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
-// Configure the RGRM typography
 const inter = Inter({ 
   subsets: ["latin"], 
   variable: "--font-inter",
   display: 'swap' 
 });
 
-/**
- * RGRMstore - Global Metadata Configuration
- * 2026 Production Standard
- */
 export const metadata: Metadata = {
-  title: {
-    default: "RaGuiRoMo Store",
-    template: "%s | RaGuiRoMo Store",
-  },
+  title: "RaGuiRoMo Store",
   description: "Official RGRMstore Identity Registry - Authenticated Design & Identity Modules.",
   manifest: "/site.webmanifest",
   icons: {
@@ -46,12 +39,19 @@ export default function RootLayout({
         {/* Main Application Content */}
         {children}
 
-        {/* RGRM Performance & Traffic Suite:
-          - Analytics: Tracks visitors and behavior.
-          - Speed Insights: Tracks Core Web Vitals (LCP, FID, CLS).
-        */}
+        {/* 1. Vercel Performance Suite */}
         <Analytics />
         <SpeedInsights />
+
+        {/* 2. Loops.so Tracking Script 
+            Note: This script enables Loops to track events and identify users 
+            directly from the frontend for your RGRM Identity Registry.
+        */}
+        <Script 
+          src="https://app.loops.so/scripts/track.js" 
+          strategy="afterInteractive" 
+          data-loops-id={process.env.NEXT_PUBLIC_LOOPS_ID} // Replace with your Loops ID in Vercel
+        />
         
       </body>
     </html>
