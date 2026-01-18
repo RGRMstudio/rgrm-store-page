@@ -1,0 +1,11 @@
+# RGRMstore - Search Engine Optimization
+# Website: https://raguiromo.store
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Sitemaps help search engines find your RGRM Registry faster
+Sitemap: https://raguiromo.store/sitemap.xml
