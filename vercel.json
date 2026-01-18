@@ -1,9 +1,8 @@
 {
-  "version": 2,
-  "framework": "nextjs",
-  "cleanUrls": true,
-  "github": {
-    "silent": true
-  },
-  "regions": ["iad1"]
+  "crons": [
+    {
+      "path": "/api/cron/sync-inventory",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }
