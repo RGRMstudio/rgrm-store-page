@@ -6,10 +6,9 @@ export async function POST(req: Request) {
     const { items } = await req.json();
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: items.map((item: any) => ({
         // price_id should match your Stripe Dashboard entries
-        price: item.priceId || process.env.STRIPE_PRICE_ID,
+        price: item.priceId || (process.env.STRIPE_PRICE_ID ?? ''),
         quantity: item.quantity || 1,
       })),
       mode: 'payment',
@@ -18,7 +17,7 @@ export async function POST(req: Request) {
       
       // Metadata allows the Webhook to identify the Printful target
       metadata: {
-        printful_store_id: process.env.PRINTFUL_STORE_002_ID,
+        printful_store_id: process.env.PRINTFUL_STORE_002_ID ?? '',
       },
     });
 
