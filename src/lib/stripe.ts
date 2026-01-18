@@ -1,19 +1,27 @@
 import Stripe from 'stripe';
 
 /**
- * RaGuiRoMo Stripe Singleton
- * This client handles all payment communication.
+ * RaGuiRoMo Store - Stripe Singleton
+ * This client handles all payment communication for RGRMstore.
+ * It ensures only one instance of Stripe is created.
  */
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('CRITICAL: STRIPE_SECRET_KEY is missing from Vercel.');
+  throw new Error('CRITICAL: STRIPE_SECRET_KEY is missing from Vercel Environment Variables.');
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16', // Locked for stability
-  typescript: true,
-  appInfo: {
-    name: 'RaGuiRoMo Bauhaus Store',
-    version: '1.0.0',
-  },
-});
+// Global augmentation for the Stripe instance to survive HMR in development
+const globalForStripe = global as unknown as { stripe: Stripe };
+
+export const stripe =
+  globalForStripe.stripe ||
+  new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2023-10-16', // Locked for stability with your account
+    typescript: true,
+    appInfo: {
+      name: 'RaGuiRoMo Store Registry',
+      version: '1.0.0',
+    },
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForStripe.stripe = stripe;
