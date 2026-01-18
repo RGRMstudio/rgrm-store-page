@@ -1,0 +1,18 @@
+# RGRMstore - Repository Protection Rules
+# These rules ensure critical files require RGRMstudio review.
+
+# Global owners for everything
+* @RGRMstudio
+
+# Protect the Security & CI Infrastructure
+/.github/           @RGRMstudio
+/package.json       @RGRMstudio
+/package-lock.json  @RGRMstudio
+
+# Protect the Core Fulfillment & Registry Engine
+/src/app/api/webhook/       @RGRMstudio
+/src/app/api/webhooks/loops/ @RGRMstudio
+/scripts/                   @RGRMstudio
+
+# Protect Environment Documentation
+/MAINTENANCE.md             @RGRMstudio
