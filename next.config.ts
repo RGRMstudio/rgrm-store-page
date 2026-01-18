@@ -1,32 +1,31 @@
 import type { NextConfig } from "next";
 
+/**
+ * RaGuiRoMo Store - Production Config 2026
+ * Unified for Store 002 (17181557)
+ */
 const nextConfig: NextConfig = {
-  // 1. Enable standalone output for high-performance Vercel hosting
-  output: "standalone",
-
-  // 2. Configure TypeScript behavior
-  typescript: {
-    // Keep this false for production to catch bugs before they go live
-    ignoreBuildErrors: false,
-  },
-
-  // 3. Experimental features for the Bauhaus 2026 Edition
+  // Enforce the new React 19 Compiler for faster RGRM components
+  reactCompiler: true,
+  
+  // Security: Prevent server-side variables from accidentally leaking
   experimental: {
-    // Improves GSAP and Lucide-React load speeds
-    optimizePackageImports: ["gsap", "lucide-react"],
-    
-    // Enables the React 19 Compiler for smoother animations
-    reactCompiler: true,
+    taint: true,
   },
 
-  // 4. Image security for your Bauhaus assets
+  // Image Optimization for Printful product mockups
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'raguiromo.store',
+        protocol: "https",
+        hostname: "files.printful.com",
       },
     ],
+  },
+
+  // Ensure environment variables are loaded for both build and runtime
+  env: {
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "https://raguiromo.store",
   },
 };
 
