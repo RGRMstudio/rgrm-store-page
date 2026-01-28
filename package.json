@@ -27,7 +27,8 @@
     "react-dom": "^19.0.0",
     "stripe": "^17.7.0",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "workflow": "^4.0.1-beta.50"
   },
   "devDependencies": {
     "@types/gsap": "^3.0.0",
