@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@types/gsap": "^3.0.0",
-    "@types/node": "^20.11.0",
+    "@types/node": "^25.1.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.23",
