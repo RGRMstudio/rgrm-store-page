@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // This allows the deployment to finish even with minor structural warnings
     ignoreBuildErrors: true,
   },
   eslint: {
-    // This prevents Linting from blocking the RGRM launch
+    // This must be inside the nextConfig object to be recognized
     ignoreDuringBuilds: true,
   },
 };
