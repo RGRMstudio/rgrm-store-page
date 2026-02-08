@@ -1,45 +1,32 @@
 {
-  "name": "raguiromo-store",
+  "name": "rgrm-store-page",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": "22.x"
-  },
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:printful": "node scripts/test-printful.js"
+    "health-check": "node --import ts-node/register --env-file=.env.local scripts/health-check.ts"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.1",
-    "@tailwindcss/postcss": "^4.0.0",
-    "@vercel/analytics": "^1.1.2",
-    "@vercel/speed-insights": "^1.3.1",
-    "axios": "^1.13.4",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.26.2",
-    "gsap": "^3.12.5",
-    "loops": "^6.0.1",
-    "lucide-react": "^0.471.2",
-    "next": "16.1.3",
-    "node-fetch": "^3.3.2",
-    "postcss": "^8.5.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "stripe": "^17.7.0",
-    "tailwind-merge": "^2.5.2",
-    "tailwindcss": "^4.0.0",
-    "workflow": "^4.0.1-beta.50"
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "stripe": "^14.14.0",
+    "lucide-react": "^0.321.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "babel-plugin-react-compiler": "^1.0.0",
-    "eslint": "^9.0.0",
-    "eslint-config-next": "15.0.0",
-    "typescript": "^5.5.0"
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5",
+    "ts-node": "^10.9.2"
   }
 }
