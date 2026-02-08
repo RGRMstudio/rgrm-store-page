@@ -4,27 +4,25 @@ import { stripe } from '@/lib/stripe';
 /**
  * RGRM STUDIO: ACQUISITION DISPATCHER
  * Phase: 01 (Brutalist Lineage)
- * Logic: Creates a Stripe Checkout session with metadata for Printful fulfillment.
+ * Final State: v1.0.0
  */
 
 export async function POST(req: Request) {
   try {
     const { artifactId, size } = await req.json();
 
-    // 1. Validation: Ensure the blueprint is complete before initiating
+    // Verification of architectural data
     if (!artifactId || !size) {
       return NextResponse.json(
-        { error: 'Missing Structural Data: artifactId or size is required.' },
+        { error: 'Incomplete Acquisition Data: artifactId and size required.' },
         { status: 400 }
       );
     }
 
-    // 2. Session Creation: Bridging the Gallery to the Vault
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          // Ensure STRIPE_PRICE_ID_STUDY_001 is defined in your Vercel/Local env
           price: process.env.STRIPE_PRICE_ID_STUDY_001, 
           quantity: 1,
         },
@@ -33,10 +31,10 @@ export async function POST(req: Request) {
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
       
-      // CRITICAL: Metadata that the Webhook (Fulfillment Foreman) uses to trigger Printful
+      // CRITICAL: Metadata for the Webhook to trigger Printful Store 002
       metadata: {
         artifactId: artifactId, // e.g., 'RGRM-001-B'
-        size: size,             // e.g., 'M', 'L', 'XL'
+        size: size,             // e.g., 'L'
         founder: 'Raul Guillermo Rosario Morales'
       },
     });
@@ -44,9 +42,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
     console.error('[STRIPE DISPATCH ERROR]:', err.message);
-    return NextResponse.json(
-      { error: 'Acquisition Session Failed. Check Studio Logs.' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Acquisition Failed' }, { status: 500 });
   }
 }
