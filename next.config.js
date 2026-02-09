@@ -1,6 +1,20 @@
-/** @type {import('next').NextContent} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  // RGRM Studio: Form Follows Function
+  // We move eslint handling to the root for better build performance
+  typescript: {
+    // Ensuring structural beauty before deployment
+    ignoreBuildErrors: false,
+  },
+  images: {
+    // Allowing the gallery to pull from external architectural sources if needed
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.printful.com',
+      },
+    ],
+  },
 };
-module.exports = nextConfig;
+
+export default nextConfig;
