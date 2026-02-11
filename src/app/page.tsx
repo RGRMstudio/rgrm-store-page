@@ -1,125 +1,36 @@
-'use client';
-
-import { useState } from 'react';
-
-/**
- * RGRM STUDIO: THE GALLERY
- * Phase: 01 (Brutalist Lineage)
- * Logic: Maps studies to the grid and dispatches acquisition requests.
- */
-
-const STUDIES = [
-  {
-    id: 'RGRM-001-B',
-    name: 'Study 001: Brutalist Tee',
-    price: '$45.00',
-    description: 'Heavyweight architectural cotton. Studio Black.',
-    sizes: ['S', 'M', 'L', 'XL']
-  }
-];
-
 export default function Home() {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
-
-  const handleAcquisition = async (artifactId: string, size: string) => {
-    setLoadingId(artifactId);
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ artifactId, size }),
-      });
-      
-      const data = await response.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Registry sync failed.');
-      }
-    } catch (err) {
-      console.error('[STUDIO ERROR]:', err);
-      alert('Acquisition Failed: Check Studio Connection.');
-    } finally {
-      setLoadingId(null);
-    }
-  };
-
   return (
-    <main className="bg-[#000000] text-[#FFFFFF] min-h-screen font-[Montserrat] p-6 md:p-16">
-      {/* Header: Structural Blueprint */}
-      <header className="mb-24 max-w-4xl">
-        <h1 className="text-6xl md:text-8xl font-bold tracking-tighter mb-4">
-          RGRM STUDIO
-        </h1>
-        <div className="flex items-center gap-4">
-          <span className="bg-[#BC2026] text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest">
-            Live Phase
-          </span>
-          <p className="text-[#BC2026] font-bold tracking-[0.3em] uppercase text-sm italic">
-            01: Brutalist Lineage
+    <main className="min-h-screen">
+      <section className="grid grid-cols-1 md:grid-cols-2 min-h-[80vh] border-b border-white/10">
+        {/* Left Side: The Narrative */}
+        <div className="p-12 flex flex-col justify-center space-y-6">
+          <h1 className="text-6xl md:text-8xl leading-none">
+            Phase 01:<br />
+            <span className="text-red-600">Brutalist</span><br />
+            Lineage
+          </h1>
+          <p className="max-w-md text-gray-400 text-lg">
+            A study in raw structural integrity. Bridging the gap between 
+            architectural precision and modern streetwear.
           </p>
+          <button className="bg-white text-black px-8 py-4 uppercase font-bold hover:bg-red-600 hover:text-white transition-all w-fit">
+            Acquire Study
+          </button>
         </div>
-      </header>
 
-      {/* The Gallery Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-16">
-        {STUDIES.map((study) => (
-          <div key={study.id} className="group flex flex-col gap-8 border border-white/10 p-8 hover:border-white/40 transition-colors">
-            {/* Visual Canvas */}
-            <div className="bg-[#111111] aspect-[4/5] relative flex items-center justify-center overflow-hidden">
-               <span className="text-white/5 text-9xl font-bold rotate-90 select-none">RGRM</span>
-               {/* When you have images, replace the span above with:
-               <img src="/path-to-image.jpg" alt={study.name} className="object-cover w-full h-full" /> 
-               */}
-            </div>
-
-            {/* Architectural Data */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-[#BC2026] text-xs font-bold uppercase tracking-widest mb-1">{study.id}</p>
-                  <h2 className="text-3xl font-bold uppercase tracking-tight">{study.name}</h2>
-                </div>
-                <span className="text-2xl font-light font-[Lato]">{study.price}</span>
-              </div>
-              
-              <p className="text-sm opacity-50 max-w-xs font-[Lato] leading-relaxed">
-                {study.description}
-              </p>
-
-              {/* Action: The Acquisition Button */}
-              <div className="pt-6 border-t border-white/10 flex flex-col gap-4">
-                <div className="flex gap-2">
-                  {study.sizes.map(size => (
-                    <button key={size} className="border border-white/20 px-4 py-2 text-xs hover:bg-white hover:text-black transition-all">
-                      {size}
-                    </button>
-                  ))}
-                </div>
-                
-                <button 
-                  onClick={() => handleAcquisition(study.id, 'M')} // Defaulting to M for now
-                  disabled={loadingId === study.id}
-                  className={`w-full py-5 font-bold uppercase tracking-[0.2em] transition-all duration-500 ${
-                    loadingId === study.id 
-                    ? 'bg-gray-800 text-gray-400 cursor-not-allowed' 
-                    : 'bg-[#FFFFFF] text-[#000000] hover:bg-[#BC2026] hover:text-[#FFFFFF]'
-                  }`}
-                >
-                  {loadingId === study.id ? 'Syncing Registry...' : 'Acquire Study'}
-                </button>
-              </div>
-            </div>
+        {/* Right Side: The Visual (Your Image) */}
+        <div className="relative bg-zinc-900 flex items-center justify-center p-12 overflow-hidden">
+          {/* REPLACE 'brutalist-tee.png' with your actual file in /public folder */}
+          <img 
+            src="/your-image-here.png" 
+            alt="RGRM Study 001" 
+            className="w-full h-auto object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-700"
+          />
+          <div className="absolute bottom-4 right-4 text-[10px] text-white/20 rotate-90">
+            RGRM_SPEC_001_V01
           </div>
-        ))}
+        </div>
       </section>
-
-      {/* Footer: Integrity Protocol */}
-      <footer className="mt-32 pt-8 border-t border-white/5 flex justify-between items-center text-[10px] opacity-30 uppercase tracking-[0.4em]">
-        <p>© 2026 RaGuiRoMo Studio</p>
-        <p>Form Follows Function</p>
-      </footer>
     </main>
   );
 }
