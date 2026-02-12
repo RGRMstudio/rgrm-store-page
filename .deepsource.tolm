@@ -1,0 +1,26 @@
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  environment = ["browser", "node"]
+  # Tells the agent to look for Next.js and React structural patterns
+  frameworks = ["react", "nextjs"]
+
+[[analyzers]]
+name = "secrets"
+enabled = true
+# This ensures your Stripe Secret Keys never accidentally leak into the blueprint
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true
+
+[exclude_patterns]
+# We don't need to inspect the "scaffolding" (modules or build files)
+patterns = [
+  "node_modules/**",
+  ".next/**",
+  "out/**",
+  "public/**"
+]
