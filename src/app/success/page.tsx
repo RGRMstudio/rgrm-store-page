@@ -1,70 +1,85 @@
-'use client';
-
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
-
-/**
- * RGRM STUDIO: ACQUISITION SUCCESS
- * Component: Certificate of Acquisition
- * Phase: 01 (Brutalist Lineage)
- */
-
-function SuccessContent() {
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-
-  return (
-    <div className="flex flex-col items-center justify-center text-center max-w-2xl mx-auto py-20 px-6">
-      {/* Structural Indicator */}
-      <div className="w-12 h-12 bg-[#BC2026] mb-8 animate-pulse" />
-
-      <h1 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase mb-4">
-        Acquisition Validated
-      </h1>
-      
-      <p className="text-[#BC2026] font-bold tracking-[0.3em] uppercase mb-12">
-        Registry Status: Confirmed
-      </p>
-
-      <div className="border border-[#FFFFFF]/20 p-8 w-full text-left font-[Lato] space-y-6">
-        <div>
-          <h2 className="text-xs opacity-40 uppercase tracking-widest mb-2">Study Phase</h2>
-          <p className="text-lg font-bold">Phase 01: Brutalist Lineage</p>
-        </div>
-
-        <div>
-          <h2 className="text-xs opacity-40 uppercase tracking-widest mb-2">Acquisition ID</h2>
-          <p className="text-sm font-mono opacity-80 break-all">
-            {sessionId || 'RGRM-PENDING-SYNC'}
-          </p>
-        </div>
-
-        <div className="pt-6 border-t border-[#FFFFFF]/10">
-          <p className="text-sm opacity-60 leading-relaxed">
-            Your study is currently undergoing the **Preservation Protocol**. 
-            Once architectural integrity is verified at the studio (Printful), 
-            shipping logistics will be dispatched to your coordinates.
-          </p>
-        </div>
-      </div>
-
-      <Link href="/" className="mt-12 group flex items-center gap-2">
-        <span className="text-xs font-bold uppercase tracking-widest group-hover:text-[#BC2026] transition-colors">
-          Return to Studio Registry
-        </span>
-        <span className="text-xl">→</span>
-      </Link>
-    </div>
-  );
-}
+import { CheckCircle2 } from 'lucide-react';
 
 export default function SuccessPage() {
+  const acquisitionDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
-    <main className="bg-[#000000] text-[#FFFFFF] min-h-screen font-[Montserrat]">
-      <Suspense fallback={<div className="p-20 text-center opacity-50">Loading Registry...</div>}>
-        <SuccessContent />
-      </Suspense>
+    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 md:p-8">
+      {/* Structural Container */}
+      <div className="w-full max-w-2xl border border-white/10 bg-zinc-950 p-8 md:p-16 relative overflow-hidden">
+        
+        {/* Accent Geometry (10% Bauhaus Red) */}
+        <div className="absolute top-0 left-0 w-1 h-full bg-[#BC2026]" />
+        
+        {/* Header Section */}
+        <div className="space-y-4 mb-12">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="text-[#BC2026] w-6 h-6" />
+            <span className="text-[10px] tracking-[0.4em] uppercase text-zinc-500">
+              Protocol: Acquisition_Success
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase font-[var(--font-headline)]">
+            Certificate of <br />
+            <span className="text-[#BC2026]">Acquisition</span>
+          </h1>
+        </div>
+
+        {/* Technical Specifications */}
+        <div className="grid grid-cols-2 gap-8 py-8 border-y border-white/5 font-[var(--font-body)] text-xs uppercase tracking-widest">
+          <div className="space-y-2">
+            <p className="text-zinc-500">Subject</p>
+            <p className="text-white">Study 001: Brutalist Lineage</p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-zinc-500">Acquisition Date</p>
+            <p className="text-white">{acquisitionDate}</p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-zinc-500">Integrity Status</p>
+            <p className="text-[#BC2026]">Validated</p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-zinc-500">Studio Origin</p>
+            <p className="text-white">RaGuiRoMo Studio</p>
+          </div>
+        </div>
+
+        {/* Narrative Closing */}
+        <div className="mt-12 space-y-6">
+          <p className="text-zinc-400 font-[var(--font-body)] leading-relaxed text-sm md:text-base">
+            This piece is a study in structural geometry and raw composition. 
+            You are now the steward of its maintenance. Follow the 
+            <span className="text-white italic"> Preservation Protocol</span> to ensure 
+            the longevity of its form and structural beauty.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 pt-6">
+            <Link 
+              href="/"
+              className="px-8 py-4 bg-white text-black text-xs font-bold uppercase tracking-widest hover:bg-[#BC2026] hover:text-white transition-all text-center"
+            >
+              Return to Gallery
+            </Link>
+            <Link 
+              href="/registry"
+              className="px-8 py-4 border border-white/10 text-white text-xs font-bold uppercase tracking-widest hover:border-white transition-all text-center"
+            >
+              Access Registry
+            </Link>
+          </div>
+        </div>
+
+        {/* Fine Print / Branding Signature */}
+        <p className="mt-16 text-[9px] text-zinc-600 uppercase tracking-[0.5em] text-center">
+          RaGuiRoMo.Store // Form Follows Function
+        </p>
+      </div>
     </main>
   );
 }
