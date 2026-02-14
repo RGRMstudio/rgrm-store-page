@@ -1,87 +1,53 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { createCheckoutSession } from '@/app/actions/checkout';
 
-// RGRM Studio - Phase 01: Brutalist Lineage
 const studies = [
-  { 
-    id: 1, 
-    name: "Study 001: Brutalist Tee", 
-    priceDisplay: "45.00", 
-    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH",
-    category: "Phase 01" 
+  {
+    id: '001',
+    name: 'Study 001: Brutalist Essential',
+    price: '$45.00',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || '', // Ties to your Vercel key
+    description: 'Phase 01 Structural Garment. Studio Black.',
+    image: '/study-001.jpg'
   },
-  { 
-    id: 2, 
-    name: "Study 002: Geometry Poster", 
-    priceDisplay: "30.00", 
-    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH",
-    category: "Phase 01" 
-  },
+  // Add more studies as they are cleared for acquisition
 ];
 
-const ProductGrid = () => {
-  const [loadingId, setLoadingId] = useState<number | null>(null);
-
-  const handleAcquisition = async (priceId: string, studyId: number) => {
-    setLoadingId(studyId);
-    
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: [{ priceId: priceId, quantity: 1 }]
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.url) {
-        window.location.href = data.url; // Redirect to Stripe Acquisition Vault
-      } else {
-        console.error('Structural Error:', data.error);
-        alert('Acquisition failed. Consult Studio Support.');
-      }
-    } catch (error) {
-      console.error('Network Error:', error);
-    } finally {
-      setLoadingId(null);
-    }
-  };
-
+export default function ProductGrid() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-1 border-t border-black bg-black">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {studies.map((study) => (
-        <div key={study.id} className="bg-white p-8 aspect-square flex flex-col justify-between group hover:bg-[#BC2026] hover:text-white transition-colors duration-300">
-          <div className="flex justify-between items-start">
-            <span className="text-[10px] uppercase font-bold tracking-tighter">{study.category}</span>
-            <span className="text-[10px] uppercase font-bold tracking-tighter">Status: Ready</span>
+        <div key={study.id} className="border-r border-b border-white/10 p-8 group hover:bg-white/[0.02] transition-colors">
+          <div className="aspect-[3/4] bg-white/5 mb-8 relative overflow-hidden">
+             {/* Study Image Placeholder */}
+             <div className="absolute inset-0 flex items-center justify-center text-[10px] text-white/10 uppercase tracking-[0.5em]">
+               Image_Ref: {study.id}
+             </div>
           </div>
           
-          <div className="flex flex-col">
-            <h3 className="text-4xl font-black uppercase leading-none mb-2 font-[family-name:var(--font-headline)]">
-              {study.name}
-            </h3>
-            <p className="text-sm font-medium font-[family-name:var(--font-body)]">
-              Form follows function. Architectural precision in every thread.
+          <div className="space-y-4">
+            <div className="flex justify-between items-start">
+              <h3 className="text-xl font-black uppercase tracking-tighter leading-none font-[family-name:var(--font-headline)]">
+                {study.name}
+              </h3>
+              <span className="text-[#BC2026] font-bold text-xs">{study.price}</span>
+            </div>
+            
+            <p className="text-[10px] text-white/40 uppercase tracking-widest leading-relaxed">
+              {study.description}
             </p>
-          </div>
-          
-          <div className="flex justify-between items-end">
-            <span className="text-2xl font-black">${study.priceDisplay}</span>
+
             <button 
-              onClick={() => handleAcquisition(study.priceId, study.id)}
-              disabled={loadingId === study.id}
-              className="text-[10px] font-bold border-b-2 border-current uppercase hover:opacity-70 disabled:opacity-50"
+              onClick={() => createCheckoutSession(study.priceId)}
+              className="w-full mt-6 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#BC2026] hover:text-white transition-all"
             >
-              {loadingId === study.id ? "CALIBRATING..." : "ACQUIRE STUDY →"}
+              Acquire Study
             </button>
           </div>
         </div>
       ))}
     </div>
   );
-};
-
-export default ProductGrid;
+}
