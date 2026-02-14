@@ -8,14 +8,14 @@ const studies = [
     id: 1, 
     name: "Study 001: Brutalist Tee", 
     priceDisplay: "45.00", 
-    priceId: "price_1Qxy...", // Replace with your actual Stripe Price ID
+    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH",
     category: "Phase 01" 
   },
   { 
     id: 2, 
     name: "Study 002: Geometry Poster", 
     priceDisplay: "30.00", 
-    priceId: "price_1Qyz...", // Replace with your actual Stripe Price ID
+    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH",
     category: "Phase 01" 
   },
 ];
