@@ -1,26 +1,32 @@
+# DeepSource Configuration for RGRM Studio
+# Phase 01: Brutalist Lineage
+
+version = 1
+
 [[analyzers]]
 name = "javascript"
 enabled = true
-
   [analyzers.meta]
   environment = ["browser", "node"]
-  # Tells the agent to look for Next.js and React structural patterns
   frameworks = ["react", "nextjs"]
+  # Ensures the inspector uses your preferred architectural standards
+  style_guide = "airbnb" 
 
 [[analyzers]]
 name = "secrets"
 enabled = true
-# This ensures your Stripe Secret Keys never accidentally leak into the blueprint
+# Protects your STRIPE_SECRET_KEY and PRINTFUL_ID from exposure
 
 [[analyzers]]
 name = "test-coverage"
 enabled = true
 
 [exclude_patterns]
-# We don't need to inspect the "scaffolding" (modules or build files)
+# We ignore the "temporary scaffolding"
 patterns = [
   "node_modules/**",
   ".next/**",
   "out/**",
-  "public/**"
+  "public/**",
+  "*.config.js"
 ]
