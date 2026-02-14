@@ -1,18 +1,21 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  // Verify the request is coming from Vercel Cron
+  // Simple security check for Cron jobs
   const authHeader = req.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', { status: 401 });
   }
 
   try {
-    // Logic to sync with Printful or update your identity registry
-    console.log("Syncing inventory...");
+    const response = await fetch(`https://api.printful.com/store/products`, {
+      headers: { 'Authorization': `Bearer ${process.env.PRINTFUL_API_KEY}` },
+    });
+    const data = await response.json();
     
-    return NextResponse.json({ success: true, lastRun: new Date().toISOString() });
+    // Logic to update your DB would go here
+    return NextResponse.json({ synced: true, count: data.result.length });
   } catch (error) {
-    return NextResponse.json({ success: false, error: "Sync failed" }, { status: 500 });
+    return NextResponse.json({ error: 'Sync Failed' }, { status: 500 });
   }
 }
