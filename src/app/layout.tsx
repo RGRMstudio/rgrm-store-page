@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Roboto } from "next/font/google";
 import "./globals.css";
+import { RGRM_IDENTITY, RGRM_SEO, RGRM_CHANNELS } from "@/lib/constants";
 
 // RGRM Typography Standard
 const montserrat = Montserrat({
@@ -15,22 +16,23 @@ const roboto = Roboto({
   weight: ["400", "500"],
 });
 
-// The RGRM Studio Identity Registry
+// The RGRM Studio Identity Registry (Dynamic from Constants)
 export const metadata: Metadata = {
-  title: "RaGuiRoMo Studio | Phase 01: Brutalist Lineage",
-  description: "Architectural Streetwear by Raul Guillermo Rosario Morales. Form Follows Function.",
-  keywords: ["RGRM", "RaGuiRoMo", "Architectural Streetwear", "Brutalist Fashion", "Raul Morales"],
-  authors: [{ name: "Raul Guillermo Rosario Morales" }],
+  title: RGRM_SEO.defaultTitle,
+  description: RGRM_SEO.description,
+  keywords: RGRM_SEO.keywords,
+  authors: [{ name: RGRM_IDENTITY.founder }],
   openGraph: {
-    title: "RaGuiRoMo Studio",
-    description: "Bridging the gap between architectural precision and modern streetwear.",
-    url: "https://raguiromo.store",
-    siteName: "RGRM Studio",
+    title: RGRM_IDENTITY.name,
+    description: RGRM_SEO.description,
+    url: RGRM_CHANNELS.storefront,
+    siteName: RGRM_IDENTITY.name,
     images: [
       {
-        url: "/og-image.npg", // Ensure you upload a brand image to your public folder later
+        url: RGRM_SEO.ogImage,
         width: 1200,
         height: 630,
+        alt: `${RGRM_IDENTITY.name} | ${RGRM_IDENTITY.tagline}`,
       },
     ],
     locale: "en_US",
@@ -38,8 +40,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RaGuiRoMo Studio",
-    description: "Form Follows Function.",
+    title: RGRM_IDENTITY.name,
+    description: RGRM_IDENTITY.tagline,
+    images: [RGRM_SEO.ogImage],
   },
 };
 
@@ -50,13 +53,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${montserrat.variable} ${roboto.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased bg-black text-white">
         {children}
         
         {/* Chatbase Studio Concierge Script */}
         <script
           src="https://www.chatbase.co/embed.min.js"
-          data-chatbot-id={process.env.gDsk1ohAYgzBh_NrHorAy}
+          data-chatbot-id={process.env.NEXT_PUBLIC_CHATBASE_CHATBOT_ID}
           data-domain="www.raguiromo.store"
           defer
         >
