@@ -1,62 +1,65 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
-  /* --- BAXHAUS DESIGN SYSTEM TOKENS --- */
+:root {
+  /* RGRM Primary Palette */
+  --rgrm-black: #000000;
+  --rgrm-white: #FFFFFF;
   
-  /* Primary Palette */
-  --color-bauhaus-red: #e63946;
-  --color-bauhaus-yellow: #ffb703;
-  --color-bauhaus-blue: #1d3557;
-  --color-bauhaus-black: #000000;
-  --color-bauhaus-white: #ffffff;
-
-  /* Typography Stack 
-     We're using a 'Grotesk' stack for that authentic Bauhaus feel.
-     These variables automatically create 'font-bauhaus' and 'font-mono' classes.
-  */
-  --font-bauhaus: "Inter", "Space Grotesk", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", monospace;
-
-  /* Custom Shadow for the 'Bauhaus Card' */
-  --shadow-bauhaus: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  /* RGRM Accents */
+  --rgrm-red: #BC2026;   /* Signature Acquisition Red */
+  --rgrm-blue: #0055A4;  /* Signal Blue */
+  
+  /* Layout Constants */
+  --border-thickness: 1px;
 }
 
 @layer base {
   body {
-    /* v4 replaces @tailwind directives with @import. 
-       We apply our base styles here to ensure clean rendering. 
-    */
-    @apply bg-white text-black antialiased font-bauhaus;
-    
-    /* Signature Bauhaus Highlight */
-    &::selection {
-      background-color: var(--color-bauhaus-red);
-      color: white;
-    }
+    @apply bg-black text-white antialiased selection:bg-[#BC2026] selection:text-white;
+    font-family: var(--font-body), sans-serif;
+    /* The Structural Grid: subtle 40px grid dots */
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
+    background-size: 40px 40px;
+    background-attachment: fixed;
   }
 
-  h1, h2, h3, h4 {
-    @apply font-black uppercase tracking-tighter leading-none;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headline), sans-serif;
+    @apply font-black uppercase tracking-tighter;
   }
 }
 
 @layer components {
-  /* Signature Heavy-Border Aesthetic */
-  .bauhaus-card {
-    @apply border-4 border-black bg-white p-6 shadow-bauhaus
-           transition-transform duration-200 
-           hover:-translate-x-1 hover:-translate-y-1;
+  /* The RGRM Structural Border */
+  .rgrm-border {
+    @apply border border-white/10;
   }
 
-  /* Interactive Signature Button */
-  .bauhaus-btn {
-    @apply inline-block px-8 py-4 bg-black text-white font-bold uppercase 
-           hover:bg-bauhaus-red active:scale-95
-           transition-all duration-300 cursor-pointer;
+  /* The Acquisition Button Logic */
+  .btn-acquire {
+    @apply relative overflow-hidden px-6 py-3 transition-all duration-300
+           border border-white hover:bg-[#BC2026] hover:border-[#BC2026]
+           uppercase text-[10px] font-bold tracking-widest;
   }
 
-  /* Utility class for that offset-line look */
-  .bauhaus-border-bottom {
-    @apply border-b-8 border-black;
+  /* Structural Divider */
+  .structural-line {
+    @apply w-full h-[1px] bg-gradient-to-r from-white/20 via-white/5 to-transparent;
   }
+}
+
+/* Custom scrollbar for a sophisticated feel */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--rgrm-black);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--rgrm-red);
 }
