@@ -1,58 +1,66 @@
-import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata } from "next";
+import { Montserrat, Roboto } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ 
-  subsets: ["latin"], 
-  variable: "--font-inter",
-  display: 'swap' 
+// RGRM Typography Standard
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-headline",
+  weight: ["700", "900"],
 });
 
-export const metadata: Metadata = {
-  title: "RaGuiRoMo Store",
-  description: "Official RGRMstore Identity Registry - Authenticated Design & Identity Modules.",
-  manifest: "/site.webmanifest",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/icons/icon-192x192.png",
-  },
-};
+const roboto = Roboto({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500"],
+});
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#000000",
+// The RGRM Studio Identity Registry
+export const metadata: Metadata = {
+  title: "RaGuiRoMo Studio | Phase 01: Brutalist Lineage",
+  description: "Architectural Streetwear by Raul Guillermo Rosario Morales. Form Follows Function.",
+  keywords: ["RGRM", "RaGuiRoMo", "Architectural Streetwear", "Brutalist Fashion", "Raul Morales"],
+  authors: [{ name: "Raul Guillermo Rosario Morales" }],
+  openGraph: {
+    title: "RaGuiRoMo Studio",
+    description: "Bridging the gap between architectural precision and modern streetwear.",
+    url: "https://raguiromo.store",
+    siteName: "RGRM Studio",
+    images: [
+      {
+        url: "/og-image.npg", // Ensure you upload a brand image to your public folder later
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RaGuiRoMo Studio",
+    description: "Form Follows Function.",
+  },
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth`}>
-      <body className="antialiased bg-white text-black selection:bg-yellow-400">
-        
-        {/* Main Application Content */}
+    <html lang="en" className={`${montserrat.variable} ${roboto.variable}`}>
+      <body className="antialiased">
         {children}
-
-        {/* 1. Vercel Performance Suite */}
-        <Analytics />
-        <SpeedInsights />
-
-        {/* 2. Loops.so Tracking Script 
-            Note: This script enables Loops to track events and identify users 
-            directly from the frontend for your RGRM Identity Registry.
-        */}
-        <Script 
-          src="https://app.loops.so/scripts/track.js" 
-          strategy="afterInteractive" 
-          data-loops-id={process.env.d5a8e958b2e9dda1ba7dda42e0dbe8b5} 
-        />
         
+        {/* Chatbase Studio Concierge Script */}
+        <script
+          src="https://www.chatbase.co/embed.min.js"
+          data-chatbot-id={process.env.gDsk1ohAYgzBh_NrHorAy}
+          data-domain="www.raguiromo.store"
+          defer
+        >
+        </script>
       </body>
     </html>
   );
