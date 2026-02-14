@@ -1,28 +1,33 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+export async function subscribeToRegistry(formData: FormData) {
+  const email = formData.get('email');
 
-/**
- * Bauhaus Registry Action
- * Handles the creation of new design identifiers for raguiromo.store
- */
-export async function createRegistryEntry(formData: FormData) {
-  const identifier = formData.get('identifier');
-  const metadata = formData.get('metadata');
+  if (!email || typeof email !== 'string') {
+    return { error: 'A valid email blueprint is required.' };
+  }
 
   try {
-    // 1. Log the registry intent
-    console.log(`[Bauhaus Protocol] Registering: ${identifier}`);
+    const response = await fetch('https://app.loops.so/api/v1/contacts/create', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        userGroup: 'Phase 01 Registry',
+        source: 'RGRM Selection Page'
+      }),
+    });
 
-    // 2. Logic for Stripe/Printful or Database would go here
-    // Example: await db.insert(...)
+    if (!response.ok) {
+      throw new Error('Communication failure with Loops.');
+    }
 
-    // 3. Purge the cache to show the new registry entry immediately
-    revalidatePath('/');
-    
-    return { success: true, message: "Entry registered to Bauhaus Protocol" };
+    return { success: true };
   } catch (error) {
-    console.error("Registry Error:", error);
-    return { success: false, error: "Protocol validation failed" };
+    console.error('Registry Error:', error);
+    return { error: 'Structural error during registration.' };
   }
 }
