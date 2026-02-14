@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Prevent crawlers from indexing private studio logic
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+Sitemap: https://raguiromo.store/sitemap.xml
