@@ -1,28 +1,37 @@
 'use server';
 
-import { stripe } from '@/lib/stripe'; // Use the verified lib instance
+import Stripe from 'stripe';
 import { redirect } from 'next/navigation';
 
-export async function createCheckoutSession() {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2023-10-16',
+});
+
+export async function createCheckoutSession(priceId: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://raguiromo.store';
+  let session;
+
   try {
-    const session = await stripe.checkout.sessions.create({
+    session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       line_items: [
         {
-          // Ensure this Price ID matches your Stripe Dashboard exactly
-          price: process.env.STRIPE_PRICE_ID, 
+          price: priceId,
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/selection`,
+      shipping_address_collection: {
+        allowed_countries: ['US', 'CA', 'GB', 'PR'], // Added PR for your local reach
+      },
     });
-
-    if (session.url) {
-      redirect(session.url);
-    }
-  } catch (error: any) {
-    console.error('Checkout Error:', error.message);
-    throw new Error('Failed to create checkout session.');
+  } catch (error) {
+    console.error('Stripe Session Error:', error);
+    throw new Error('Failed to initiate acquisition.');
   }
+
+  // Redirects the user to the Stripe hosted checkout
+  redirect(session.url!);
 }
