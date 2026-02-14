@@ -50,7 +50,7 @@ export default function RootLayout({
         <Script 
           src="https://app.loops.so/scripts/track.js" 
           strategy="afterInteractive" 
-          data-loops-id={process.env.NEXT_PUBLIC_LOOPS_ID} // Replace with your Loops ID in Vercel
+          data-loops-id={process.env.d5a8e958b2e9dda1ba7dda42e0dbe8b5} 
         />
         
       </body>
