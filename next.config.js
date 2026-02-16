@@ -1,6 +1,17 @@
-/** @type {import('next').NextContent} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  eslint: {
+    // Structural integrity checks are handled during development
+    ignoreDuringBuilds: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'files.cdn.printful.com',
+      },
+    ],
+  },
 };
+
 module.exports = nextConfig;
