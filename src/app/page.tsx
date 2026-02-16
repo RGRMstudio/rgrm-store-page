@@ -1,118 +1,70 @@
-'use client'; // <--- 1. This is required for useState/useEffect
+'use client';
 
-import React, { useState, useEffect, Suspense } from 'react'; // <--- 2. Added missing imports
-import dynamic from 'next/dynamic'; // <--- 3. Fixed dynamic import
+import React from 'react';
 import Link from 'next/link';
+import { RGRM_IDENTITY, RGRM_PHASES, RGRM_CHANNELS } from '@/lib/constants';
 
-// Make sure this file exists at: src/components/ProductCard.tsx
-import ProductGrid from '@/components/ProductCard'; 
-
-const IdentityPop = dynamic(() => import('@/components/IdentityPop'), { 
-  ssr: false,
-  loading: () => <div className="h-40 animate-pulse bg-gray-100 border-4 border-black mb-8" /> 
-});
-
-const IdentityStory = dynamic(() => import('@/components/IdentityStory'), { 
-  ssr: false,
-  loading: () => <div className="h-64 animate-pulse bg-gray-50 border-2 border-black" />
-});
-
-export default function Home() {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  if (!hasMounted) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-black border-t-red-600 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
+export default function HomePage() {
   return (
-    <main className="relative min-h-screen bg-white text-black font-sans selection:bg-yellow-400">
-      {/* RGRM Global Header */}
-      <header className="p-6 border-b-8 border-black flex justify-between items-center bg-white sticky top-0 z-50">
-        <div className="flex flex-col">
-          <h1 className="text-4xl font-black uppercase tracking-tighter leading-none">
-            RaGuiRoMo <span className="text-red-600">Store</span>
-          </h1>
-          <span className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-50">
-            Authenticated Identity Registry
-          </span>
+    <main className="min-h-screen bg-black text-white flex flex-col selection:bg-[#BC2026]">
+      {/* STRUCTURAL HEADER */}
+      <nav className="p-6 flex justify-between items-center blueprint-border border-t-0 border-x-0">
+        <span className="font-black tracking-tighter text-xl">{RGRM_IDENTITY.shortName}</span>
+        <div className="flex gap-8 text-[10px] uppercase tracking-[0.3em] font-bold">
+          <Link href="/selection" className="hover:text-rgrm-red transition-colors">Studies</Link>
+          <Link href="/selection/register" className="hover:text-rgrm-red transition-colors">Registry</Link>
         </div>
-        <nav className="hidden md:flex gap-10 font-black text-xs tracking-widest">
-          <a href="#registry" className="hover:text-blue-600 transition-colors underline decoration-4 underline-offset-4">REGISTRY</a>
-          <a href="#shop" className="hover:text-green-600 transition-colors underline decoration-4 underline-offset-4">SHOP</a>
-          <a href="#narrative" className="hover:text-red-600 transition-colors underline decoration-4 underline-offset-4">STORY</a>
-        </nav>
-      </header>
+      </nav>
 
-      {/* Main Layout Grid */}
-      <div className="max-w-7xl mx-auto p-6 md:p-12 lg:p-20">
-        
-        {/* Section 1: Interaction & Identity */}
-        <section id="registry" className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-24">
-          <div className="space-y-8">
-            <Suspense fallback={<div>Initializing...</div>}>
-              <IdentityPop />
-            </Suspense>
+      {/* HERO SECTION: THE MANIFESTO */}
+      <section className="flex-grow flex flex-col justify-center px-6 md:px-24 py-24 relative overflow-hidden">
+        <div className="max-w-4xl space-y-8 z-10">
+          <p className="text-rgrm-red text-xs font-bold uppercase tracking-[0.5em] animate-pulse">
+            Status: {RGRM_PHASES.current.status} // Phase {RGRM_PHASES.current.id}
+          </p>
+          
+          <h1 className="text-6xl md:text-9xl font-black uppercase tracking-tighter leading-[0.85] font-[family-name:var(--font-headline)]">
+            {RGRM_PHASES.current.name}
+          </h1>
+
+          <p className="text-sm md:text-xl uppercase tracking-widest leading-relaxed text-white/60 max-w-2xl font-[family-name:var(--font-body)]">
+            {RGRM_IDENTITY.mission} Every garment is an acquisition of structural integrity.
+          </p>
+
+          <div className="pt-12">
+            <Link href="/selection">
+              <button className="btn-acquire">
+                Enter the Gallery
+              </button>
+            </Link>
           </div>
+        </div>
 
-          <div className="relative group">
-            <div className="absolute inset-0 bg-black translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform" />
-            <div className="relative border-8 border-black p-8 bg-red-600">
-               <div className="bg-white p-10 border-4 border-black">
-                 <h2 className="text-8xl font-black uppercase leading-[0.8] mb-6 tracking-tighter">
-                   RGRM<br/><span className="text-blue-600">REG</span>
-                 </h2>
-                 <p className="text-xl font-black border-t-8 border-black pt-6 uppercase">
-                   Module 002: Authentication
-                 </p>
-                 <p className="text-sm font-bold opacity-70 mt-4 leading-relaxed">
-                   Verification of design lineage and production origin for RGRMstore artifacts.
-                 </p>
-               </div>
-            </div>
-          </div>
-        </section>
+        {/* ARCHITECTURAL WATERMARK */}
+        <div className="absolute bottom-[-10%] right-[-5%] text-[30vw] font-black text-white/[0.02] uppercase pointer-events-none select-none leading-none">
+          {RGRM_IDENTITY.shortName}
+        </div>
+      </section>
 
-        {/* --- NEW SECTION: SHOP --- */}
-        <section id="shop" className="mb-24 border-8 border-black">
-          <div className="bg-black text-white p-4">
-            <h2 className="text-xl font-black uppercase tracking-widest">
-              Artifact Collection
-            </h2>
-          </div>
-          {/* This loads the Product Grid we built earlier */}
-          <ProductGrid />
-        </section>
+      {/* SYSTEM COORDINATES FOOTER */}
+      <footer className="p-12 blueprint-border border-b-0 border-x-0 grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+        <div>
+          <p className="text-[10px] uppercase font-bold text-white/20 tracking-widest mb-2">Blueprint Founder</p>
+          <p className="text-xs uppercase font-bold tracking-widest">{RGRM_IDENTITY.founder}</p>
+        </div>
 
-        {/* Section 2: Brand Narrative */}
-        <section id="narrative" className="border-t-8 border-black pt-20">
-          <div className="bg-yellow-400 border-8 border-black p-1 translate-x-[-10px]">
-            <div className="bg-white p-8 md:p-16 border-4 border-black">
-              <Suspense fallback={<div>Loading Narrative...</div>}>
-                <IdentityStory />
-              </Suspense>
-            </div>
-          </div>
-        </section>
+        <div className="flex gap-6 justify-center">
+          <a href={RGRM_CHANNELS.instagram} target="_blank" className="text-[10px] uppercase tracking-widest hover:text-rgrm-red transition-colors">IG</a>
+          <a href={RGRM_CHANNELS.x} target="_blank" className="text-[10px] uppercase tracking-widest hover:text-rgrm-red transition-colors">X</a>
+          <a href={RGRM_CHANNELS.linkedin} target="_blank" className="text-[10px] uppercase tracking-widest hover:text-rgrm-red transition-colors">LI</a>
+        </div>
 
-      </div>
-
-      {/* RGRM Footer */}
-      <footer className="mt-20 p-16 bg-black text-white border-t-[12px] border-red-600 flex flex-col items-center gap-6">
-        <p className="text-3xl font-black uppercase tracking-[0.3em] text-center">
-          RGRMstore <span className="text-red-600">•</span> 2026
-        </p>
-        <div className="h-1 w-24 bg-blue-600" />
-        <p className="text-[10px] font-bold tracking-[0.5em] opacity-40">
-          IDENTITY IS THE ULTIMATE LUXURY
-        </p>
+        <div className="text-right">
+          <p className="text-[8px] uppercase tracking-[0.5em] text-white/20 leading-loose">
+            © {RGRM_IDENTITY.established} {RGRM_IDENTITY.shortName} Studio <br />
+            {RGRM_IDENTITY.tagline}
+          </p>
+        </div>
       </footer>
     </main>
   );
