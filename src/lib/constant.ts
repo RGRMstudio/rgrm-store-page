@@ -1,3 +1,8 @@
+/**
+ * RGRM STUDIO | CENTRAL REGISTRY
+ * Guiding Principle: Form Follows Function
+ */
+
 export const RGRM_IDENTITY = {
   name: "RaGuiRoMo Studio",
   shortName: "RGRM",
@@ -25,5 +30,5 @@ export const RGRM_SEO = {
   defaultTitle: "RaGuiRoMo Studio | Phase 01: Brutalist Lineage",
   description: "Architectural Streetwear by Raul Guillermo Rosario Morales. Every piece is a study in structural integrity.",
   ogImage: "/og-image.jpg",
-  keywords: ["RGRM", "RaGuiRoMo", "Architectural Streetwear", "Brutalist Fashion", "Raul Morales"],
+  keywords: ["RGRM", "RaGuiRoMo", "Architectural Streetwear", "Brutalist Fashion", "Raul Morales", "Studio Streetwear"],
 };
