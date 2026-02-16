@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 
 // --- CONFIGURATION ---
-// Replace these IDs with the ones from your Stripe Dashboard > Products > Pricing
+// ⚠️ ACTION REQUIRED: Replace the strings below with your REAL Stripe Price IDs ⚠️
 const PRODUCTS = [
   { 
     id: 1, 
     name: "Bauhaus Tee No. 1", 
     priceDisplay: "45.00", 
-    priceId: "price_1Qxy...", // <--- PASTE YOUR STRIPE PRICE ID HERE
+    // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
+    priceId: "price_REPLACE_THIS_WITH_REAL_ID_FROM_STRIPE", 
     category: "Apparel",
     description: "Heavyweight cotton. 240gsm. Screen printed in Brooklyn.",
     color: "bg-red-600"
@@ -20,7 +21,8 @@ const PRODUCTS = [
     id: 2, 
     name: "Manifesto Poster", 
     priceDisplay: "30.00", 
-    priceId: "price_1Qyz...", // <--- PASTE YOUR STRIPE PRICE ID HERE
+    // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
+    priceId: "price_REPLACE_THIS_WITH_REAL_ID_FROM_STRIPE", 
     category: "Print",
     description: "A2 Matte Finish. The principles of modern identity.",
     color: "bg-blue-600"
@@ -29,7 +31,8 @@ const PRODUCTS = [
     id: 3, 
     name: "Geometric Study", 
     priceDisplay: "120.00", 
-    priceId: "price_1Qab...", // <--- PASTE YOUR STRIPE PRICE ID HERE
+    // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
+    priceId: "price_REPLACE_THIS_WITH_REAL_ID_FROM_STRIPE", 
     category: "Digital",
     description: "Limited edition digital asset + Physical key.",
     color: "bg-yellow-400"
@@ -56,8 +59,9 @@ export default function SelectionPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
+        // This will now tell you exactly what Stripe is complaining about!
         console.error('Checkout error:', data.error);
-        alert('System Error: Could not initiate checkout sequence.');
+        alert(`Stripe Error: ${data.error || 'Check Vercel Logs for details'}`);
       }
     } catch (error) {
       console.error('Network error:', error);
