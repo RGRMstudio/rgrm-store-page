@@ -1,65 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --font-headline: var(--font-headline);
+  --font-body: var(--font-body);
+  /* RGRM Palette */
+  --color-studio-black: #000000;
+  --color-canvas-white: #FFFFFF;
+  --color-rgrm-red: #BC2026;
+  --color-rgrm-blue: #0055A4;
+}
 
 :root {
-  /* RGRM Primary Palette */
-  --rgrm-black: #000000;
-  --rgrm-white: #FFFFFF;
-  
-  /* RGRM Accents */
-  --rgrm-red: #BC2026;   /* Signature Acquisition Red */
-  --rgrm-blue: #0055A4;  /* Signal Blue */
-  
-  /* Layout Constants */
-  --border-thickness: 1px;
+  background-color: black;
+  color: white;
 }
 
-@layer base {
-  body {
-    @apply bg-black text-white antialiased selection:bg-[#BC2026] selection:text-white;
-    font-family: var(--font-body), sans-serif;
-    /* The Structural Grid: subtle 40px grid dots */
-    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
-    background-size: 40px 40px;
-    background-attachment: fixed;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-headline), sans-serif;
-    @apply font-black uppercase tracking-tighter;
-  }
+body {
+  @apply antialiased bg-black text-white selection:bg-rgrm-red selection:text-white;
 }
 
-@layer components {
-  /* The RGRM Structural Border */
-  .rgrm-border {
-    @apply border border-white/10;
-  }
-
-  /* The Acquisition Button Logic */
-  .btn-acquire {
-    @apply relative overflow-hidden px-6 py-3 transition-all duration-300
-           border border-white hover:bg-[#BC2026] hover:border-[#BC2026]
-           uppercase text-[10px] font-bold tracking-widest;
-  }
-
-  /* Structural Divider */
-  .structural-line {
-    @apply w-full h-[1px] bg-gradient-to-r from-white/20 via-white/5 to-transparent;
-  }
+/* RGRM Architectural Utilities */
+@utility btn-acquire {
+  @apply px-8 py-4 bg-white text-black font-black uppercase tracking-[0.3em] 
+         hover:bg-rgrm-red hover:text-white transition-all duration-300;
 }
 
-/* Custom scrollbar for a sophisticated feel */
-::-webkit-scrollbar {
-  width: 5px;
-}
-::-webkit-scrollbar-track {
-  background: var(--rgrm-black);
-}
-::-webkit-scrollbar-thumb {
-  background: #333;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--rgrm-red);
+@utility blueprint-border {
+  @apply border border-white/10;
 }
