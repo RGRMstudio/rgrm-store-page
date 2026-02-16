@@ -3,11 +3,12 @@
 @theme {
   --font-headline: var(--font-headline);
   --font-body: var(--font-body);
-  /* RGRM Palette */
-  --color-studio-black: #000000;
-  --color-canvas-white: #FFFFFF;
-  --color-rgrm-red: #BC2026;
-  --color-rgrm-blue: #0055A4;
+  
+  /* RGRM Palette: 60-30-10 Rule */
+  --color-studio-black: #000000;   /* 60% */
+  --color-canvas-white: #FFFFFF;   /* 30% */
+  --color-rgrm-red: #BC2026;      /* 10% (Accent) */
+  --color-signal-blue: #0055A4;   /* Secondary Accent */
 }
 
 :root {
