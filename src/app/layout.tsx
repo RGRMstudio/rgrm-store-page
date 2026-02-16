@@ -4,19 +4,18 @@ import "./globals.css";
 import { RGRM_IDENTITY, RGRM_SEO, RGRM_CHANNELS } from "@/lib/constants";
 
 // RGRM Typography Standard
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-headline",
-  weight: ["700", "900"],
+const montserrat = Montserrat({ 
+  subsets: ["latin"], 
+  variable: "--font-headline", 
+  weight: ["700", "900"] 
 });
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500"],
+const roboto = Roboto({ 
+  subsets: ["latin"], 
+  variable: "--font-body", 
+  weight: ["400", "500"] 
 });
 
-// The RGRM Studio Identity Registry (Dynamic from Constants)
 export const metadata: Metadata = {
   title: RGRM_SEO.defaultTitle,
   description: RGRM_SEO.description,
