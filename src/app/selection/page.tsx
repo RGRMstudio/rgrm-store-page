@@ -12,7 +12,7 @@ const PRODUCTS = [
     name: "Bauhaus Tee No. 1", 
     priceDisplay: "45.00", 
     // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
-    priceId: "price_REPLACE_THIS_WITH_REAL_ID_FROM_STRIPE", 
+    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH", 
     category: "Apparel",
     description: "Heavyweight cotton. 240gsm. Screen printed in Brooklyn.",
     color: "bg-red-600"
@@ -22,7 +22,7 @@ const PRODUCTS = [
     name: "Manifesto Poster", 
     priceDisplay: "30.00", 
     // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
-    priceId: "price_REPLACE_THIS_WITH_REAL_ID_FROM_STRIPE", 
+    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH", 
     category: "Print",
     description: "A2 Matte Finish. The principles of modern identity.",
     color: "bg-blue-600"
@@ -32,7 +32,7 @@ const PRODUCTS = [
     name: "Geometric Study", 
     priceDisplay: "120.00", 
     // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
-    priceId: "price_REPLACE_THIS_WITH_REAL_ID_FROM_STRIPE", 
+    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH", 
     category: "Digital",
     description: "Limited edition digital asset + Physical key.",
     color: "bg-yellow-400"
