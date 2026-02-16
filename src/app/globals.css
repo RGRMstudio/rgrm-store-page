@@ -1,31 +1,12 @@
 @import "tailwindcss";
 
-@theme {
-  --font-headline: var(--font-headline);
-  --font-body: var(--font-body);
-  
-  /* RGRM Palette: 60-30-10 Rule */
-  --color-studio-black: #000000;   /* 60% */
-  --color-canvas-white: #FFFFFF;   /* 30% */
-  --color-rgrm-red: #BC2026;      /* 10% (Accent) */
-  --color-signal-blue: #0055A4;   /* Secondary Accent */
-}
-
 :root {
-  background-color: black;
-  color: white;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 body {
-  @apply antialiased bg-black text-white selection:bg-rgrm-red selection:text-white;
-}
-
-/* RGRM Architectural Utilities */
-@utility btn-acquire {
-  @apply px-8 py-4 bg-white text-black font-black uppercase tracking-[0.3em] 
-         hover:bg-rgrm-red hover:text-white transition-all duration-300;
-}
-
-@utility blueprint-border {
-  @apply border border-white/10;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
 }
