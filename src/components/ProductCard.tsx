@@ -1,53 +1,80 @@
 'use client';
 
-import React from 'react';
-import { createCheckoutSession } from '@/app/actions/checkout';
+import React, { useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
 
-const studies = [
-  {
-    id: '001',
-    name: 'Study 001: Brutalist Essential',
-    price: '$45.00',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || '', // Ties to your Vercel key
-    description: 'Phase 01 Structural Garment. Studio Black.',
-    image: '/study-001.jpg'
-  },
-  // Add more studies as they are cleared for acquisition
-];
+// Initialize Stripe outside of the component to avoid re-initialization
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-export default function ProductGrid() {
+export default function ProductCard({ product }: { product: any }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleAcquire = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // We pass the price ID from our environment variables
+        body: JSON.stringify({
+          priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID,
+        }),
+      });
+
+      const { sessionId, error } = await response.json();
+
+      if (error) {
+        console.error("Acquisition Error:", error);
+        setLoading(false);
+        return;
+      }
+
+      const stripe = await stripePromise;
+      const { error: stripeError } = await stripe!.redirectToCheckout({ sessionId });
+
+      if (stripeError) {
+        console.error("Stripe Redirect Error:", stripeError.message);
+      }
+    } catch (err) {
+      console.error("Critical System Failure:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {studies.map((study) => (
-        <div key={study.id} className="border-r border-b border-white/10 p-8 group hover:bg-white/[0.02] transition-colors">
-          <div className="aspect-[3/4] bg-white/5 mb-8 relative overflow-hidden">
-             {/* Study Image Placeholder */}
-             <div className="absolute inset-0 flex items-center justify-center text-[10px] text-white/10 uppercase tracking-[0.5em]">
-               Image_Ref: {study.id}
-             </div>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex justify-between items-start">
-              <h3 className="text-xl font-black uppercase tracking-tighter leading-none font-[family-name:var(--font-headline)]">
-                {study.name}
-              </h3>
-              <span className="text-[#BC2026] font-bold text-xs">{study.price}</span>
-            </div>
-            
-            <p className="text-[10px] text-white/40 uppercase tracking-widest leading-relaxed">
-              {study.description}
-            </p>
-
-            <button 
-              onClick={() => createCheckoutSession(study.priceId)}
-              className="w-full mt-6 py-4 bg-white text-black text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#BC2026] hover:text-white transition-all"
-            >
-              Acquire Study
-            </button>
-          </div>
+    <div className="blueprint-border p-6 space-y-4 bg-black">
+      <div className="aspect-square bg-white/5 relative overflow-hidden">
+        {/* Product Image placeholder */}
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className="object-cover w-full h-full opacity-80 hover:opacity-100 transition-opacity"
+        />
+      </div>
+      
+      <div className="flex justify-between items-end">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-rgrm-red mb-1">
+            Study {product.id}
+          </p>
+          <h3 className="font-black uppercase tracking-tighter text-xl leading-none">
+            {product.name}
+          </h3>
         </div>
-      ))}
+        <p className="font-bold text-sm tracking-widest">${product.price}</p>
+      </div>
+
+      <button 
+        onClick={handleAcquire}
+        disabled={loading}
+        className="w-full btn-acquire disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "Processing..." : "Acquire Study"}
+      </button>
     </div>
   );
 }
