@@ -1,161 +1,199 @@
-'use client';
-
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { client, urlFor } from '@/lib/sanity';
+import { RGRM_IDENTITY } from '@/lib/constants';
+import AddToCartButton from '@/components/product/AddToCartButton';
 
-// --- CONFIGURATION ---
-// ⚠️ ACTION REQUIRED: Replace the strings below with your REAL Stripe Price IDs ⚠️
-const PRODUCTS = [
-  { 
-    id: 1, 
-    name: "Bauhaus Tee No. 1", 
-    priceDisplay: "45.00", 
-    // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
-    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH", 
-    category: "Apparel",
-    description: "Heavyweight cotton. 240gsm. Screen printed in Brooklyn.",
-    color: "bg-red-600"
-  },
-  { 
-    id: 2, 
-    name: "Manifesto Poster", 
-    priceDisplay: "30.00", 
-    // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
-    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH", 
-    category: "Print",
-    description: "A2 Matte Finish. The principles of modern identity.",
-    color: "bg-blue-600"
-  },
-  { 
-    id: 3, 
-    name: "Geometric Study", 
-    priceDisplay: "120.00", 
-    // 👇 DELETE THIS PLACEHOLDER AND PASTE YOUR REAL ID INSIDE THE QUOTES
-    priceId: "price_1SzoioDVc7z8RC9IwwYzowLH", 
-    category: "Digital",
-    description: "Limited edition digital asset + Physical key.",
-    color: "bg-yellow-400"
-  },
-];
+// --- 1. CONFIGURATION ---
+// Revalidate this page every 60 seconds to check for price/stock updates (ISR)
+export const revalidate = 60;
 
-export default function SelectionPage() {
-  const [loadingId, setLoadingId] = useState<number | null>(null);
+// Define the shape of the data coming from Sanity
+interface ProductData {
+  id: string;
+  name: string;
+  price: number;
+  status: 'AVAILABLE' | 'LOW STOCK' | 'SOLD OUT';
+  image: any; // Sanity Image Object
+  description: string;
+  specs: string;
+  material?: string;
+  fit?: string;
+  origin?: string;
+}
 
-  const handleCheckout = async (priceId: string, productId: number) => {
-    setLoadingId(productId);
-    
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: [{ priceId: priceId, quantity: 1 }]
-        }),
-      });
+// --- 2. GENERATE STATIC PARAMS (SSG) ---
+// This tells Next.js to pre-build a page for every ID currently in Sanity
+export async function generateStaticParams() {
+  const query = `*[_type == "study"]{ "id": id }`;
+  const products = await client.fetch(query);
 
-      const data = await response.json();
+  return products.map((product: { id: string }) => ({
+    id: product.id,
+  }));
+}
 
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        // This will now tell you exactly what Stripe is complaining about!
-        console.error('Checkout error:', data.error);
-        alert(`Stripe Error: ${data.error || 'Check Vercel Logs for details'}`);
-      }
-    } catch (error) {
-      console.error('Network error:', error);
-      alert('Network Error: Please check your connection.');
-    } finally {
-      setLoadingId(null);
-    }
+// --- 3. DYNAMIC METADATA (SEO) ---
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const query = `*[_type == "study" && id == $id][0]{ name, description }`;
+  const product = await client.fetch(query, { id: params.id });
+
+  if (!product) return { title: 'FILE NOT FOUND' };
+
+  return {
+    title: `${product.name} // ${params.id}`,
+    description: product.description,
   };
+}
+
+// --- 4. THE PAGE COMPONENT ---
+export default async function ProductPage({ params }: { params: { id: string } }) {
+  // Fetch full details
+  const query = `
+    *[_type == "study" && id == $id][0] {
+      id,
+      name,
+      price,
+      status,
+      "image": mainImage,
+      description,
+      specs,
+      material,
+      fit,
+      origin
+    }
+  `;
+  
+  const product: ProductData = await client.fetch(query, { id: params.id });
+
+  // If ID doesn't exist in Sanity, trigger the 404 page
+  if (!product) {
+    notFound();
+  }
+
+  const isSoldOut = product.status === 'SOLD OUT';
 
   return (
-    <main className="min-h-screen bg-white text-black font-sans selection:bg-yellow-400">
+    <main className="min-h-screen pt-24 pb-12 flex flex-col lg:flex-row relative z-10 bg-black">
       
-      {/* HEADER: Navigation & Identity */}
-      <header className="sticky top-0 z-50 bg-white border-b-8 border-black p-6 flex justify-between items-center">
-        <Link href="/" className="group flex items-center gap-2 font-black text-xs tracking-widest uppercase hover:text-red-600 transition-colors">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Return to Origin</span>
-        </Link>
+      {/* --- COLUMN 1: VISUAL EVIDENCE (Sticky Image) --- */}
+      <section className="w-full lg:w-1/2 px-6 lg:pl-12 lg:pr-6 mb-12 lg:mb-0">
+        <div className="sticky top-32">
+           
+           {/* Image Container */}
+           <div className="aspect-[3/4] w-full bg-neutral-900 relative border border-white/10 overflow-hidden group">
+             
+             {/* Sanity Image */}
+             {product.image && (
+               <Image 
+                 src={urlFor(product.image).width(1200).height(1600).url()}
+                 alt={product.name}
+                 fill
+                 className={`object-cover transition-all duration-700 ${isSoldOut ? 'grayscale opacity-50' : 'group-hover:scale-105'}`}
+                 priority // Load this image immediately
+               />
+             )}
+             
+             {/* Fallback for missing image */}
+             {!product.image && (
+               <div className="absolute inset-0 flex items-center justify-center text-white/5 font-black text-6xl rotate-[-45deg] select-none">
+                 NO_SIGNAL
+               </div>
+             )}
+             
+             {/* Status Badge */}
+             <div className="absolute top-4 left-4 bg-black/80 backdrop-blur border border-white/20 px-3 py-1">
+               <span className={`text-xs font-bold tracking-widest uppercase ${isSoldOut ? 'text-neutral-500' : 'text-rgrm-red animate-pulse'}`}>
+                 STATUS: {product.status}
+               </span>
+             </div>
+
+             {/* Watermark ID */}
+             <div className="absolute bottom-4 right-4 text-[10px] font-mono text-white/40 bg-black/50 px-2 py-1">
+               REF: {product.id}
+             </div>
+           </div>
+
+           {/* Breadcrumbs Navigation */}
+           <div className="mt-6 flex gap-2 text-[10px] uppercase tracking-widest text-white/40 font-bold">
+             <Link href="/" className="hover:text-white transition-colors">Index</Link> 
+             <span>/</span>
+             <Link href="/selection" className="hover:text-white transition-colors">Selection</Link>
+             <span>/</span>
+             <span className="text-white border-b border-rgrm-red pb-0.5">{product.id}</span>
+           </div>
+        </div>
+      </section>
+
+      {/* --- COLUMN 2: TECHNICAL DOSSIER (Scrollable Info) --- */}
+      <section className="w-full lg:w-1/2 px-6 lg:pr-24 lg:pl-12 flex flex-col justify-center">
         
-        <h1 className="text-2xl font-black uppercase tracking-tighter">
-          RGRM<span className="text-blue-600">/SELECT</span>
-        </h1>
-      </header>
-
-      {/* HERO SECTION */}
-      <section className="bg-black text-white p-12 border-b-8 border-black">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-6xl md:text-8xl font-black uppercase leading-[0.8] tracking-tighter mb-6">
-            Artifact<br /><span className="text-transparent stroke-white stroke-2 md:stroke-4" style={{ WebkitTextStroke: '2px white' }}>Acquisition</span>
-          </h2>
-          <p className="text-sm font-bold tracking-[0.2em] uppercase opacity-70 max-w-lg border-l-4 border-red-600 pl-4">
-            Authorized for public distribution. <br/> 
-            Identity verification tokens included with all physical goods.
-          </p>
-        </div>
-      </section>
-
-      {/* PRODUCT GRID */}
-      <section className="max-w-7xl mx-auto p-6 md:p-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="space-y-8 max-w-xl">
           
-          {PRODUCTS.map((product) => (
-            <div key={product.id} className="group relative bg-white border-4 border-black transition-all hover:-translate-y-2 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-              
-              {/* Category Tag */}
-              <div className="absolute top-0 right-0 bg-black text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
-                {product.category}
-              </div>
-
-              {/* Product Visual Placeholder */}
-              <div className={`h-64 w-full border-b-4 border-black flex items-center justify-center ${product.color} bg-opacity-10 group-hover:bg-opacity-20 transition-all`}>
-                <ShoppingBag className="w-12 h-12 opacity-20" />
-              </div>
-
-              {/* Content */}
-              <div className="p-6 flex flex-col gap-4">
-                <div>
-                  <h3 className="text-2xl font-black uppercase leading-none mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs font-bold opacity-60 uppercase tracking-wide">
-                    {product.description}
-                  </p>
-                </div>
-
-                <div className="h-0.5 w-full bg-black opacity-10" />
-
-                <div className="flex items-center justify-between mt-auto">
-                  <span className="text-3xl font-black tracking-tighter">
-                    ${product.priceDisplay}
-                  </span>
-                  
-                  <button
-                    onClick={() => handleCheckout(product.priceId, product.id)}
-                    disabled={loadingId === product.id}
-                    className="bg-black text-white px-6 py-3 text-xs font-black uppercase tracking-widest hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loadingId === product.id ? "Processing..." : "Acquire"}
-                  </button>
-                </div>
-              </div>
+          {/* Header Block */}
+          <div className="border-b border-white/20 pb-8 space-y-4">
+            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85] font-[family-name:var(--font-headline)]">
+              {product.name}
+            </h1>
+            <div className="flex justify-between items-center">
+              <p className="text-2xl font-light tracking-widest text-rgrm-red font-mono">
+                ${product.price}.00 USD
+              </p>
+              <span className="text-[10px] uppercase tracking-widest text-white/30">
+                Phase: 001
+              </span>
             </div>
-          ))}
+          </div>
+
+          {/* Description Block */}
+          <div className="prose prose-invert">
+            <p className="text-sm md:text-base leading-loose text-white/80 font-[family-name:var(--font-body)] uppercase tracking-wide">
+              {product.description || "Structural data corrupted. Description unavailable."}
+            </p>
+          </div>
+
+          {/* Technical Specs Table */}
+          <div className="grid grid-cols-1 gap-4 py-8 border-y border-white/10">
+             <SpecRow label="Material" value={product.material || 'N/A'} />
+             <SpecRow label="Fit Profile" value={product.fit || 'Standard'} />
+             <SpecRow label="Origin" value={product.origin || 'Imported'} />
+             <SpecRow label="Engineering" value={RGRM_IDENTITY.shortName + " Studio"} />
+          </div>
+
+          {/* ACTION MODULE (Client Component) */}
+          <div className="pt-8 space-y-4">
+            <AddToCartButton 
+              disabled={isSoldOut}
+              item={{
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                // If image exists, pass the URL, otherwise empty string
+                image: product.image ? urlFor(product.image).width(200).url() : '',
+                quantity: 1
+              }}
+            />
+            
+            <div className="flex justify-between items-center text-[9px] text-white/30 uppercase tracking-widest">
+              <span>Secure Transaction // Encrypted</span>
+              <span>Global Logistics Available</span>
+            </div>
+          </div>
 
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="border-t-8 border-black p-12 bg-gray-50 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">
-          SECURE TRANSACTION PROTOCOL • STRIPE ENCRYPTED
-        </p>
-      </footer>
-
     </main>
+  );
+}
+
+// --- HELPER COMPONENT ---
+function SpecRow({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="flex justify-between items-center text-xs uppercase tracking-[0.15em] hover:bg-white/5 p-2 transition-colors -mx-2 rounded-sm">
+      <span className="text-white/40 font-bold">{label}</span>
+      <span className="text-white font-medium text-right">{value}</span>
+    </div>
   );
 }
