@@ -1,68 +1,108 @@
-import type { Metadata } from "next";
-import { Montserrat, Roboto } from "next/font/google";
+import React from 'react';
+import type { Metadata, Viewport } from "next";
+import { Oswald, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { RGRM_IDENTITY, RGRM_SEO, RGRM_CHANNELS } from "@/lib/constants";
 
-// RGRM Typography Standard
-const montserrat = Montserrat({ 
-  subsets: ["latin"], 
-  variable: "--font-headline", 
-  weight: ["700", "900"] 
+// --- IMPORTS: CONTEXT & COMPONENTS ---
+import { CartProvider } from '@/context/CartContext';
+import BlueprintGrid from '@/components/ui/BlueprintGrid';
+import CartDrawer from '@/components/cart/CartDrawer';
+import CartTrigger from '@/components/cart/CartTrigger';
+import { RGRM_IDENTITY } from '@/lib/constants';
+
+// --- 1. FONT CONFIGURATION ---
+// "Headline" Font: Industrial, Condensed, Uppercase-heavy
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-headline",
+  weight: ["400", "500", "700"], 
+  display: "swap",
 });
 
-const roboto = Roboto({ 
-  subsets: ["latin"], 
-  variable: "--font-body", 
-  weight: ["400", "500"] 
+// "Body" Font: Technical, Geometric, Monospace-feel
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
 });
 
+// --- 2. METADATA (SEO) ---
 export const metadata: Metadata = {
-  title: RGRM_SEO.defaultTitle,
-  description: RGRM_SEO.description,
-  keywords: RGRM_SEO.keywords,
+  metadataBase: new URL('https://www.rgrm.studio'), // Replace with your actual domain
+  title: {
+    template: `%s // ${RGRM_IDENTITY.shortName}`,
+    default: `${RGRM_IDENTITY.shortName} // STRUCTURAL STUDIES`,
+  },
+  description: `${RGRM_IDENTITY.mission} ${RGRM_IDENTITY.tagline}`,
+  keywords: ["fashion", "brutalist", "technical apparel", "streetwear", "structural design", "avant-garde"],
   authors: [{ name: RGRM_IDENTITY.founder }],
+  creator: RGRM_IDENTITY.shortName,
   openGraph: {
-    title: RGRM_IDENTITY.name,
-    description: RGRM_SEO.description,
-    url: RGRM_CHANNELS.storefront,
-    siteName: RGRM_IDENTITY.name,
-    images: [
-      {
-        url: RGRM_SEO.ogImage,
-        width: 1200,
-        height: 630,
-        alt: `${RGRM_IDENTITY.name} | ${RGRM_IDENTITY.tagline}`,
-      },
-    ],
+    title: RGRM_IDENTITY.shortName,
+    description: "Every garment is an acquisition of structural integrity.",
+    siteName: RGRM_IDENTITY.shortName,
     locale: "en_US",
     type: "website",
+    // images: ['/og-image.jpg'], // Add this later for social sharing
   },
-  twitter: {
-    card: "summary_large_image",
-    title: RGRM_IDENTITY.name,
-    description: RGRM_IDENTITY.tagline,
-    images: [RGRM_SEO.ogImage],
+  icons: {
+    icon: "/favicon.ico", 
   },
 };
 
+// --- 3. VIEWPORT SETTINGS ---
+// Crucial for preventing "white bars" on mobile scroll and locking zoom
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, 
+};
+
+// --- 4. ROOT LAYOUT ---
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${montserrat.variable} ${roboto.variable}`}>
-      <body className="antialiased bg-black text-white">
-        {children}
-        
-        {/* Chatbase Studio Concierge Script */}
-        <script
-          src="https://www.chatbase.co/embed.min.js"
-          data-chatbot-id={process.env.NEXT_PUBLIC_CHATBASE_CHATBOT_ID}
-          data-domain="www.raguiromo.store"
-          defer
-        >
-        </script>
+    <html lang="en" className="scroll-smooth">
+      <body
+        className={`
+          ${oswald.variable} 
+          ${spaceGrotesk.variable} 
+          antialiased 
+          bg-black 
+          text-white 
+          min-h-screen 
+          flex 
+          flex-col
+          overflow-x-hidden
+          selection:bg-[#BC2026] 
+          selection:text-white
+        `}
+      >
+        {/* WRAPPER: Cart Context Provider */}
+        <CartProvider>
+          
+          {/* LAYER 1: ATMOSPHERE (Backgrounds) */}
+          <BlueprintGrid />
+          <div className="bg-noise" /> {/* Defined in globals.css */}
+
+          {/* LAYER 2: GLOBAL UI (Floating Elements) */}
+          <CartTrigger />
+
+          {/* LAYER 3: PAGE CONTENT */}
+          <div className="relative z-10 flex flex-col min-h-screen">
+            {children}
+          </div>
+
+          {/* LAYER 4: OVERLAYS (Drawers/Modals) */}
+          <CartDrawer />
+          
+        </CartProvider>
       </body>
     </html>
   );
