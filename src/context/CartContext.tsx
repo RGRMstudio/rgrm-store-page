@@ -2,14 +2,18 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// --- 1. TYPE DEFINITIONS ---
+/**
+ * RGRM // MANIFEST PROTOCOL
+ * Core state management for the acquisition system.
+ */
+
+// --- 1. DATA STRUCTURES ---
 export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string; // URL string
-  size?: string; // Optional: For future expansion
-  quantity: number;
+  id: string;      // Structural ID (e.g., STUDY-001)
+  name: string;    // Designation
+  price: number;   // Unit Cost
+  image: string;   // Visual Reference URL
+  quantity: number; 
 }
 
 interface CartContextType {
@@ -17,86 +21,82 @@ interface CartContextType {
   isCartOpen: boolean;
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, delta: number) => void;
   toggleCart: () => void;
   cartTotal: number;
   cartCount: number;
 }
 
-// Create the Context
+// Initialize Context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// --- 2. PROVIDER COMPONENT ---
+// --- 2. PROVIDER IMPLEMENTATION ---
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // --- 3. PERSISTENCE LOGIC (LocalStorage) ---
-  
-  // Load from storage on initial client mount
+  // PERSISTENCE: Load stored manifest on boot
   useEffect(() => {
     setIsMounted(true);
-    const savedCart = localStorage.getItem('rgrm-manifest'); // Unique key for your brand
-    if (savedCart) {
+    const savedManifest = localStorage.getItem('rgrm-registry-manifest');
+    if (savedManifest) {
       try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Manifest Data Corrupted', e);
-        // If data is corrupt, reset it
-        localStorage.removeItem('rgrm-manifest');
+        setCart(JSON.parse(savedManifest));
+      } catch (error) {
+        console.error("DATA_CORRUPTION: Resetting Manifest", error);
+        localStorage.removeItem('rgrm-registry-manifest');
       }
     }
   }, []);
 
-  // Save to storage whenever cart changes
+  // PERSISTENCE: Save manifest on state change
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem('rgrm-manifest', JSON.stringify(cart));
+      localStorage.setItem('rgrm-registry-manifest', JSON.stringify(cart));
     }
   }, [cart, isMounted]);
 
-  // --- 4. ACTIONS ---
+  // --- 3. CORE ACTIONS ---
 
   const addToCart = (newItem: CartItem) => {
-    setCart((prevCart) => {
-      // Check if item already exists in the manifest
-      const existingItem = prevCart.find((item) => item.id === newItem.id);
-
-      if (existingItem) {
-        // If exists, increment quantity
-        return prevCart.map((item) =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + 1 }
+    setCart((prev) => {
+      const existing = prev.find((item) => item.id === newItem.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === newItem.id 
+            ? { ...item, quantity: item.quantity + 1 } 
             : item
         );
       }
-      
-      // If new, add to array with quantity 1
-      // Ensure we don't accidentally pass a quantity from the component if not intended
-      return [...prevCart, { ...newItem, quantity: 1 }];
+      return [...prev, { ...newItem, quantity: 1 }];
     });
-
-    // Auto-open the drawer to confirm acquisition
+    // Visual feedback: Open drawer on acquisition
     setIsCartOpen(true);
   };
 
   const removeFromCart = (id: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+    setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const toggleCart = () => {
-    setIsCartOpen((prev) => !prev);
+  const updateQuantity = (id: string, delta: number) => {
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const newQty = Math.max(1, item.quantity + delta);
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      })
+    );
   };
 
-  // --- 5. DERIVED STATE (Calculations) ---
-  
-  // Calculate total valuation
-  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  
-  // Calculate total number of physical units
-  const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
+  const toggleCart = () => setIsCartOpen((prev) => !prev);
 
-  // --- 6. RENDER ---
+  // --- 4. DERIVED ANALYTICS ---
+  const cartTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
   return (
     <CartContext.Provider
       value={{
@@ -104,6 +104,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         isCartOpen,
         addToCart,
         removeFromCart,
+        updateQuantity,
         toggleCart,
         cartTotal,
         cartCount,
@@ -114,11 +115,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// --- 7. CUSTOM HOOK ---
+// --- 5. SYSTEM HOOK ---
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error('SYSTEM_ERROR: useCart must be used within a CartProvider');
   }
   return context;
 }
