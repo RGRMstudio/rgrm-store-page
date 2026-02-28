@@ -1,71 +1,43 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // 1. CONTENT SCANNING
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+
+  // 2. DESIGN SYSTEM CALIBRATION
   theme: {
     extend: {
-      // --- 1. INDUSTRIAL COLOR PALETTE ---
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        // The signature 'RGRM Red' used for alerts and highlights
-        'rgrm-red': '#BC2026', 
+        // RGRM Signature Palette
+        "rgrm-red": "#FF0000", // The primary action/diagnostic color
+        "rgrm-black": "#000000",
+        "rgrm-gray": "#1A1A1A",
+        "rgrm-light": "#F5F5F5",
       },
-
-      // --- 2. TYPOGRAPHY SYSTEM ---
-      // These link to the CSS variables defined in layout.tsx
       fontFamily: {
-        headline: ['var(--font-headline)', 'sans-serif'], // Oswald
-        body: ['var(--font-body)', 'sans-serif'],         // Space Grotesk
-        mono: ['Courier New', 'Courier', 'monospace'],     // Fallback technical font
+        // Technical typography mapping
+        mono: ["var(--font-geist-mono)", "Menlo", "monospace"],
+        sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],
       },
-
-      // --- 3. ANIMATION KEYFRAMES ---
-      keyframes: {
-        // Used for Skeleton Loading (Scanning effect)
-        shimmer: {
-          '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(100%)' },
-        },
-        // Used for 404 Pages and System Errors
-        glitch: {
-          '0%': { transform: 'translate(0)' },
-          '20%': { transform: 'translate(-2px, 2px)' },
-          '40%': { transform: 'translate(-2px, -2px)' },
-          '60%': { transform: 'translate(2px, 2px)' },
-          '80%': { transform: 'translate(2px, -2px)' },
-          '100%': { transform: 'translate(0)' },
-        },
-        // A slower, more ominous pulse for status indicators
-        'pulse-slow': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.5' },
-        },
+      letterSpacing: {
+        // Brutalist tracking adjustments
+        tightest: "-.075em",
+        widest: ".25em",
+        registry: ".5em",
       },
-
-      // --- 4. ANIMATION UTILITIES ---
-      animation: {
-        'shimmer': 'shimmer 2s infinite linear',
-        'glitch': 'glitch 1s infinite linear',
-        'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-
-      // --- 5. CURSOR ---
-      cursor: {
-        // Optional: Adds a technical crosshair cursor to specific elements
-        'crosshair': 'crosshair',
-      }
     },
   },
-  plugins: [
-    // Required for the "prose" text block on the Product Detail page
-    require('@tailwindcss/typography'), 
-  ],
+
+  // 3. UTILITY EXTENSIONS
+  plugins: [],
 };
 
 export default config;
