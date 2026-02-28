@@ -4,6 +4,8 @@
 ## 01 // SYSTEM OVERVIEW
 RGRM Studio is a high-performance digital ecosystem designed for the acquisition of "Structural Studies." This repository manages the end-to-end flow from content modeling in Sanity to automated fulfillment via Printful and identity registration via Loops.
 
+
+
 ## 02 // CORE INFRASTRUCTURE
 The engine is powered by a tri-sector handshake:
 1. **Financial Gateway**: Stripe (Custom Checkout + Webhooks)
@@ -23,6 +25,8 @@ The engine is powered by a tri-sector handshake:
 - `/src/app/not-found.tsx` — Null_Reference error protocol.
 - `tailwind.config.ts` — Brutalist aesthetic constraints.
 - `postcss.config.mjs` — ESM-optimized style processing.
+
+
 
 ## 04 // ENVIRONMENT PARAMETERS
 System requires a `.env.local` file (excluded from Git). Refer to `.env.example` for the template.
