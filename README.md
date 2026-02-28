@@ -1,68 +1,36 @@
-# ⬛ RGRM // IDENTITY REGISTRY MODULE 002
-## PROJECT: STRUCTURAL STUDIES INTERFACE (v1.0.4)
+# ⬛ RGRM // IDENTITY REGISTRY [MODULE_002]
+**Architecture:** Next.js 15 (App Router) | Sanity.io | Stripe | Printful | Loops.so
 
-![Build Status](https://github.com/RGRMstudio/rgrm-store-page/actions/workflows/health-check.yml/badge.svg)
-![Security](https://img.shields.io/badge/Security-Dependabot_Active-blue)
-![Registry](https://img.shields.io/badge/Registry-Loops.so_Integrated-black)
+## 01 // SYSTEM OVERVIEW
+RGRM Studio is a high-performance digital ecosystem designed for the acquisition of "Structural Studies." This repository manages the end-to-end flow from content modeling in Sanity to automated fulfillment via Printful and identity registration via Loops.
 
-**RGRMstore** is a high-performance, autonomous e-commerce engine designed for the distribution of physical identity modules and digital registry authentication. Every garment is an acquisition of structural integrity.
+## 02 // CORE INFRASTRUCTURE
+The engine is powered by a tri-sector handshake:
+1. **Financial Gateway**: Stripe (Custom Checkout + Webhooks)
+2. **Manufacturing**: Printful API (Store ID: 17181557)
+3. **Identity CRM**: Loops.so (Event-driven registration)
 
----
+## 03 // FILE MANIFEST
+### Command & Control
+- `/src/app/api/checkout/route.ts` — Stripe session initialization.
+- `/src/app/api/webhook/route.ts` — Autonomous fulfillment & registration trigger.
+- `/scripts/health-check.ts` — API diagnostic utility.
+- `/scripts/backup-env.sh` — Encrypted environment security.
 
-## 🏗️ Architecture Stack
+### Design & Interface
+- `/src/app/selection/` — Product grid & dossier views.
+- `/src/app/registry/success/` — Post-acquisition confirmation.
+- `/src/app/not-found.tsx` — Null_Reference error protocol.
+- `tailwind.config.ts` — Brutalist aesthetic constraints.
+- `postcss.config.mjs` — ESM-optimized style processing.
 
+## 04 // ENVIRONMENT PARAMETERS
+System requires a `.env.local` file (excluded from Git). Refer to `.env.example` for the template.
 
-
-- **Frontend:** Next.js 15+ (App Router / React 19)
-- **CMS:** Sanity.io (Content Lake & Study Blueprints)
-- **Payments:** Stripe (Production Node)
-- **Fulfillment:** Printful (Store 002: 17181557)
-- **CRM:** Loops.so (Identity Registered Event)
-- **State:** React Context API (Manifest Persistence)
-- **Motion:** Framer Motion (Mechanical Kinetics)
-
----
-
-## 📡 Protocol Endpoints & Integration
-
-The system operates through a series of secure handshakes:
-- **Stripe:** `/api/webhook` — Triggers Printful manufacturing & Loops event injection.
-- **Loops:** `/api/webhooks/loops` — Handles lifecycle feedback & clearance updates.
-- **Sanity:** Establishing connection via `src/lib/sanity.ts` for real-time inventory updates.
-
----
-
-## 🛠️ Operational Commands
-
-For use within the iPad Codespace or Terminal environment:
-
-### **Initialization & Maintenance**
-- `npm install` — Initialize local dependencies.
-- `npm run dev` — Boot system in local observation mode.
-- `npx ts-node scripts/health-check.ts` — Verifies all API connections (Sanity, Stripe, Printful).
-- `scripts/backup-env.sh` — Encrypts and backs up production environment variables.
-
-### **Production Deployment**
-- `git push origin main` — Standard production sync via Vercel.
-- `git push -o "secret-scanning=bypass" origin main` — Elevated sync (bypass scanning).
-
----
-
-## 🔐 Security & Structural Integrity
-
-This repository is protected by **CODEOWNERS**. 
-- **Critical Sectors:** Changes to `/src/app/api/webhook` or `.github` require explicit approval from **@RGRMstudio**.
-- **Data Integrity:** Strict TypeScript enforcement (see `tsconfig.json`) ensures no loose variables compromise the codebase.
-- **Styling:** Brutalist UI constraints maintained through `tailwind.config.ts`.
-
----
-
-## 🧭 Directory Map
-
-```text
-src/
-├── app/              # Routing: Manifesto, Selection, Registry, 404
-├── components/       # UI: Skeletons, ProductCards, MotionGrid, Cart
-├── context/          # Global State: Cart Management
-├── lib/              # Protocols: Sanity Client, Stripe Init, Constants
-└── schemas/          # Blueprints: Sanity Document Definitions
+```env
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+PRINTFUL_API_KEY=...
+LOOPS_API_KEY=...
+NEXT_PUBLIC_SANITY_PROJECT_ID=...
+NEXT_PUBLIC_BASE_URL=[https://www.raguiromo.store](https://www.raguiromo.store)
