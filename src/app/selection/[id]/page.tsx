@@ -18,8 +18,9 @@ async function getProduct(id: string) {
 }
 
 export default async function StudyDossier({ params }: PageProps) {
-  const resolvedParams = await params;
-  const product = await getProduct(resolvedParams.id);
+  // In Next.js 15+, params must be awaited
+  const { id } = await params;
+  const product = await getProduct(id);
 
   if (!product) {
     return (
@@ -30,15 +31,17 @@ export default async function StudyDossier({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen pt-24 pb-12 flex flex-col lg:flex-row relative z-10 bg-black">
+    <main className="min-h-screen pt-24 pb-12 flex flex-col lg:flex-row relative z-10 bg-black text-white">
       {/* 1. VISUAL EVIDENCE PANEL */}
       <section className="w-full lg:w-1/2 px-6 lg:pl-12 lg:pr-6 mb-12 lg:mb-0">
         <div className="border border-white/10 bg-zinc-900 aspect-square relative overflow-hidden group">
-          <img 
-            src={urlFor(product.image).url()} 
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+          {product.image && (
+            <img 
+              src={urlFor(product.image).url()} 
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          )}
           <div className="absolute top-4 left-4 bg-black/80 px-3 py-1 text-[10px] font-mono text-rgrm-red">
             REF_IMG_{product._id.substring(0, 6)}
           </div>
@@ -70,11 +73,11 @@ export default async function StudyDossier({ params }: PageProps) {
             <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-6">
               <div>
                 <span className="block text-white/20 mb-1">[CATEGORY]</span>
-                <span className="text-white">{product.category || 'STRUCTURAL_STUDY'}</span>
+                <span className="text-white font-bold">{product.category || 'STRUCTURAL_STUDY'}</span>
               </div>
               <div>
                 <span className="block text-white/20 mb-1">[STUDIO]</span>
-                <span className="text-white">RGRM_MEX_002</span>
+                <span className="text-white font-bold">RGRM_MEX_2026</span>
               </div>
             </div>
           </div>
@@ -83,7 +86,7 @@ export default async function StudyDossier({ params }: PageProps) {
             id: product._id,
             name: product.name,
             price: product.price,
-            image: urlFor(product.image).url()
+            image: product.image ? urlFor(product.image).url() : undefined
           }} />
           
           <p className="mt-6 text-[9px] text-white/20 font-mono italic">
