@@ -1,6 +1,5 @@
 import { client, urlFor } from '@/lib/sanity';
 import AddToCartButton from '@/components/product/AddToCartButton';
-import { RGRM_IDENTITY } from '@/lib/constants';
 import Link from 'next/link';
 
 /**
@@ -8,14 +7,19 @@ import Link from 'next/link';
  * Single Product Architecture (Structural Study Details)
  */
 
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
 async function getProduct(id: string) {
-  const query = `*[_type == "study" && _id == "${id}"][0]`;
-  const data = await client.fetch(query);
+  const query = `*[_type == "study" && _id == $id][0]`;
+  const data = await client.fetch(query, { id });
   return data;
 }
 
-export default async function StudyDossier({ params }: { params: { id: string } }) {
-  const product = await getProduct(params.id);
+export default async function StudyDossier({ params }: PageProps) {
+  const resolvedParams = await params;
+  const product = await getProduct(resolvedParams.id);
 
   if (!product) {
     return (
@@ -29,7 +33,7 @@ export default async function StudyDossier({ params }: { params: { id: string } 
     <main className="min-h-screen pt-24 pb-12 flex flex-col lg:flex-row relative z-10 bg-black">
       {/* 1. VISUAL EVIDENCE PANEL */}
       <section className="w-full lg:w-1/2 px-6 lg:pl-12 lg:pr-6 mb-12 lg:mb-0">
-        <div className="border border-white/10 bg-rgrm-gray aspect-square relative overflow-hidden group">
+        <div className="border border-white/10 bg-zinc-900 aspect-square relative overflow-hidden group">
           <img 
             src={urlFor(product.image).url()} 
             alt={product.name}
