@@ -1,28 +1,31 @@
 import { createClient } from 'next-sanity';
 import imageUrlBuilder from '@sanity/image-url';
 
-// --- 1. CONFIGURATION ---
-// Ideally, these should be in .env.local, but we provide fallbacks here
-// to prevent the build from crashing if variables are missing.
-export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'your_project_id';
-export const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-export const apiVersion = '2024-01-01'; // Lock version for stability
+/**
+ * RGRM // SANITY_IO_CLIENT_CONFIG
+ * Environment: Production
+ */
 
-// --- 2. CLIENT INITIALIZATION ---
 export const client = createClient({
-  projectId,
-  dataset,
-  apiVersion,
-  // usage: true -> Fast (CDN), false -> Fresh (API)
-  // We use CDN for production speed, API for development accuracy
-  useCdn: process.env.NODE_ENV === 'production', 
+  // Check your sanity.json or manage.sanity.io for these values
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'your_project_id', 
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: '2024-03-02', // Use current date for latest API features
+  useCdn: true, // true for fast response, false for fresh data
 });
 
-// --- 3. IMAGE BUILDER UTILITY ---
-// Sanity returns images as cryptic references (e.g., image-Tb9Ew8CXIwaY6R1kjMvI0uRR-2000x3000-jpg).
-// This builder converts them into actual URLs (https://cdn.sanity.io/...).
+// 1. Initialize the Image Builder
 const builder = imageUrlBuilder(client);
 
+// 2. Helper function to generate optimized image URLs
+// Usage: urlFor(product.image).width(800).url()
 export function urlFor(source: any) {
   return builder.image(source);
 }
+
+/**
+ * ARCHITECTURAL NOTE:
+ * Ensure your .env.local contains:
+ * NEXT_PUBLIC_SANITY_PROJECT_ID=xxxxxx
+ * NEXT_PUBLIC_SANITY_DATASET=production
+ */
