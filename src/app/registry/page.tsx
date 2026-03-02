@@ -20,7 +20,7 @@ export default function SuccessPage() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-xl w-full border border-white/10 p-8 md:p-12 bg-black/50 backdrop-blur-xl relative z-10 text-center"
       >
-        {/* Success Icon - FIXED SYNTAX (Line 171 focus) */}
+        {/* Success Icon - RECALIBRATED SYNTAX */}
         <div className="w-16 h-16 border-2 border-rgrm-red rounded-full mx-auto flex items-center justify-center mb-8">
           <motion.div 
             initial={{ scale: 0 }}
@@ -45,7 +45,7 @@ export default function SuccessPage() {
           </p>
         </header>
 
-        <div className="space-y-6 mb-12 text-xs text-white/60 uppercase font-mono leading-relaxed">
+        <div className="space-y-6 mb-12 text-xs text-white/60 uppercase font-mono leading-relaxed text-center">
           <p>
             Your acquisition has been logged into the RGRM Studio core manifest. 
             The manufacturing sequence for your specific study has been initialized.
