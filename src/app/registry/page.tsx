@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useCart } from '@/context/CartContext';
 import BlueprintGrid from '@/components/ui/BlueprintGrid';
 
 /**
@@ -12,8 +11,6 @@ import BlueprintGrid from '@/components/ui/BlueprintGrid';
  */
 
 export default function SuccessPage() {
-  const { cart } = useCart();
-
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 relative overflow-hidden">
       <BlueprintGrid />
@@ -23,7 +20,7 @@ export default function SuccessPage() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-xl w-full border border-white/10 p-8 md:p-12 bg-black/50 backdrop-blur-xl relative z-10 text-center"
       >
-        {/* Success Icon - FIXED SYNTAX */}
+        {/* Success Icon - FIXED SYNTAX (Line 171 focus) */}
         <div className="w-16 h-16 border-2 border-rgrm-red rounded-full mx-auto flex items-center justify-center mb-8">
           <motion.div 
             initial={{ scale: 0 }}
@@ -43,7 +40,7 @@ export default function SuccessPage() {
           <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4">
             Identity_Registered
           </h1>
-          <p className="text-[10px] font-mono text-rgrm-red uppercase tracking-registry">
+          <p className="text-[10px] font-mono text-rgrm-red uppercase tracking-widest">
             Status: Acquisition_Confirmed // Structural_Study_Locked
           </p>
         </header>
