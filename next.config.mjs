@@ -1,37 +1,15 @@
-/** @type {import('next').NextConfig} */
+/** @type {import('next').NextType} */
 const nextConfig = {
-  // TURBOPACK OPTIMIZATION
-  transpilePackages: ['@stripe/stripe-js'],
-  
-  // IMAGE INTEGRITY: Allows high-res renders from Printful/Stripe
+  // Turbopack is already enabled by default in Next.js 16
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'files.stripe.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'files.printful.com',
+        hostname: 'cdn.sanity.io',
       },
     ],
   },
-
-  // STRUCTURAL BYPASS: Fixes the 'eslint' warning from your build logs
-  eslint: {
-    // We handle linting via CI/CD to keep the build pipeline fast
-    ignoreDuringBuilds: true,
-  },
-  
-  typescript: {
-    // Ensuring type safety is handled locally to maintain deployment speed
-    ignoreBuilds: true,
-  },
-
-  // RGRM CORE REDIRECTS (Optional: If you move Phase 01 to a specific route)
-  async redirects() {
-    return [];
-  },
+  // Removed 'eslint' and 'typescript.ignoreBuilds' as they are no longer supported here
 };
 
 export default nextConfig;
