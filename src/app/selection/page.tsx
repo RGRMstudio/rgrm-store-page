@@ -1,199 +1,90 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
 import { client, urlFor } from '@/lib/sanity';
-import { RGRM_IDENTITY } from '@/lib/constants';
 import AddToCartButton from '@/components/product/AddToCartButton';
+import Link from 'next/link';
 
-// --- 1. CONFIGURATION ---
-// Revalidate this page every 60 seconds to check for price/stock updates (ISR)
-export const revalidate = 60;
+/**
+ * RGRM // SELECTION_ARCHIVE_INTERFACE
+ * Protocol: ISR_REVALIDATION (60s)
+ */
 
-// Define the shape of the data coming from Sanity
-interface ProductData {
-  id: string;
-  name: string;
-  price: number;
-  status: 'AVAILABLE' | 'LOW STOCK' | 'SOLD OUT';
-  image: any; // Sanity Image Object
-  description: string;
-  specs: string;
-  material?: string;
-  fit?: string;
-  origin?: string;
+export const revalidate = 60; // Recheck Sanity every 60 seconds
+
+async function getProducts() {
+  const query = `*[_type == "study"] | order(_createdAt desc)`;
+  const data = await client.fetch(query);
+  return data;
 }
 
-// --- 2. GENERATE STATIC PARAMS (SSG) ---
-// This tells Next.js to pre-build a page for every ID currently in Sanity
-export async function generateStaticParams() {
-  const query = `*[_type == "study"]{ "id": id }`;
-  const products = await client.fetch(query);
-
-  return products.map((product: { id: string }) => ({
-    id: product.id,
-  }));
-}
-
-// --- 3. DYNAMIC METADATA (SEO) ---
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const query = `*[_type == "study" && id == $id][0]{ name, description }`;
-  const product = await client.fetch(query, { id: params.id });
-
-  if (!product) return { title: 'FILE NOT FOUND' };
-
-  return {
-    title: `${product.name} // ${params.id}`,
-    description: product.description,
-  };
-}
-
-// --- 4. THE PAGE COMPONENT ---
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  // Fetch full details
-  const query = `
-    *[_type == "study" && id == $id][0] {
-      id,
-      name,
-      price,
-      status,
-      "image": mainImage,
-      description,
-      specs,
-      material,
-      fit,
-      origin
-    }
-  `;
-  
-  const product: ProductData = await client.fetch(query, { id: params.id });
-
-  // If ID doesn't exist in Sanity, trigger the 404 page
-  if (!product) {
-    notFound();
-  }
-
-  const isSoldOut = product.status === 'SOLD OUT';
+export default async function SelectionPage() {
+  const products = await getProducts();
 
   return (
-    <main className="min-h-screen pt-24 pb-12 flex flex-col lg:flex-row relative z-10 bg-black">
-      
-      {/* --- COLUMN 1: VISUAL EVIDENCE (Sticky Image) --- */}
-      <section className="w-full lg:w-1/2 px-6 lg:pl-12 lg:pr-6 mb-12 lg:mb-0">
-        <div className="sticky top-32">
-           
-           {/* Image Container */}
-           <div className="aspect-[3/4] w-full bg-neutral-900 relative border border-white/10 overflow-hidden group">
-             
-             {/* Sanity Image */}
-             {product.image && (
-               <Image 
-                 src={urlFor(product.image).width(1200).height(1600).url()}
-                 alt={product.name}
-                 fill
-                 className={`object-cover transition-all duration-700 ${isSoldOut ? 'grayscale opacity-50' : 'group-hover:scale-105'}`}
-                 priority // Load this image immediately
-               />
-             )}
-             
-             {/* Fallback for missing image */}
-             {!product.image && (
-               <div className="absolute inset-0 flex items-center justify-center text-white/5 font-black text-6xl rotate-[-45deg] select-none">
-                 NO_SIGNAL
-               </div>
-             )}
-             
-             {/* Status Badge */}
-             <div className="absolute top-4 left-4 bg-black/80 backdrop-blur border border-white/20 px-3 py-1">
-               <span className={`text-xs font-bold tracking-widest uppercase ${isSoldOut ? 'text-neutral-500' : 'text-rgrm-red animate-pulse'}`}>
-                 STATUS: {product.status}
-               </span>
-             </div>
-
-             {/* Watermark ID */}
-             <div className="absolute bottom-4 right-4 text-[10px] font-mono text-white/40 bg-black/50 px-2 py-1">
-               REF: {product.id}
-             </div>
-           </div>
-
-           {/* Breadcrumbs Navigation */}
-           <div className="mt-6 flex gap-2 text-[10px] uppercase tracking-widest text-white/40 font-bold">
-             <Link href="/" className="hover:text-white transition-colors">Index</Link> 
-             <span>/</span>
-             <Link href="/selection" className="hover:text-white transition-colors">Selection</Link>
-             <span>/</span>
-             <span className="text-white border-b border-rgrm-red pb-0.5">{product.id}</span>
-           </div>
+    <main className="min-h-screen bg-black pt-32 pb-24 px-6 md:px-12 relative z-10">
+      {/* 1. SECTION HEADER */}
+      <header className="max-w-7xl mx-auto mb-20 border-b border-white/5 pb-12">
+        <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-6">
+          Structural_Studies
+        </h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <p className="text-xs font-mono text-white/40 uppercase tracking-widest max-w-md">
+            Archive of physical artifacts and digital manifestations. 
+            Acquisition registers identity to the RGRM core database.
+          </p>
+          <span className="text-[10px] font-mono text-rgrm-red bg-rgrm-red/10 px-3 py-1 border border-rgrm-red/20 uppercase">
+            Records_Found: [{products.length}]
+          </span>
         </div>
-      </section>
+      </header>
 
-      {/* --- COLUMN 2: TECHNICAL DOSSIER (Scrollable Info) --- */}
-      <section className="w-full lg:w-1/2 px-6 lg:pr-24 lg:pl-12 flex flex-col justify-center">
-        
-        <div className="space-y-8 max-w-xl">
-          
-          {/* Header Block */}
-          <div className="border-b border-white/20 pb-8 space-y-4">
-            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85] font-[family-name:var(--font-headline)]">
-              {product.name}
-            </h1>
-            <div className="flex justify-between items-center">
-              <p className="text-2xl font-light tracking-widest text-rgrm-red font-mono">
-                ${product.price}.00 USD
-              </p>
-              <span className="text-[10px] uppercase tracking-widest text-white/30">
-                Phase: 001
-              </span>
-            </div>
-          </div>
+      {/* 2. PRODUCT GRID */}
+      <section className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
+          {products.map((product: any) => (
+            <div key={product._id} className="group relative flex flex-col">
+              
+              {/* Product Visual Container */}
+              <Link href={`/selection/${product._id}`} className="block relative aspect-[4/5] overflow-hidden bg-zinc-900 border border-white/10 mb-6">
+                <img 
+                  src={urlFor(product.image).url()} 
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                />
+                <div className="absolute top-4 right-4 text-[9px] font-mono text-white/40 bg-black/80 px-2 py-1 uppercase">
+                  Ref_{product._id.substring(0, 4)}
+                </div>
+              </Link>
 
-          {/* Description Block */}
-          <div className="prose prose-invert">
-            <p className="text-sm md:text-base leading-loose text-white/80 font-[family-name:var(--font-body)] uppercase tracking-wide">
-              {product.description || "Structural data corrupted. Description unavailable."}
-            </p>
-          </div>
+              {/* Product Info */}
+              <div className="flex-1 mb-8">
+                <div className="flex justify-between items-start mb-2">
+                  <h2 className="text-xl font-black uppercase tracking-tight group-hover:text-rgrm-red transition-colors">
+                    <Link href={`/selection/${product._id}`}>{product.name}</Link>
+                  </h2>
+                  <span className="text-sm font-mono text-white/80">${product.price}</span>
+                </div>
+                <p className="text-[10px] text-white/40 font-mono uppercase tracking-widest mb-4 line-clamp-1">
+                  {product.category || 'Structural_Study'}
+                </p>
+              </div>
 
-          {/* Technical Specs Table */}
-          <div className="grid grid-cols-1 gap-4 py-8 border-y border-white/10">
-             <SpecRow label="Material" value={product.material || 'N/A'} />
-             <SpecRow label="Fit Profile" value={product.fit || 'Standard'} />
-             <SpecRow label="Origin" value={product.origin || 'Imported'} />
-             <SpecRow label="Engineering" value={RGRM_IDENTITY.shortName + " Studio"} />
-          </div>
-
-          {/* ACTION MODULE (Client Component) */}
-          <div className="pt-8 space-y-4">
-            <AddToCartButton 
-              disabled={isSoldOut}
-              item={{
-                id: product.id,
+              {/* Acquisition Protocol Button */}
+              <AddToCartButton product={{
+                id: product._id,
                 name: product.name,
                 price: product.price,
-                // If image exists, pass the URL, otherwise empty string
-                image: product.image ? urlFor(product.image).width(200).url() : '',
-                quantity: 1
-              }}
-            />
-            
-            <div className="flex justify-between items-center text-[9px] text-white/30 uppercase tracking-widest">
-              <span>Secure Transaction // Encrypted</span>
-              <span>Global Logistics Available</span>
+                image: urlFor(product.image).url()
+              }} />
             </div>
-          </div>
-
+          ))}
         </div>
       </section>
-    </main>
-  );
-}
 
-// --- HELPER COMPONENT ---
-function SpecRow({ label, value }: { label: string, value: string }) {
-  return (
-    <div className="flex justify-between items-center text-xs uppercase tracking-[0.15em] hover:bg-white/5 p-2 transition-colors -mx-2 rounded-sm">
-      <span className="text-white/40 font-bold">{label}</span>
-      <span className="text-white font-medium text-right">{value}</span>
-    </div>
+      {/* 3. TERMINAL FOOTER */}
+      <footer className="max-w-7xl mx-auto mt-32 pt-12 border-t border-white/5 flex justify-between items-center opacity-20 text-[9px] font-mono uppercase tracking-tighter">
+        <span>RGRM // STUDIO_M_002</span>
+        <span>SYSTEM_STATUS: [NOMINAL]</span>
+        <span>{new Date().getFullYear()} ©</span>
+      </footer>
+    </main>
   );
 }
