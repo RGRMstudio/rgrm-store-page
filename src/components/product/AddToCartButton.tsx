@@ -5,7 +5,7 @@ import { useCart } from '@/context/CartContext';
 
 /**
  * RGRM // ACQUISITION_TRIGGER
- * Protocol: Manual Registry Entry
+ * Status: Manual Registry Entry Node
  */
 
 interface ProductProps {
@@ -21,12 +21,12 @@ export default function AddToCartButton({ product }: ProductProps) {
   const { addToCart, setIsCartOpen } = useCart();
   const [status, setStatus] = useState<'IDLE' | 'SYNCING'>('IDLE');
 
-  const handleAcquire = async () => {
+  const handleAcquire = () => {
     // 1. Initialize Sync State
     setStatus('SYNCING');
 
     // 2. Execute Registry Entry
-    // We wrap this in a small timeout to simulate the "Processing" aesthetic of RGRM
+    // Simulated delay for the technical "Processing" aesthetic
     setTimeout(() => {
       addToCart({
         id: product.id,
@@ -35,7 +35,7 @@ export default function AddToCartButton({ product }: ProductProps) {
         image: product.image,
       });
 
-      // 3. Open the Manifest Drawer
+      // 3. Open the Manifest Manifest
       setIsCartOpen(true);
       setStatus('IDLE');
     }, 600);
@@ -71,10 +71,14 @@ export default function AddToCartButton({ product }: ProductProps) {
         </span>
       </button>
 
-      {/* Technical Metadata Underline */}
-      <div className="mt-2 flex justify-between items-center opacity-20 group-hover:opacity-40 transition-opacity">
-        <span className="text-[8px] font-mono uppercase tracking-tighter">Auth_Required: [TRUE]</span>
-        <span className="text-[8px] font-mono uppercase tracking-tighter">Object_ID: {product.id.substring(0, 8)}</span>
+      {/* Technical Metadata Footer */}
+      <div className="mt-3 flex justify-between items-center opacity-30 group-hover:opacity-60 transition-opacity">
+        <span className="text-[8px] font-mono uppercase tracking-tighter">
+          Auth_Required: [TRUE]
+        </span>
+        <span className="text-[8px] font-mono uppercase tracking-tighter">
+          ID: {product.id.substring(0, 12)}
+        </span>
       </div>
     </div>
   );
