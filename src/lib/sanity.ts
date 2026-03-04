@@ -2,30 +2,44 @@ import { createClient } from 'next-sanity';
 import imageUrlBuilder from '@sanity/image-url';
 
 /**
- * RGRM // SANITY_IO_CLIENT_CONFIG
- * Environment: Production
+ * RGRM // SANITY_IO_CORE_CLIENT
+ * Status: Authenticated / CDN_Optimized
  */
 
 export const client = createClient({
-  // Check your sanity.json or manage.sanity.io for these values
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'your_project_id', 
+  // These variables must be set in Vercel and .env.local
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  apiVersion: '2024-03-02', // Use current date for latest API features
-  useCdn: true, // true for fast response, false for fresh data
+  apiVersion: '2026-03-04', // Current RGRM Protocol Date
+  useCdn: false, // Set to false for Webhook/Revalidation to see changes instantly
+  
+  // Required for the 'revalidateTag' handshake
+  token: process.env.SANITY_API_READ_TOKEN, 
 });
 
-// 1. Initialize the Image Builder
+// 1. Initialize the Global Image Builder
 const builder = imageUrlBuilder(client);
 
-// 2. Helper function to generate optimized image URLs
-// Usage: urlFor(product.image).width(800).url()
+/**
+ * Generates optimized CDN URLs for Sanity assets.
+ * Usage: <img src={urlFor(product.image).width(800).url()} />
+ */
 export function urlFor(source: any) {
   return builder.image(source);
 }
 
 /**
- * ARCHITECTURAL NOTE:
- * Ensure your .env.local contains:
- * NEXT_PUBLIC_SANITY_PROJECT_ID=xxxxxx
- * NEXT_PUBLIC_SANITY_DATASET=production
+ * RGRM // DATA_FETCHING_PROTOCOL
+ * Fetches all 'study' documents with a cache tag for the webhook.
  */
+export async function getProducts() {
+  const query = `*[_type == "study"] | order(_createdAt desc)`;
+  
+  // The 'next' object here is the key to the Webhook syncing.
+  // It tells Next.js to group these results under the 'study' tag.
+  return await client.fetch(
+    query, 
+    {}, 
+    { next: { tags: ['study'] } }
+  );
+}
