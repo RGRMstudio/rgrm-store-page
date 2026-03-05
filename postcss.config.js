@@ -1,15 +1,15 @@
 /**
  * RGRM // POSTCSS_ENGINE_CONFIGURATION
- * Protocol: Tailwind_v4 + Autoprefixer_Standard
- * Status: Production_Synchronized
+ * Standard: CommonJS (Node.js Compatible)
+ * Protocol: Tailwind_v4 + Autoprefixer
  */
 
 module.exports = {
   plugins: {
-    // This handles the new Tailwind CSS v4 processing
+    // This processes the new Tailwind CSS v4 syntax
     '@tailwindcss/postcss': {},
     
-    // This ensures your CSS variables work on all modern browsers
+    // This adds cross-browser prefixes for CSS variables and layouts
     'autoprefixer': {},
   },
-}
+};
