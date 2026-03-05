@@ -1,18 +1,14 @@
-/** * RGRM // POSTCSS_ARCHITECTURE_RECALIBRATION
- * Configured for Next.js 16 + Tailwind CSS v4 (Turbopack Compatible)
+/**
+ * RGRM // POSTCSS_ENGINE_CONFIGURATION
+ * Compatible with Next.js 16 (Turbopack) & Tailwind CSS v4
  */
 
-/** @type {import('postcss-load-config').Config} */
-const config = {
+module.exports = {
   plugins: {
-    // Sector 01: Tailwind v4 PostCSS Engine
-    // This replaces the legacy 'tailwindcss' plugin to resolve the direct-use error.
+    // This handles the new Tailwind v4 processing engine
     '@tailwindcss/postcss': {},
     
-    // Sector 02: Vendor Prefixing
-    // Ensures CSS architectural integrity across legacy and modern browsers.
-    autoprefixer: {},
+    // This ensures cross-browser compatibility for your CSS variables
+    'autoprefixer': {},
   },
-};
-
-export default config;
+}
