@@ -1,6 +1,7 @@
 /**
  * RGRM // SCHEMA: STRUCTURAL STUDY
  * Documentation for Identity Registry Module 002.
+ * Updated with Stripe Integration for Real-Time Acquisition.
  */
 
 export default {
@@ -52,7 +53,15 @@ export default {
       name: 'price',
       title: 'Acquisition Cost (USD)',
       type: 'number',
+      description: 'The raw numerical value (e.g., 450).',
       validation: (Rule: any) => Rule.required().min(0),
+    },
+    {
+      name: 'stripePriceId',
+      title: 'Stripe Price ID',
+      type: 'string',
+      description: 'The secure identifier from Stripe (starts with price_...).',
+      validation: (Rule: any) => Rule.required(),
     },
     {
       name: 'mainImage',
