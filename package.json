@@ -11,7 +11,6 @@
     "start": "next start",
     "lint": "next lint",
     "test:printful": "node scripts/test-printful.js"
-  },
   "dependencies": {
     "@gsap/react": "^2.1.1",
     "@sanity/client": "^6.15.20",
