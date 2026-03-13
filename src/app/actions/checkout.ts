@@ -1,37 +1,44 @@
-'use server';
+"use server";
 
-import Stripe from 'stripe';
-import { redirect } from 'next/navigation';
+import Stripe from "stripe";
+import { headers } from "next/headers";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  // Updated to match Stripe library ^17.7.0 requirements
+  // @ts-ignore
+  apiVersion: '2025-02-24.acacia',
 });
 
 export async function createCheckoutSession(priceId: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://raguiromo.store';
-  let session;
+  const headersList = headers();
+  const origin = headersList.get("origin");
 
   try {
-    session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+    const session = await stripe.checkout.sessions.create({
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      mode: 'payment',
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/selection`,
-      shipping_address_collection: {
-        allowed_countries: ['US', 'CA', 'GB', 'PR'], // Added PR for your local reach
+      mode: "payment",
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/selection`,
+      
+      // RGRM Branding & Fulfillment Metadata
+      metadata: {
+        project: "RGRM_STORE",
+        type: "IDENTITY_REGISTRATION",
+        printful_variant_id: process.env.PRINTFUL_VARIANT_ID || "",
       },
+      
+      // Optional: Automatic tax & shipping if configured in Stripe
+      automatic_tax: { enabled: false },
     });
-  } catch (error) {
-    console.error('Stripe Session Error:', error);
-    throw new Error('Failed to initiate acquisition.');
-  }
 
-  // Redirects the user to the Stripe hosted checkout
-  redirect(session.url!);
+    return { sessionId: session.id, url: session.url };
+  } catch (error) {
+    console.error("RGRM Checkout Error:", error);
+    throw new Error("Failed to create checkout session");
+  }
 }
