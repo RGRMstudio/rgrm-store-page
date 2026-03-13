@@ -1,55 +1,40 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// Initialize the Stripe engine with the secret key from your Vercel Environment
+// Initialize the Stripe engine with the latest RGRM compatibility
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  // @ts-ignore
+  apiVersion: '2025-02-24.acacia',
 });
 
 export async function POST(req: Request) {
   try {
-    // STRUCTURAL INTEGRITY: Use the Vercel variable, or fallback to the verified Study 001 ID
-    const activePriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1SzoioDVc7z8RC9IwwYzowLH';
+    const { priceId } = await req.json();
 
-    // TRIGGER: Create the high-end Acquisition Session
+    if (!priceId) {
+      return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      
-      // LOGISTICS: Collect physical coordinates for the Printful manufacturing node
-      // We focus on your core shipping zones for Phase 01
-      shipping_address_collection: {
-        allowed_countries: ['US', 'PR', 'CA', 'ES', 'MX'], 
-      },
-
       line_items: [
         {
-          price: activePriceId, 
+          price: priceId,
           quantity: 1,
         },
       ],
-
       mode: 'payment',
-
-      // REDIRECTS: Ensure the user reaches the Registry with their unique Session ID
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/selection`,
-
-      // THE MANUFACTURING SIGNAL: This metadata is what your Webhook will send to Printful
+      success_url: `${req.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get('origin')}/selection`,
       metadata: {
-        // REPLACE 'YOUR_PRINTFUL_SYNC_ID' with the 9-digit ID you found in Printful
-        printful_variant_id: "YOUR_PRINTFUL_SYNC_ID",
-        study_phase: "Phase 01: Brutalist Lineage",
-        brand: "RaGuiRoMo Studio"
-      }
+        project: 'RGRM_STORE',
+        printful_variant_id: process.env.PRINTFUL_VARIANT_ID || '',
+      },
     });
 
-    // Return the Session ID to the "Acquire" button in your ProductCard.tsx
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (err: any) {
-    console.error("Stripe Acquisition Failure:", err.message);
-    return NextResponse.json(
-      { error: `Structural error in checkout: ${err.message}` }, 
-      { status: 500 }
-    );
+    console.error('RGRM API Error:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
