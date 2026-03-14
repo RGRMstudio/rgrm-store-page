@@ -19,14 +19,14 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       
-      // LOGISTICS: Collect physical coordinates for the Printful manufacturing node
+      // LOGISTICS: Collect physical coordinates for shipping
       shipping_address_collection: {
         allowed_countries: ['US', 'PR', 'CA', 'ES', 'MX'], 
       },
 
       line_items: [
         {
-          price: priceId,
+          price: priceId, // Cleaned: only one price key
           quantity: 1,
         },
       ],
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       success_url: `${req.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/selection`,
 
-      // THE MANUFACTURING SIGNAL: This is what triggers Printful and Loops
+      // THE MANUFACTURING SIGNAL: This triggers Printful and Loops
       metadata: {
         project: 'RGRM_STORE',
         brand: 'RaGuiRoMo Studio',
