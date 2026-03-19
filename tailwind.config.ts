@@ -1,30 +1,26 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  // 1. CONTENT SCANNING
+  // CONTENT SCANNING — fixed to match your actual folder structure
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
 
-  // 2. DESIGN SYSTEM CALIBRATION
   theme: {
     extend: {
       colors: {
-        // RGRM Signature Palette
-        "rgrm-red": "#FF0000", // The primary action/diagnostic color
+        "rgrm-red": "#BC2026",    // matches your selection:bg-[#BC2026] in page.tsx
         "rgrm-black": "#000000",
         "rgrm-gray": "#1A1A1A",
         "rgrm-light": "#F5F5F5",
       },
       fontFamily: {
-        // Technical typography mapping
         mono: ["var(--font-geist-mono)", "Menlo", "monospace"],
         sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],
       },
       letterSpacing: {
-        // Brutalist tracking adjustments
         tightest: "-.075em",
         widest: ".25em",
         registry: ".5em",
@@ -36,7 +32,6 @@ const config: Config = {
     },
   },
 
-  // 3. UTILITY EXTENSIONS
   plugins: [],
 };
 
