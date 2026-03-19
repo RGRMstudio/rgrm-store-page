@@ -9,3 +9,4 @@ out
 .env.production.local
 .env.local
 .env.local
+scripts/sync-products.mjs
