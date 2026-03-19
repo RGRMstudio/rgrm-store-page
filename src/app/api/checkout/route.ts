@@ -7,10 +7,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { priceId } = await req.json();
+    const { priceId, printfulVariantId, productName, size } = await req.json();
 
     if (!priceId) {
       return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
+    }
+
+    if (!printfulVariantId) {
+      return NextResponse.json({ error: 'Variant ID is required' }, { status: 400 });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -18,19 +22,16 @@ export async function POST(req: Request) {
       shipping_address_collection: {
         allowed_countries: ['US', 'PR', 'CA', 'ES', 'MX'],
       },
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/selection`,
       metadata: {
         project: 'RGRM_STORE',
         brand: 'RaGuiRoMo Studio',
-        printful_variant_id: process.env.PRINTFUL_VARIANT_ID || '',
+        printful_variant_id: printfulVariantId,  // ← dynamic per size
+        product_name: productName || '',
+        size: size || '',
       },
     });
 
