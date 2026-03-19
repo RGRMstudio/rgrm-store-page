@@ -1,100 +1,25 @@
-import { client, urlFor } from '@/lib/sanity';
-import AddToCartButton from '@/components/product/AddToCartButton';
-import Link from 'next/link';
+// app/selection/[id]/page.tsx
+import { notFound } from 'next/navigation';
+import { getProductById, RGRM_PRODUCTS } from '@/lib/products';
+import ProductDetail from '@/components/ProductDetail';
 
-/**
- * RGRM // DOSSIER_VIEW
- * Single Product Architecture (Structural Study Details)
- */
+// Generate static pages for all products at build time
+export async function generateStaticParams() {
+  return RGRM_PRODUCTS.map((product) => ({
+    id: product.id,
+  }));
+}
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
-async function getProduct(id: string) {
-  const query = `*[_type == "study" && _id == $id][0]`;
-  const data = await client.fetch(query, { id });
-  return data;
-}
-
-export default async function StudyDossier({ params }: PageProps) {
-  // In Next.js 15+, params must be awaited
-  const { id } = await params;
-  const product = await getProduct(id);
+export default function ProductPage({ params }: PageProps) {
+  const product = getProductById(params.id);
 
   if (!product) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-rgrm-red font-mono text-xs uppercase">
-        Error: Dossier_Not_Found
-      </div>
-    );
+    notFound();
   }
 
-  return (
-    <main className="min-h-screen pt-24 pb-12 flex flex-col lg:flex-row relative z-10 bg-black text-white">
-      {/* 1. VISUAL EVIDENCE PANEL */}
-      <section className="w-full lg:w-1/2 px-6 lg:pl-12 lg:pr-6 mb-12 lg:mb-0">
-        <div className="border border-white/10 bg-zinc-900 aspect-square relative overflow-hidden group">
-          {product.image && (
-            <img 
-              src={urlFor(product.image).url()} 
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          )}
-          <div className="absolute top-4 left-4 bg-black/80 px-3 py-1 text-[10px] font-mono text-rgrm-red">
-            REF_IMG_{product._id.substring(0, 6)}
-          </div>
-        </div>
-      </section>
-
-      {/* 2. TECHNICAL SPECIFICATIONS PANEL */}
-      <section className="w-full lg:w-1/2 px-6 lg:pr-12 lg:pl-6 flex flex-col justify-center">
-        <div className="max-w-md">
-          <nav className="mb-8">
-            <Link href="/selection" className="text-[10px] font-mono text-white/40 hover:text-rgrm-red transition-colors">
-              [BACK_TO_ARCHIVE]
-            </Link>
-          </nav>
-
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4 leading-none">
-            {product.name}
-          </h1>
-          
-          <div className="flex items-center gap-4 mb-10">
-            <span className="text-2xl font-mono text-white">${product.price}</span>
-            <span className="text-[10px] font-mono text-rgrm-red px-2 py-1 border border-rgrm-red/30 uppercase">
-              Limited_Acquisition
-            </span>
-          </div>
-
-          <div className="space-y-6 mb-12 text-xs text-white/50 font-mono leading-relaxed uppercase">
-            <p>{product.description}</p>
-            <div className="grid grid-cols-2 gap-4 border-y border-white/5 py-6">
-              <div>
-                <span className="block text-white/20 mb-1">[CATEGORY]</span>
-                <span className="text-white font-bold">{product.category || 'STRUCTURAL_STUDY'}</span>
-              </div>
-              <div>
-                <span className="block text-white/20 mb-1">[STUDIO]</span>
-                <span className="text-white font-bold">RGRM_MEX_2026</span>
-              </div>
-            </div>
-          </div>
-
-          <AddToCartButton product={{
-            id: product._id,
-            name: product.name,
-            price: product.price,
-            image: product.image ? urlFor(product.image).url() : undefined
-          }} />
-          
-          <p className="mt-6 text-[9px] text-white/20 font-mono italic">
-            * All acquisitions are logged into the Identity Registry. 
-            Allow 7-14 cycles for manufacturing and dispatch.
-          </p>
-        </div>
-      </section>
-    </main>
-  );
+  return <ProductDetail product={product} />;
 }
