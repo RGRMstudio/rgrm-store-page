@@ -1,90 +1,124 @@
-import { client, urlFor } from '@/lib/sanity';
-import AddToCartButton from '@/components/product/AddToCartButton';
+// app/selection/page.tsx
 import Link from 'next/link';
+import Image from 'next/image';
+import { RGRM_PRODUCTS } from '@/lib/products';
 
-/**
- * RGRM // SELECTION_ARCHIVE_INTERFACE
- * Protocol: ISR_REVALIDATION (60s)
- */
+export const metadata = {
+  title: 'Studies | RaGuiRoMo Studio',
+  description: 'Acquire structured garments from the RGRM identity series.',
+};
 
-export const revalidate = 60; // Recheck Sanity every 60 seconds
-
-async function getProducts() {
-  const query = `*[_type == "study"] | order(_createdAt desc)`;
-  const data = await client.fetch(query);
-  return data;
-}
-
-export default async function SelectionPage() {
-  const products = await getProducts();
-
+export default function SelectionPage() {
   return (
-    <main className="min-h-screen bg-black pt-32 pb-24 px-6 md:px-12 relative z-10">
-      {/* 1. SECTION HEADER */}
-      <header className="max-w-7xl mx-auto mb-20 border-b border-white/5 pb-12">
-        <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-none mb-6">
-          Structural_Studies
+    <main className="min-h-screen bg-black text-white">
+
+      {/* ── HEADER ── */}
+      <div className="px-6 md:px-12 pt-12 pb-8 border-b border-white/10">
+        <p className="text-rgrm-red text-[10px] font-mono tracking-widest uppercase mb-3">
+          RaGuiRoMo Studio // Active Studies
+        </p>
+        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none">
+          The Gallery
         </h1>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-          <p className="text-xs font-mono text-white/40 uppercase tracking-widest max-w-md">
-            Archive of physical artifacts and digital manifestations. 
-            Acquisition registers identity to the RGRM core database.
-          </p>
-          <span className="text-[10px] font-mono text-rgrm-red bg-rgrm-red/10 px-3 py-1 border border-rgrm-red/20 uppercase">
-            Records_Found: [{products.length}]
-          </span>
-        </div>
-      </header>
+        <p className="text-white/40 text-xs uppercase tracking-widest mt-4 font-mono">
+          {RGRM_PRODUCTS.filter(p => p.status !== 'SOLD OUT').length} pieces available
+        </p>
+      </div>
 
-      {/* 2. PRODUCT GRID */}
-      <section className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-24">
-          {products.map((product: any) => (
-            <div key={product._id} className="group relative flex flex-col">
-              
-              {/* Product Visual Container */}
-              <Link href={`/selection/${product._id}`} className="block relative aspect-[4/5] overflow-hidden bg-zinc-900 border border-white/10 mb-6">
-                <img 
-                  src={urlFor(product.image).url()} 
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                />
-                <div className="absolute top-4 right-4 text-[9px] font-mono text-white/40 bg-black/80 px-2 py-1 uppercase">
-                  Ref_{product._id.substring(0, 4)}
+      {/* ── PRODUCT GRID ── */}
+      <div className="px-6 md:px-12 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-white/5">
+          {RGRM_PRODUCTS.map((product) => {
+            const isSoldOut = product.status === 'SOLD OUT';
+            const isLowStock = product.status === 'LOW STOCK';
+
+            return (
+              <Link
+                key={product.id}
+                href={`/selection/${product.id}`}
+                className={`group relative block bg-black overflow-hidden transition-all duration-300 hover:z-10 ${
+                  isSoldOut ? 'opacity-50 grayscale' : ''
+                }`}
+              >
+                {/* Image */}
+                <div className="aspect-[3/4] relative w-full overflow-hidden bg-neutral-900">
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white/10 font-black text-4xl rotate-[-45deg] select-none">
+                        NO_IMG
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Status badge */}
+                  {product.status !== 'AVAILABLE' && (
+                    <div className="absolute top-3 right-3 bg-black/90 border border-white/20 px-2 py-1">
+                      <span className={`text-[9px] font-bold tracking-widest uppercase ${
+                        isLowStock ? 'text-yellow-500' : 'text-white/40'
+                      }`}>
+                        {product.status}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+                  {/* Hover CTA */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black to-transparent">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-rgrm-red">
+                      {isSoldOut ? 'ARCHIVED' : 'ACQUIRE >>'}
+                    </span>
+                  </div>
                 </div>
+
+                {/* Data panel */}
+                <div className="p-4 bg-black border-t border-white/5">
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="text-[9px] text-rgrm-red font-mono tracking-widest uppercase">
+                      {product.id}
+                    </p>
+                    <p className="text-xs font-bold font-mono text-white">
+                      ${product.price}.00
+                    </p>
+                  </div>
+                  <h3 className="text-sm font-bold uppercase tracking-tighter text-white/90 mt-1">
+                    {product.name}
+                  </h3>
+                  <p className="text-[9px] text-white/30 font-mono uppercase tracking-widest mt-1">
+                    {product.variants.filter(v => v.inStock).length} sizes available
+                  </p>
+                </div>
+
+                {/* Corner detail */}
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-rgrm-red transition-colors duration-300" />
               </Link>
-
-              {/* Product Info */}
-              <div className="flex-1 mb-8">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-xl font-black uppercase tracking-tight group-hover:text-rgrm-red transition-colors">
-                    <Link href={`/selection/${product._id}`}>{product.name}</Link>
-                  </h2>
-                  <span className="text-sm font-mono text-white/80">${product.price}</span>
-                </div>
-                <p className="text-[10px] text-white/40 font-mono uppercase tracking-widest mb-4 line-clamp-1">
-                  {product.category || 'Structural_Study'}
-                </p>
-              </div>
-
-              {/* Acquisition Protocol Button */}
-              <AddToCartButton product={{
-                id: product._id,
-                name: product.name,
-                price: product.price,
-                image: urlFor(product.image).url()
-              }} />
-            </div>
-          ))}
+            );
+          })}
         </div>
-      </section>
+      </div>
 
-      {/* 3. TERMINAL FOOTER */}
-      <footer className="max-w-7xl mx-auto mt-32 pt-12 border-t border-white/5 flex justify-between items-center opacity-20 text-[9px] font-mono uppercase tracking-tighter">
-        <span>RGRM // STUDIO_M_002</span>
-        <span>SYSTEM_STATUS: [NOMINAL]</span>
-        <span>{new Date().getFullYear()} ©</span>
-      </footer>
+      {/* ── FOOTER NOTE ── */}
+      <div className="px-6 md:px-12 py-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <p className="text-white/20 text-[9px] uppercase tracking-widest font-mono">
+          All pieces made to order · Shipped via Printful · No returns on custom items
+        </p>
+        <Link
+          href="/"
+          className="text-[9px] uppercase tracking-widest font-bold text-white/40 hover:text-rgrm-red transition-colors duration-300"
+        >
+          ← Back to Studio
+        </Link>
+      </div>
+
     </main>
   );
 }
