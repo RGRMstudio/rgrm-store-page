@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:printful": "node scripts/test-printful.js"
+    "test:printful": "node scripts/test-printful.js",
+    "sync:products": "node scripts/sync-products.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
