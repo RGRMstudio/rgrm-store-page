@@ -1,300 +1,127 @@
-cat > scripts/sync-products.mjs << 'EOF'
-import Stripe from 'stripe';
-import fs from 'fs';
-import { config } from 'dotenv';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
-// Reads from .env.local — keys never hardcoded
-config({ path: '.env.local' });
+import { createClient } from '@sanity/client';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+const SANITY_PROJECT_ID = process.env.SANITY_API_PROJECT_ID;
+const SANITY_DATASET = process.env.SANITY_API_DATASET;
+const SANITY_TOKEN = process.env.SANITY_API_WRITE_TOKEN;
+
+if (!PRINTFUL_API_KEY || !SANITY_PROJECT_ID || !SANITY_DATASET || !SANITY_TOKEN) {
+  console.error('❌ Missing environment variables. Check your .env.local');
+  process.exit(1);
+}
+
+const sanity = createClient({
+  projectId: SANITY_PROJECT_ID,
+  dataset: SANITY_DATASET,
+  token: SANITY_TOKEN,
+  apiVersion: '2024-01-01',
+  useCdn: false,
 });
 
-const PRINTFUL_TOKEN = process.env.PRINTFUL_ACCESS_TOKEN;
-const STORE_ID = '17181557';
-
-const PRINTFUL_PRODUCTS = [
-  { printfulId: 423009703, slug: 'RGRM_STUDY_001' },
-  { printfulId: 419646976, slug: 'RGRM_DIRECTIONS_SHOWER_CURTAIN' },
-  { printfulId: 413108976, slug: 'RGRM_MECHANICAL_CREATURE_MUG' },
-  { printfulId: 409274941, slug: 'RGRM_NEON_BEACH_DUFFLE' },
-  { printfulId: 409274147, slug: 'RGRM_ALL_EVERYTHING_PLACEMAT' },
-  { printfulId: 409272730, slug: 'RGRM_GREEN_GODDESS_TOTE' },
-  { printfulId: 409269932, slug: 'RGRM_OUR_SHAPES_DRESS' },
-  { printfulId: 409269683, slug: 'RGRM_NEON_BEACH_JERSEY' },
-  { printfulId: 409269340, slug: 'RGRM_SOLAR_JIGSAW' },
-  { printfulId: 409269002, slug: 'RGRM_COLLAGE_LAPTOP_SLEEVE' },
-  { printfulId: 409268600, slug: 'RGRM_KOIZEN_JIGSAW' },
-  { printfulId: 409263531, slug: 'RGRM_OLDS_MOBILE_PRINT' },
-  { printfulId: 406236613, slug: 'RGRM_ELECTRONEURONS_BIKINI' },
-  { printfulId: 406236219, slug: 'RGRM_BRAINSTORMING_HOODIE' },
-  { printfulId: 406235215, slug: 'RGRM_GARFIELD_MOUSEPAD' },
-  { printfulId: 406231193, slug: 'RGRM_KHLOE_LEGGINGS' },
-  { printfulId: 406230029, slug: 'RGRM_LA_CHAISE_TABLE_RUNNER' },
-  { printfulId: 406223256, slug: 'RGRM_AVRIL_TEE' },
-];
-
-async function fetchPrintfulProduct(id) {
-  const res = await fetch(`https://api.printful.com/store/products/${id}`, {
-    headers: { Authorization: `Bearer ${PRINTFUL_TOKEN}` },
+// ─── Printful API helper ───────────────────────────────────────────────────────
+async function printfulFetch(endpoint) {
+  const res = await fetch(`https://api.printful.com${endpoint}`, {
+    headers: {
+      Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
   });
+  if (!res.ok) throw new Error(`Printful API error: ${res.status} ${res.statusText}`);
   const data = await res.json();
   return data.result;
 }
 
+// ─── Sync a single product to Sanity ──────────────────────────────────────────
+async function syncProduct(product) {
+  const detail = await printfulFetch(`/store/products/${product.id}`);
+  const { sync_product, sync_variants } = detail;
+
+  const variants = sync_variants.map((v) => ({
+    _type: 'variant',
+    _key: String(v.id),
+    variantId: String(v.id),
+    name: v.name,
+    sku: v.sku,
+    price: parseFloat(v.retail_price),
+    currency: v.currency,
+    size: v.size || null,
+    color: v.color || null,
+    colorCode: v.color_code || null,
+    inStock: v.availability_status === 'active',
+    printfulVariantId: String(v.variant_id),
+    stripeProductId: v.product?.stripe_product_id || null,
+    stripePriceId: v.product?.stripe_price_id || null,
+    previewImage: v.files?.find((f) => f.type === 'preview')?.preview_url || null,
+  }));
+
+  const doc = {
+    _type: 'product',
+    _id: `printful-${sync_product.id}`,
+    printfulId: String(sync_product.id),
+    name: sync_product.name,
+    slug: {
+      _type: 'slug',
+      current: sync_product.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, ''),
+    },
+    thumbnail: sync_product.thumbnail_url,
+    isActive: true,
+    variants,
+    updatedAt: new Date().toISOString(),
+  };
+
+  await sanity.createOrReplace(doc);
+  console.log(`✅ Synced: ${sync_product.name} (${variants.length} variants)`);
+}
+
+// ─── Mark deleted products as inactive ────────────────────────────────────────
+async function deactivateMissingProducts(activePrintfulIds) {
+  const sanityProducts = await sanity.fetch(
+    `*[_type == "product" && isActive == true]{ _id, printfulId, name }`
+  );
+
+  for (const product of sanityProducts) {
+    if (!activePrintfulIds.includes(product.printfulId)) {
+      await sanity.patch(product._id).set({ isActive: false }).commit();
+      console.log(`⚠️  Deactivated missing product: ${product.name}`);
+    }
+  }
+}
+
+// ─── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  // Safety checks
-  if (!process.env.STRIPE_SECRET_KEY) {
-    console.error('❌ STRIPE_SECRET_KEY missing from .env.local');
-    process.exit(1);
-  }
-  if (!PRINTFUL_TOKEN) {
-    console.error('❌ PRINTFUL_ACCESS_TOKEN missing from .env.local');
-    process.exit(1);
+  console.log('🚀 Starting Printful → Sanity sync...\n');
+
+  const products = await printfulFetch('/store/products?limit=100');
+
+  if (!products || products.length === 0) {
+    console.log('No products found in Printful store.');
+    return;
   }
 
-  console.log('🚀 Starting RGRM product sync...\n');
-  const products = [];
+  console.log(`📦 Found ${products.length} products in Printful\n`);
 
-  for (const item of PRINTFUL_PRODUCTS) {
+  const activePrintfulIds = products.map((p) => String(p.id));
+
+  for (const product of products) {
     try {
-      console.log(`📦 Fetching Printful product ${item.printfulId}...`);
-      const pf = await fetchPrintfulProduct(item.printfulId);
-
-      const name = pf.sync_product.name;
-      const thumbnail = pf.sync_product.thumbnail_url;
-      const firstVariant = pf.sync_variants[0];
-      const price = Math.round(parseFloat(firstVariant.retail_price) * 100);
-
-      console.log(`💳 Creating Stripe product: ${name} @ $${price / 100}`);
-      const stripeProduct = await stripe.products.create({
-        name,
-        images: thumbnail ? [thumbnail] : [],
-        metadata: {
-          printful_store_product_id: String(item.printfulId),
-          rgrm_slug: item.slug,
-        },
-      });
-
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: price,
-        currency: 'usd',
-      });
-
-      const variants = pf.sync_variants.map((v) => ({
-        size: v.size || v.name,
-        variantId: v.id,
-        inStock: true,
-      }));
-
-      products.push({
-        id: item.slug,
-        name,
-        description: `${name} — RaGuiRoMo Studio`,
-        price: price / 100,
-        stripePriceId: stripePrice.id,
-        image: thumbnail || '',
-        status: 'AVAILABLE',
-        category: 'APPAREL',
-        variants,
-      });
-
-      console.log(`✅ Done: ${name} → ${stripePrice.id}\n`);
-      await new Promise(r => setTimeout(r, 500));
-
+      await syncProduct(product);
     } catch (err) {
-      console.error(`❌ Failed for ${item.printfulId}:`, err.message);
+      console.error(`❌ Failed to sync product ${product.id}:`, err.message);
     }
   }
 
-  const output = `// src/lib/products.ts
-// AUTO-GENERATED by scripts/sync-products.mjs
-// Last synced: ${new Date().toISOString()}
+  await deactivateMissingProducts(activePrintfulIds);
 
-export interface PrintfulVariant {
-  size: string;
-  variantId: number;
-  inStock: boolean;
+  console.log('\n✅ Sync complete!');
 }
 
-export interface RGRMProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stripePriceId: string;
-  image: string;
-  status: 'AVAILABLE' | 'LOW STOCK' | 'SOLD OUT';
-  category: string;
-  variants: PrintfulVariant[];
-}
-
-export const RGRM_PRODUCTS: RGRMProduct[] = ${JSON.stringify(products, null, 2)};
-
-export function getProductById(id: string): RGRMProduct | undefined {
-  return RGRM_PRODUCTS.find((p) => p.id === id);
-}
-
-export function getProductByPriceId(priceId: string): RGRMProduct | undefined {
-  return RGRM_PRODUCTS.find((p) => p.stripePriceId === priceId);
-}
-`;
-
-  fs.writeFileSync('src/lib/products.ts', output);
-  console.log('✅ src/lib/products.ts written!');
-  console.log(`📊 Total products synced: ${products.length}`);
-}
-
-main();
-EOF
-cat > scripts/sync-products.mjs << 'EOF'
-import Stripe from 'stripe';
-import fs from 'fs';
-import { config } from 'dotenv';
-
-// Reads from .env.local — keys never hardcoded
-config({ path: '.env.local' });
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+main().catch((err) => {
+  console.error('Fatal error:', err);
+  process.exit(1);
 });
-
-const PRINTFUL_TOKEN = process.env.PRINTFUL_ACCESS_TOKEN;
-const STORE_ID = '17181557';
-
-const PRINTFUL_PRODUCTS = [
-  { printfulId: 423009703, slug: 'RGRM_STUDY_001' },
-  { printfulId: 419646976, slug: 'RGRM_DIRECTIONS_SHOWER_CURTAIN' },
-  { printfulId: 413108976, slug: 'RGRM_MECHANICAL_CREATURE_MUG' },
-  { printfulId: 409274941, slug: 'RGRM_NEON_BEACH_DUFFLE' },
-  { printfulId: 409274147, slug: 'RGRM_ALL_EVERYTHING_PLACEMAT' },
-  { printfulId: 409272730, slug: 'RGRM_GREEN_GODDESS_TOTE' },
-  { printfulId: 409269932, slug: 'RGRM_OUR_SHAPES_DRESS' },
-  { printfulId: 409269683, slug: 'RGRM_NEON_BEACH_JERSEY' },
-  { printfulId: 409269340, slug: 'RGRM_SOLAR_JIGSAW' },
-  { printfulId: 409269002, slug: 'RGRM_COLLAGE_LAPTOP_SLEEVE' },
-  { printfulId: 409268600, slug: 'RGRM_KOIZEN_JIGSAW' },
-  { printfulId: 409263531, slug: 'RGRM_OLDS_MOBILE_PRINT' },
-  { printfulId: 406236613, slug: 'RGRM_ELECTRONEURONS_BIKINI' },
-  { printfulId: 406236219, slug: 'RGRM_BRAINSTORMING_HOODIE' },
-  { printfulId: 406235215, slug: 'RGRM_GARFIELD_MOUSEPAD' },
-  { printfulId: 406231193, slug: 'RGRM_KHLOE_LEGGINGS' },
-  { printfulId: 406230029, slug: 'RGRM_LA_CHAISE_TABLE_RUNNER' },
-  { printfulId: 406223256, slug: 'RGRM_AVRIL_TEE' },
-];
-
-async function fetchPrintfulProduct(id) {
-  const res = await fetch(`https://api.printful.com/store/products/${id}`, {
-    headers: { Authorization: `Bearer ${PRINTFUL_TOKEN}` },
-  });
-  const data = await res.json();
-  return data.result;
-}
-
-async function main() {
-  // Safety checks
-  if (!process.env.STRIPE_SECRET_KEY) {
-    console.error('❌ STRIPE_SECRET_KEY missing from .env.local');
-    process.exit(1);
-  }
-  if (!PRINTFUL_TOKEN) {
-    console.error('❌ PRINTFUL_ACCESS_TOKEN missing from .env.local');
-    process.exit(1);
-  }
-
-  console.log('🚀 Starting RGRM product sync...\n');
-  const products = [];
-
-  for (const item of PRINTFUL_PRODUCTS) {
-    try {
-      console.log(`📦 Fetching Printful product ${item.printfulId}...`);
-      const pf = await fetchPrintfulProduct(item.printfulId);
-
-      const name = pf.sync_product.name;
-      const thumbnail = pf.sync_product.thumbnail_url;
-      const firstVariant = pf.sync_variants[0];
-      const price = Math.round(parseFloat(firstVariant.retail_price) * 100);
-
-      console.log(`💳 Creating Stripe product: ${name} @ $${price / 100}`);
-      const stripeProduct = await stripe.products.create({
-        name,
-        images: thumbnail ? [thumbnail] : [],
-        metadata: {
-          printful_store_product_id: String(item.printfulId),
-          rgrm_slug: item.slug,
-        },
-      });
-
-      const stripePrice = await stripe.prices.create({
-        product: stripeProduct.id,
-        unit_amount: price,
-        currency: 'usd',
-      });
-
-      const variants = pf.sync_variants.map((v) => ({
-        size: v.size || v.name,
-        variantId: v.id,
-        inStock: true,
-      }));
-
-      products.push({
-        id: item.slug,
-        name,
-        description: `${name} — RaGuiRoMo Studio`,
-        price: price / 100,
-        stripePriceId: stripePrice.id,
-        image: thumbnail || '',
-        status: 'AVAILABLE',
-        category: 'APPAREL',
-        variants,
-      });
-
-      console.log(`✅ Done: ${name} → ${stripePrice.id}\n`);
-      await new Promise(r => setTimeout(r, 500));
-
-    } catch (err) {
-      console.error(`❌ Failed for ${item.printfulId}:`, err.message);
-    }
-  }
-
-  const output = `// src/lib/products.ts
-// AUTO-GENERATED by scripts/sync-products.mjs
-// Last synced: ${new Date().toISOString()}
-
-export interface PrintfulVariant {
-  size: string;
-  variantId: number;
-  inStock: boolean;
-}
-
-export interface RGRMProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stripePriceId: string;
-  image: string;
-  status: 'AVAILABLE' | 'LOW STOCK' | 'SOLD OUT';
-  category: string;
-  variants: PrintfulVariant[];
-}
-
-export const RGRM_PRODUCTS: RGRMProduct[] = ${JSON.stringify(products, null, 2)};
-
-export function getProductById(id: string): RGRMProduct | undefined {
-  return RGRM_PRODUCTS.find((p) => p.id === id);
-}
-
-export function getProductByPriceId(priceId: string): RGRMProduct | undefined {
-  return RGRM_PRODUCTS.find((p) => p.stripePriceId === priceId);
-}
-`;
-
-  fs.writeFileSync('src/lib/products.ts', output);
-  console.log('✅ src/lib/products.ts written!');
-  console.log(`📊 Total products synced: ${products.length}`);
-}
-
-main();
-EOF
