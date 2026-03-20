@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         break;
 
       // ── Shipment events ───────────────────────────────────────
-      case "shipment_sent":
+      case "package_shipped":
         console.log("Order shipped:", data.shipment?.id);
         // You can notify customer via Loops here
         break;
