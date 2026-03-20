@@ -16,7 +16,7 @@ const globalForStripe = global as unknown as { stripe: Stripe };
 export const stripe =
   globalForStripe.stripe ||
   new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2026-02-25.clover', // Locked for stability with your account
+    apiVersion: '2025-10-29.clover', // Locked for stability with your account
     typescript: true,
     appInfo: {
       name: 'RaGuiRoMo Store Registry',
