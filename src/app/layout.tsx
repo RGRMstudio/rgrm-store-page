@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata, Viewport } from "next";
 import { Oswald, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/react';
 
 // --- IMPORTS: CONTEXT & COMPONENTS ---
 import { CartProvider } from '@/context/CartContext';
@@ -11,7 +12,6 @@ import CartTrigger from '@/components/cart/CartTrigger';
 import { RGRM_IDENTITY } from '@/lib/constants';
 
 // --- 1. FONT CONFIGURATION ---
-// "Headline" Font: Industrial, Condensed, Uppercase-heavy
 const oswald = Oswald({
   subsets: ["latin"],
   variable: "--font-headline",
@@ -19,7 +19,6 @@ const oswald = Oswald({
   display: "swap",
 });
 
-// "Body" Font: Technical, Geometric, Monospace-feel
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-body",
@@ -29,7 +28,7 @@ const spaceGrotesk = Space_Grotesk({
 
 // --- 2. METADATA (SEO) ---
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.rgrm.studio'), // Replace with your actual domain
+  metadataBase: new URL('https://www.raguiromo.store'),
   title: {
     template: `%s // ${RGRM_IDENTITY.shortName}`,
     default: `${RGRM_IDENTITY.shortName} // STRUCTURAL STUDIES`,
@@ -44,7 +43,6 @@ export const metadata: Metadata = {
     siteName: RGRM_IDENTITY.shortName,
     locale: "en_US",
     type: "website",
-    // images: ['/og-image.jpg'], // Add this later for social sharing
   },
   icons: {
     icon: "/favicon.ico", 
@@ -52,7 +50,6 @@ export const metadata: Metadata = {
 };
 
 // --- 3. VIEWPORT SETTINGS ---
-// Crucial for preventing "white bars" on mobile scroll and locking zoom
 export const viewport: Viewport = {
   themeColor: "#000000",
   width: "device-width",
@@ -84,25 +81,18 @@ export default function RootLayout({
           selection:text-white
         `}
       >
-        {/* WRAPPER: Cart Context Provider */}
         <CartProvider>
-          
-          {/* LAYER 1: ATMOSPHERE (Backgrounds) */}
           <BlueprintGrid />
-          <div className="bg-noise" /> {/* Defined in globals.css */}
-
-          {/* LAYER 2: GLOBAL UI (Floating Elements) */}
+          <div className="bg-noise" />
           <CartTrigger />
-
-          {/* LAYER 3: PAGE CONTENT */}
           <div className="relative z-10 flex flex-col min-h-screen">
             {children}
           </div>
-
-          {/* LAYER 4: OVERLAYS (Drawers/Modals) */}
           <CartDrawer />
-          
         </CartProvider>
+
+        {/* VERCEL ANALYTICS */}
+        <Analytics />
       </body>
     </html>
   );
