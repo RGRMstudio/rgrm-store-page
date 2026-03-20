@@ -9,6 +9,27 @@ const sanity = createClient({
   useCdn: false,
 });
 
+async function sendLoopsEvent(email: string, eventName: string, eventProperties: Record<string, any> = {}, contactProperties: Record<string, any> = {}) {
+  try {
+    const res = await fetch('https://app.loops.so/api/v1/events/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.LOOPS_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, eventName, eventProperties, contactProperties }),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      console.error(`Loops event "${eventName}" failed:`, error);
+    } else {
+      console.log(`✅ Loops event "${eventName}" sent to ${email}`);
+    }
+  } catch (err) {
+    console.error(`Loops fetch error for "${eventName}":`, err);
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -17,7 +38,8 @@ export async function POST(req: Request) {
     console.log("Printful webhook received:", type);
 
     switch (type) {
-      // ── Order events ──────────────────────────────────────────
+
+      // ── Order Events ──────────────────────────────────────────────────────
       case "order_created":
         console.log("New order created:", data.order?.id);
         break;
@@ -34,13 +56,46 @@ export async function POST(req: Request) {
         console.log("Order canceled:", data.order?.id);
         break;
 
-      // ── Shipment events ───────────────────────────────────────
-      case "package_shipped":
-        console.log("Order shipped:", data.shipment?.id);
-        // You can notify customer via Loops here
+      case "order_put_hold":
+        console.warn("Order put on hold:", data.order?.id);
         break;
 
-      // ── Product events ────────────────────────────────────────
+      case "order_remove_hold":
+        console.log("Order hold removed:", data.order?.id);
+        break;
+
+      // ── Shipment Events ───────────────────────────────────────────────────
+      case "package_shipped": {
+        const order = data.order;
+        const shipment = data.shipment;
+        const customerEmail = order?.recipient?.email;
+
+        console.log("Package shipped:", shipment?.id);
+
+        if (customerEmail) {
+          await sendLoopsEvent(
+            customerEmail,
+            'Package Shipped',
+            {
+              trackingNumber: shipment?.tracking_number || '',
+              trackingUrl: shipment?.tracking_url || '',
+              carrier: shipment?.carrier || '',
+              estimatedDelivery: shipment?.estimated_delivery_date || '',
+              orderId: order?.id,
+            },
+            {
+              lastShipmentDate: new Date().toISOString(),
+            }
+          );
+        }
+        break;
+      }
+
+      case "package_returned":
+        console.warn("Package returned:", data.shipment?.id);
+        break;
+
+      // ── Product Events ────────────────────────────────────────────────────
       case "product_synced":
       case "product_updated": {
         const product = data.sync_product;
@@ -56,7 +111,7 @@ export async function POST(req: Request) {
           })
           .commit();
 
-        console.log("Product synced to Sanity:", product.name);
+        console.log("✅ Product synced to Sanity:", product.name);
         break;
       }
 
@@ -69,48 +124,7 @@ export async function POST(req: Request) {
           .set({ isActive: false })
           .commit();
 
-        console.log("Product deactivated in Sanity:", deletedProduct.id);
-        break;
-      }
-
-      // ── Stock events ──────────────────────────────────────────
-      case "stock_updated": {
-        const stockProduct = data.sync_product;
-        if (!stockProduct) break;
-
-        console.log("Stock updated for product:", stockProduct.id);
-        // Trigger a full re-sync for this product
-        const res = await fetch(
-          `https://api.printful.com/store/products/${stockProduct.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
-            },
-          }
-        );
-        const productData = await res.json();
-        const { sync_product, sync_variants } = productData.result;
-
-        const variants = sync_variants.map((v: any) => ({
-          _type: "variant",
-          _key: String(v.id),
-          variantId: String(v.id),
-          name: v.name,
-          sku: v.sku,
-          price: parseFloat(v.retail_price),
-          currency: v.currency,
-          size: v.size || null,
-          color: v.color || null,
-          inStock: v.availability_status === "active",
-          updatedAt: new Date().toISOString(),
-        }));
-
-        await sanity
-          .patch(`printful-${sync_product.id}`)
-          .set({ variants, updatedAt: new Date().toISOString() })
-          .commit();
-
-        console.log("Stock updated in Sanity for:", sync_product.name);
+        console.log("✅ Product deactivated in Sanity:", deletedProduct.id);
         break;
       }
 

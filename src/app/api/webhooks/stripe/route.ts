@@ -24,7 +24,6 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    // 1. RETRIEVE FULL SESSION WITH SHIPPING
     const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
       expand: ['line_items'],
     });
@@ -33,7 +32,7 @@ export async function POST(req: Request) {
     const customer = fullSession.customer_details;
     const variantId = fullSession.metadata?.printful_variant_id;
 
-    // 2. CREATE PRINTFUL ORDER
+    // 1. CREATE PRINTFUL ORDER
     if (shipping?.address && customer?.email && variantId) {
       try {
         const printfulOrder = await fetch('https://api.printful.com/orders', {
@@ -44,8 +43,7 @@ export async function POST(req: Request) {
           },
           body: JSON.stringify({
             recipient: {
-              name: shipping.name || customer.name || 'RGRM Customer',
-              email: customer.email,
+              name: customer.name,
               address1: shipping.address.line1,
               address2: shipping.address.line2 || '',
               city: shipping.address.city,
@@ -83,7 +81,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. SEND LOOPS CONFIRMATION EMAIL
+    // 2. SEND LOOPS ORDER CONFIRMATION EMAIL
     if (customer?.email) {
       try {
         const loopsRes = await fetch('https://app.loops.so/api/v1/events/send', {
@@ -99,6 +97,16 @@ export async function POST(req: Request) {
               firstName: customer.name?.split(' ')[0] || '',
               lastName: customer.name?.split(' ').slice(1).join(' ') || '',
               lastPurchaseDate: new Date().toISOString(),
+              lastOrderAmount: ((fullSession.amount_total || 0) / 100).toFixed(2),
+              lastOrderCurrency: fullSession.currency?.toUpperCase() || 'USD',
+            },
+            eventProperties: {
+              orderId: session.id,
+              orderAmount: ((fullSession.amount_total || 0) / 100).toFixed(2),
+              currency: fullSession.currency?.toUpperCase() || 'USD',
+              shippingName: customer.name,
+              shippingCity: shipping?.address?.city || '',
+              shippingCountry: shipping?.address?.country || '',
             },
           }),
         });
@@ -107,7 +115,7 @@ export async function POST(req: Request) {
           const loopsError = await loopsRes.json();
           console.error('Loops email failed:', loopsError);
         } else {
-          console.log(`✅ Loops email sent to ${customer.email}`);
+          console.log(`✅ Loops order confirmation sent to ${customer.email}`);
         }
       } catch (loopsErr) {
         console.error('Loops fetch error:', loopsErr);
