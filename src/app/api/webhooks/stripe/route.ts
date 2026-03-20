@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         const printfulOrder = await fetch('https://api.printful.com/orders', {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${process.env.PRINTFUL_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
