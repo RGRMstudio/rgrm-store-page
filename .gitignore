@@ -22,3 +22,6 @@ Thumbs.db
 
 # ----- MISC -----
 *.pem
+.env.local
+.env.local.save
+*.swp
