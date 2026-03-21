@@ -1,0 +1,150 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "stringCasing",
+                "constraint": "uppercase"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Tactical identifier (e.g., STUDY-001).",
+        "name": "id",
+        "type": "string",
+        "title": "Study ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The engineering name of the module.",
+        "name": "name",
+        "type": "string",
+        "title": "Designation"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "price",
+        "type": "number",
+        "title": "Acquisition Cost (USD)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Starts with price_...",
+        "name": "stripePriceId",
+        "type": "string",
+        "title": "Stripe Price ID"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "mainImage",
+        "type": "image",
+        "title": "Visual Evidence (Primary)"
+      },
+      {
+        "rows": 5,
+        "name": "description",
+        "type": "text",
+        "title": "Tactical Analysis"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Available",
+              "value": "AVAILABLE"
+            },
+            {
+              "title": "Archived",
+              "value": "SOLD OUT"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "AVAILABLE",
+        "name": "status",
+        "type": "string",
+        "title": "Operational Status"
+      }
+    ],
+    "name": "study",
+    "type": "document",
+    "title": "Structural Study"
+  }
+]

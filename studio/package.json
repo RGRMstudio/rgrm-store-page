@@ -15,7 +15,7 @@
     "lucide-react": "^0.471.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "sanity": "^5.17.1",
+    "sanity": "^5.14.1",
     "styled-components": "^6.1.11"
   },
   "devDependencies": {
