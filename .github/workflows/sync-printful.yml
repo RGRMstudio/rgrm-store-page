@@ -1,0 +1,26 @@
+name: Sync Printful → Sanity
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Printful Sync
+        run: |
+          curl -X POST ${{ secrets.NEXT_PUBLIC_SITE_URL }}/api/sync/printful \
+            -H "Authorization: Bearer ${{ secrets.SYNC_SECRET }}" \
+            -f \
+            --retry 3 \
+            --retry-delay 5
+
+      - name: Log result
+        if: success()
+        run: echo "✅ Printful sync triggered successfully"
+
+      - name: Log failure
+        if: failure()
+        run: echo "❌ Printful sync failed — check API logs in Vercel dashboard"
