@@ -25,7 +25,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.raguiromo.store'),
+  metadataBase: new URL("https://www.raguiromo.store"),
   title: {
     template: `%s // ${RGRM_IDENTITY.shortName}`,
     default: `${RGRM_IDENTITY.shortName} // STRUCTURAL STUDIES`,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   authors: [{ name: RGRM_IDENTITY.founder }],
   creator: RGRM_IDENTITY.shortName,
   verification: {
-    google: 'c907f11ae8e1f504',
+    google: "c907f11ae8e1f504",
   },
   openGraph: {
     title: RGRM_IDENTITY.shortName,
