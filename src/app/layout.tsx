@@ -37,6 +37,9 @@ export const metadata: Metadata = {
   keywords: ["fashion", "brutalist", "technical apparel", "streetwear", "structural design", "avant-garde"],
   authors: [{ name: RGRM_IDENTITY.founder }],
   creator: RGRM_IDENTITY.shortName,
+  verification: {
+    google: 'c907f11ae8e1f504',
+  },
   openGraph: {
     title: RGRM_IDENTITY.shortName,
     description: "Every garment is an acquisition of structural integrity.",
@@ -77,23 +80,4 @@ export default function RootLayout({
           flex 
           flex-col
           overflow-x-hidden
-          selection:bg-[#BC2026] 
-          selection:text-white
-        `}
-      >
-        <CartProvider>
-          <BlueprintGrid />
-          <div className="bg-noise" />
-          <CartTrigger />
-          <div className="relative z-10 flex flex-col min-h-screen">
-            {children}
-          </div>
-          <CartDrawer />
-        </CartProvider>
-
-        {/* VERCEL ANALYTICS */}
-        <Analytics />
-      </body>
-    </html>
-  );
-}
+          selection​​​​​​​​​​​​​​​​
