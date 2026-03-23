@@ -1,62 +1,56 @@
-'use client';
+"use client"
 
-import React, { useEffect, useState } from 'react';
-import { useCart } from '@/context/CartContext';
+import { useEffect, useState } from "react"
+import { ShoppingBag } from "lucide-react"
 
-export default function CartTrigger() {
-  const { toggleCart, cartCount } = useCart();
-  const [isBumped, setIsBumped] = useState(false);
+type CartTriggerProps = {
+  cartCount?: number
+  onClick?: () => void
+}
 
-  // Animation effect when cart count changes
+export default function CartTrigger({
+  cartCount = 0,
+  onClick,
+}: CartTriggerProps) {
+  const [isMounted, setIsMounted] = useState(false)
+  const [isBumped, setIsBumped] = useState(false)
+
+  // Prevent hydration mismatch in Next.js
   useEffect(() => {
-    if (cartCount === 0) return;
-    setIsBumped(true);
-    const timer = setTimeout(() => setIsBumped(false), 300);
-    return () => clearTimeout(timer);
-  }, [cartCount]);
+    setIsMounted(true)
+  }, [])
+
+  // Small animation bump when cart changes
+  useEffect(() => {
+    if (!isMounted) return
+
+    if (cartCount > 0) {
+      setIsBumped(true)
+      const timer = setTimeout(() => {
+        setIsBumped(false)
+      }, 150)
+      return () => clearTimeout(timer)
+    }
+  }, [cartCount, isMounted])
+
+  if (!isMounted) return null
+
+  const safeCartCount = cartCount ?? 0
 
   return (
-    <button 
-      onClick={toggleCart}
-      className="fixed top-6 right-6 z-50 flex items-center gap-3 group mix-blend-difference text-white"
-      aria-label="Open Manifest"
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 px-4 py-2 border border-white/20 hover:border-white transition-all duration-200"
     >
-      
-      {/* --- 1. TEXT LABEL (Desktop Only) --- */}
-      <div className="text-right hidden md:block">
-        <span className="block text-[8px] uppercase tracking-[0.2em] opacity-60 group-hover:text-rgrm-red group-hover:opacity-100 transition-all duration-300">
-          Manifest
-        </span>
-        <span className={`block text-[10px] font-bold font-mono transition-transform duration-100 ${isBumped ? 'scale-110 text-rgrm-red' : 'text-white'}`}>
-          {cartCount.toString().padStart(2, '0')} UNITS
-        </span>
-      </div>
-      
-      {/* --- 2. ICON GRAPHIC --- */}
-      <div className="relative w-10 h-10 border border-white/20 bg-black/50 backdrop-blur-sm flex items-center justify-center transition-all duration-300 group-hover:bg-white group-hover:text-black group-hover:border-white">
-        
-        {/* The Icon (A technical 'List' symbol) */}
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          width="16" 
-          height="16" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor" 
-          strokeWidth={1.5}
-        >
-          <path strokeLinecap="square" strokeLinejoin="miter" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+      <ShoppingBag size={18} />
 
-        {/* Red Dot Notification (Mobile Only - since text is hidden) */}
-        {cartCount > 0 && (
-          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rgrm-red md:hidden">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-rgrm-red opacity-75"></span>
-            <span className="relative inline-flex w-2.5 h-2.5 bg-rgrm-red"></span>
-          </div>
-        )}
-      </div>
-
+      <span
+        className={`block text-[10px] font-bold font-mono transition-transform duration-100 ${
+          isBumped ? "scale-110 text-rgrm-red" : "text-white"
+        }`}
+      >
+        {safeCartCount.toString().padStart(2, "0")} UNITS
+      </span>
     </button>
-  );
+  )
 }
