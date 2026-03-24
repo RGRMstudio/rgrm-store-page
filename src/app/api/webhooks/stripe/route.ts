@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 
+// Updated apiVersion to match the latest Stripe SDK requirement
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
+  apiVersion: '2026-02-25.clover',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
