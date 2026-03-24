@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     // This clears the cache for anything tagged with 'study'
     revalidateTag(body._type);
-    console.log(`REVALIDATED: ${body._type}`);
+    console.log(revalidateTag(body._type, 'page');
 
     return NextResponse.json({ revalidated: true, now: Date.now() });
   } catch (err: any) {
