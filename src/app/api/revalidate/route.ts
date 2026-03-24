@@ -1,34 +1,30 @@
+// src/app/api/revalidate/route.ts
+
 import { revalidateTag } from 'next/cache';
-import { type NextRequest, NextResponse } from 'next/server';
-import { parseBody } from 'next-sanity/webhook';
+import { NextResponse } from 'next/server';
 
-/**
- * RGRM // CACHE_INVALIDATION_PROTOCOL
- * Purpose: Sync Sanity CMS with Next.js Frontend in real-time.
- */
-
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { body, isValidSignature } = await parseBody<{ _type: string }>(
-      req,
-      process.env.SANITY_REVALIDATE_SECRET
-    );
+    const body = await request.json();
 
-    if (!isValidSignature) {
-      return new NextResponse('Invalid Signature', { status: 401 });
+    if (!body._type) {
+      return NextResponse.json({ message: 'Missing type' }, { status: 400 });
     }
 
-    if (!body?._type) {
-      return new NextResponse('Bad Request', { status: 400 });
-    }
+    // Ensure the tag is explicitly passed as a string
+    // In some TS versions, adding a second argument like 'page' or 'layout' 
+    // is required if you are using revalidatePath, but for revalidateTag 
+    // it usually just needs the tag.
+    
+    revalidateTag(String(body._type));
+    
+    console.log(`REVALIDATED: ${body._type}`);
 
-    // This clears the cache for anything tagged with 'study'
-    revalidateTag(body._type);
-    console.log(revalidateTag(body._type, 'page');
-
-    return NextResponse.json({ revalidated: true, now: Date.now() });
-  } catch (err: any) {
-    console.error(err);
-    return new NextResponse(err.message, { status: 500 });
+    return NextResponse.json({ 
+      revalidated: true, 
+      now: Date.now() 
+    });
+  } catch (err) {
+    return NextResponse.json({ message: 'Error revalidating' }, { status: 500 });
   }
 }
