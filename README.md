@@ -38,3 +38,18 @@ PRINTFUL_API_KEY=...
 LOOPS_API_KEY=...
 NEXT_PUBLIC_SANITY_PROJECT_ID=...
 NEXT_PUBLIC_BASE_URL=[https://www.raguiromo.store](https://www.raguiromo.store)
+```
+
+## 05 // SANITY MANIFEST TROUBLESHOOTING
+If you run `npx sanity manifest extract` from the repository root, Sanity CLI can fail with:
+
+- `Error: Failed to extract manifest`
+- `No project root found`
+
+This project stores the Sanity Studio in `/studio`, so run manifest extraction from that directory context:
+
+```bash
+npm run sanity:manifest
+```
+
+Also note: the repo is pinned to Node `20.x` in `package.json`. Running Node 24+ can trigger `npm warn EBADENGINE`.

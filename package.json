@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "test:printful": "node scripts/test-printful.js",
-    "sync:products": "node scripts/sync-products.mjs"
+    "sync:products": "node scripts/sync-products.mjs",
+    "sanity:manifest": "cd studio && npx sanity manifest extract --path ../public/static/studio"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
