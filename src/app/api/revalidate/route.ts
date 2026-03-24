@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     // IF THE ABOVE STILL FAILS, try this instead:
     // revalidateTag(String(body._type), 'page');
 
-    console.log(`REVALIDATED: ${body._type}`);
+    console.log(revalidateTag(String(body._type), 'page');
 
     return NextResponse.json({ revalidated: true, now: Date.now() });
   } catch (err) {
