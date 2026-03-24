@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Safety check: ensure the body and the _type property exist
+    // 1. Basic validation to ensure we have the data we need
     if (!body || !body._type) {
       return NextResponse.json(
         { message: 'Missing _type in request body' }, 
@@ -16,14 +16,11 @@ export async function POST(request: Request) {
     const tagToRevalidate = String(body._type);
 
     /**
-     * Next.js 16.2.1 TypeScript check:
-     * We pass the tag as the first argument and 'page' as the second.
-     * This satisfies the "Expected 2 arguments" error.
+     * 2. REVALIDATION LOGIC
+     * We pass two arguments to satisfy the TypeScript "Expected 2 arguments" error.
+     * The first is the tag name, the second is the type ('page').
      */
-    revalidateTag(tagToRevalidate);
-
-    // If the error persists after the above, uncomment the line below and delete the one above:
-    // revalidateTag(tagToRevalidate, 'page');
+    revalidateTag(tagToRevalidate, 'page');
 
     console.log(`Successfully revalidated tag: ${tagToRevalidate}`);
 
