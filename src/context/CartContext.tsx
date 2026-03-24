@@ -1,89 +1,129 @@
-'use client';
+"use client"
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
-/**
- * RGRM // CART_CONTEXT_PROTOCOL
- * Manages identity registry state and persistent local storage.
- */
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string;
+export type CartItem = {
+  id: string
+  title: string
+  price: number
+  quantity: number
+  image?: string
 }
 
-interface CartContextType {
-  cart: CartItem[];
-  addToCart: (product: any) => void;
-  removeFromCart: (productId: string) => void;
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
-  cartTotal: number;
+type CartContextType = {
+  items: CartItem[]
+  cartCount: number
+  totalPrice: number
+  addItem: (item: CartItem) => void
+  removeItem: (id: string) => void
+  updateQuantity: (id: string, quantity: number) => void
+  clearCart: () => void
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [items, setItems] = useState<CartItem[]>([])
+  const [mounted, setMounted] = useState(false)
 
-  // 1. PERSISTENCE HANDSHAKE: Load cart from LocalStorage on mount
+  // Load cart from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('rgrm-registry-manifest');
-    if (savedCart) {
+    const stored = localStorage.getItem("rgrm-cart")
+    if (stored) {
       try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("LOG_ERROR: Registry corrupted, resetting state.");
-        localStorage.removeItem('rgrm-registry-manifest');
+        setItems(JSON.parse(stored))
+      } catch {
+        setItems([])
       }
     }
-  }, []);
+    setMounted(true)
+  }, [])
 
-  // 2. DATA SYNCHRONIZATION: Save cart to LocalStorage on change
+  // Persist cart
   useEffect(() => {
-    localStorage.setItem('rgrm-registry-manifest', JSON.stringify(cart));
-  }, [cart]);
+    if (mounted) {
+      localStorage.setItem("rgrm-cart", JSON.stringify(items))
+    }
+  }, [items, mounted])
 
-  const addToCart = (product: any) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+  const addItem = (item: CartItem) => {
+    setItems((prev) => {
+      const existing = prev.find((i) => i.id === item.id)
+
+      if (existing) {
+        return prev.map((i) =>
+          i.id === item.id
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        )
       }
-      return [...prevCart, { ...product, quantity: 1 }];
-    });
-  };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
-  };
+      return [...prev, item]
+    })
+  }
 
-  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const removeItem = (id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id))
+  }
+
+  const updateQuantity = (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeItem(id)
+      return
+    }
+
+    setItems((prev) =>
+      prev.map((i) =>
+        i.id === id ? { ...i, quantity } : i
+      )
+    )
+  }
+
+  const clearCart = () => {
+    setItems([])
+  }
+
+  const cartCount = useMemo(
+    () => items.reduce((acc, item) => acc + item.quantity, 0),
+    [items]
+  )
+
+  const totalPrice = useMemo(
+    () =>
+      items.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0
+      ),
+    [items]
+  )
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      removeFromCart, 
-      isCartOpen, 
-      setIsCartOpen, 
-      cartTotal 
-    }}>
+    <CartContext.Provider
+      value={{
+        items,
+        cartCount,
+        totalPrice,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
-  );
+  )
 }
 
 export function useCart() {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider sector.');
+  const context = useContext(CartContext)
+  if (!context) {
+    throw new Error("useCart must be used inside CartProvider")
   }
-  return context;
+  return context
 }
