@@ -8,7 +8,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const signature = (await headers()).get('Stripe-Signature') as string;
+  const headersList = await headers();
+  const signature = headersList.get('Stripe-Signature') as string;
 
   let event: Stripe.Event;
 
@@ -19,27 +20,27 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
+    console.error(`❌ Webhook Error: ${err.message}`);
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    // Retrieve full session with line items
     const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
       expand: ['line_items'],
     });
 
-    // CAST TO ANY: This bypasses the "Property does not exist on Response" error
+    // Bypass type checking for newer Stripe Response wrapper
     const sessionData = fullSession as any;
 
     const shipping = sessionData.shipping_details;
     const customer = sessionData.customer_details;
     const variantId = sessionData.metadata?.printful_variant_id;
 
-    console.log('✅ Processing order for:', customer?.email);
+    console.log('✅ MODULE_002: Order detected for', customer?.email);
     
-    // Your Printful / Loops logic continues here...
+    // Future: Add Printful fulfillment logic here
   }
 
   return NextResponse.json({ received: true });
