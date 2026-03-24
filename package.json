@@ -1,7 +1,6 @@
 {
   "name": "raguiromo-store",
   "version": "1.0.0",
-  "private": true,
   "engines": {
     "node": "20.x"
   },
@@ -9,7 +8,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "15.1.6",
+    "stripe": "^17.0.0",
+    "sanity": "latest"
+  },
     "test:printful": "node scripts/test-printful.js",
     "sync:products": "node scripts/sync-products.mjs",
     "sanity:manifest": "cd studio && npx sanity manifest extract --path ../public/static/studio"
