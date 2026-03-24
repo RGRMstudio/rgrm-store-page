@@ -16,8 +16,8 @@ export async function POST(request: Request) {
     
     // IF THE ABOVE STILL FAILS, try this instead:
     // revalidateTag(String(body._type), 'page');
-
-    console.log(revalidateTag(String(body._type), 'page');
+// Explicitly providing two arguments to satisfy the TypeScript error
+revalidateTag(String(body._type), 'page');
 
     return NextResponse.json({ revalidated: true, now: Date.now() });
   } catch (err) {
