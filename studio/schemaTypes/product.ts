@@ -1,35 +1,49 @@
-// Add these fields to your product document schema
 export default {
   name: 'product',
   type: 'document',
-  title: 'Product',
+  title: 'Products',
   fields: [
     {
-      name: 'name',
+      name: 'title',
       type: 'string',
       title: 'Product Name',
+      description: 'The name of your structural study or poster.',
     },
-    // ... your other fields (price, images, etc.)
     {
-      name: 'variants',
-      type: 'array',
-      title: 'Product Variants',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            { name: 'title', type: 'string', title: 'Variant Name (e.g. Black / XL)' },
-            { name: 'price', type: 'number', title: 'Price' },
-            { 
-              name: 'printful_variant_id', 
-              type: 'string', 
-              title: 'Printful Variant ID',
-              description: 'Get this from your Printful dashboard or the test script.'
-            },
-            { name: 'sku', type: 'string', title: 'SKU' }
-          ]
-        }
-      ]
-    }
-  ]
-}
+      name: 'slug',
+      type: 'slug',
+      title: 'URL Slug',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+      description: 'The web address (e.g., raguiromo.store/product/manifesto-poster).',
+    },
+    {
+      name: 'printfulId',
+      type: 'number',
+      title: 'Printful Product ID',
+      readOnly: true,
+      description: 'This is linked automatically. Do not change.',
+    },
+    {
+      name: 'price',
+      type: 'number',
+      title: 'Retail Price (USD)',
+    },
+    {
+      name: 'image',
+      type: 'image',
+      title: 'Main Product Image',
+      options: {
+        hotspot: true, // Allows you to crop the image perfectly in the CMS
+      },
+    },
+    {
+      name: 'description',
+      type: 'text',
+      title: 'Product Description',
+      rows: 4,
+    },
+  ],
+};
