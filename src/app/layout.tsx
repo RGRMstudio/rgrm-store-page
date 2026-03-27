@@ -1,100 +1,41 @@
-import React from "react"
-import type { Metadata, Viewport } from "next"
-import { Oswald, Space_Grotesk } from "next/font/google"
-import "./globals.css"
-import { Analytics } from "@vercel/analytics/react"
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Footer from "@/components/Footer";
+import { Analytics } from "@vercel/analytics/react";
 
-import { CartProvider } from "@/context/CartContext"
-import BlueprintGrid from "@/components/ui/BlueprintGrid"
-import CartDrawer from "@/components/cart/CartDrawer"
-import CartTrigger from "@/components/cart/CartTrigger"
-import { RGRM_IDENTITY } from "@/lib/constants"
-
-const oswald = Oswald({
-  subsets: ["latin"],
-  variable: "--font-headline",
-  weight: ["400", "500", "700"],
-  display: "swap",
-})
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["300", "400", "500", "700"],
-  display: "swap",
-})
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  title: "RGRM STUDIO | STRUCTURAL STUDIES",
+  description: "Exclusive Manifesto Posters and design products for architectural minds.",
+  keywords: ["Manifesto Poster", "Structural Studies", "RGRM", "Design Store"],
   metadataBase: new URL("https://www.raguiromo.store"),
-  title: {
-    template: `%s // ${RGRM_IDENTITY.shortName}`,
-    default: `${RGRM_IDENTITY.shortName} // STRUCTURAL STUDIES`,
-  },
-  description: `${RGRM_IDENTITY.mission} ${RGRM_IDENTITY.tagline}`,
-  keywords: [
-    "fashion",
-    "brutalist",
-    "technical apparel",
-    "streetwear",
-    "structural design",
-    "avant-garde",
-  ],
-  authors: [{ name: RGRM_IDENTITY.founder }],
-  creator: RGRM_IDENTITY.shortName,
-  verification: {
-    google: "c907f11ae8e1f504",
-  },
   openGraph: {
-    title: RGRM_IDENTITY.shortName,
-    description: "Every garment is an acquisition of structural integrity.",
-    siteName: RGRM_IDENTITY.shortName,
-    locale: "en_US",
+    title: "RGRM STUDIO",
+    description: "Design products for architectural minds.",
+    url: "https://www.raguiromo.store",
+    siteName: "RGRM STUDIO",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
     type: "website",
   },
-  icons: {
-    icon: "/favicon.ico",
-  },
-}
-
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body
-        className={`${oswald.variable} ${spaceGrotesk.variable} antialiased bg-black text-white min-h-screen flex flex-col overflow-x-hidden selection:bg-[#BC2026] selection:text-white`}
-      >
-        <CartProvider>
-          {/* Background Systems */}
-          <BlueprintGrid />
-          <div className="bg-noise" />
-
-          {/* Cart Trigger (fixed UI element recommended) */}
-          <div className="fixed top-6 right-6 z-50">
-            <CartTrigger />
-          </div>
-
-          {/* Main Content */}
-          <div className="relative z-10 flex flex-col min-h-screen">
-            {children}
-          </div>
-
-          {/* Cart Drawer */}
-          <CartDrawer />
-        </CartProvider>
-
+      <body className={`${inter.className} antialiased bg-white`}>
+        {/* Navigation could go here */}
+        
+        {children}
+        
+        <Footer />
         <Analytics />
       </body>
     </html>
-  )
+  );
 }
