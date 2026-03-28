@@ -9,9 +9,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Printful Sync
+    - name: Trigger Printful Sync
         run: |
-          curl -X POST ${{ secrets.NEXT_PUBLIC_SITE_URL }}/api/sync/printful \
+          curl -X POST "${{ secrets.SITE_URL }}/api/sync/printful" \
             -H "Authorization: Bearer ${{ secrets.SYNC_SECRET }}" \
             -f \
             --retry 3 \
