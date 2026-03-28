@@ -1,49 +1,79 @@
-export default {
+import { defineType, defineField } from 'sanity'
+
+export default defineType({
   name: 'product',
+  title: 'Product',
   type: 'document',
-  title: 'Products',
   fields: [
-    {
-      name: 'title',
-      type: 'string',
+    defineField({
+      name: 'name',
       title: 'Product Name',
-      description: 'The name of your structural study or poster.',
-    },
-    {
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'slug',
+      title: 'Slug',
       type: 'slug',
-      title: 'URL Slug',
       options: {
-        source: 'title',
+        source: 'name',
         maxLength: 96,
       },
-      description: 'The web address (e.g., raguiromo.store/product/manifesto-poster).',
-    },
-    {
-      name: 'printfulId',
-      type: 'number',
-      title: 'Printful Product ID',
-      readOnly: true,
-      description: 'This is linked automatically. Do not change.',
-    },
-    {
-      name: 'price',
-      type: 'number',
-      title: 'Retail Price (USD)',
-    },
-    {
-      name: 'image',
-      type: 'image',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'mainImage',
       title: 'Main Product Image',
+      type: 'image',
       options: {
-        hotspot: true, // Allows you to crop the image perfectly in the CMS
+        hotspot: true, // Enables the focal point UI
       },
-    },
-    {
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative Text',
+          description: 'Important for SEO and accessibility.',
+        },
+      ],
+    }),
+    defineField({
+      name: 'price',
+      title: 'Price (USD)',
+      type: 'number',
+      validation: (Rule) => Rule.required().min(0),
+    }),
+    defineField({
+      name: 'inventory',
+      title: 'Inventory Stock',
+      type: 'number',
+      description: 'Used for Stripe and inventory sync hooks.',
+      initialValue: 0,
+      validation: (Rule) => Rule.required().min(0),
+    }),
+    defineField({
       name: 'description',
+      title: 'Description',
       type: 'text',
-      title: 'Product Description',
       rows: 4,
-    },
+    }),
+    defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Product Design', value: 'product' },
+          { title: 'Fashion', value: 'fashion' },
+          { title: 'Art/Print', value: 'art' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'stripeProductId',
+      title: 'Stripe Product ID',
+      type: 'string',
+      readOnly: true, // This gets populated by your sync scripts
+    }),
   ],
-};
+})
