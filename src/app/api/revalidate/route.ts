@@ -7,13 +7,20 @@ export async function POST(request: Request) {
     const tag = body?._type;
 
     if (tag) {
-      // @ts-ignore - Bypassing the "2 arguments" error to force the build
-      revalidateTag(String(tag));
-      console.log(`REVALIDATED: ${tag}`);
+      // Corrected: Adding 'page' as the 2nd argument satisfies TypeScript
+      revalidateTag(String(tag), 'page');
+      
+      console.log(`RGRM REVALIDATE SUCCESS: ${tag}`);
+      return NextResponse.json({ 
+        revalidated: true, 
+        tag: tag 
+      });
     }
 
-    return NextResponse.json({ revalidated: true });
-  } catch (err) {
-    return NextResponse.json({ message: 'Error' }, { status: 500 });
+    return NextResponse.json({ message: 'No tag provided' }, { status: 400 });
+
+  } catch (err: any) {
+    console.error('Revalidation Error:', err.message);
+    return NextResponse.json({ message: 'Error', error: err.message }, { status: 500 });
   }
 }
