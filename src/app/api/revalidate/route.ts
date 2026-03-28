@@ -7,20 +7,15 @@ export async function POST(request: Request) {
     const tag = body?._type;
 
     if (tag) {
-      // Corrected: Adding 'page' as the 2nd argument satisfies TypeScript
+      // The 2nd argument 'page' is required in Next.js 16.2+
       revalidateTag(String(tag), 'page');
       
       console.log(`RGRM REVALIDATE SUCCESS: ${tag}`);
-      return NextResponse.json({ 
-        revalidated: true, 
-        tag: tag 
-      });
+      return NextResponse.json({ revalidated: true, tag });
     }
 
     return NextResponse.json({ message: 'No tag provided' }, { status: 400 });
-
   } catch (err: any) {
-    console.error('Revalidation Error:', err.message);
     return NextResponse.json({ message: 'Error', error: err.message }, { status: 500 });
   }
 }
