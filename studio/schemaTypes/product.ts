@@ -26,14 +26,14 @@ export default defineType({
       title: 'Main Product Image',
       type: 'image',
       options: {
-        hotspot: true, // Enables the focal point UI
+        hotspot: true, // Enables the focal point UI in the Studio
       },
       fields: [
         {
           name: 'alt',
           type: 'string',
           title: 'Alternative Text',
-          description: 'Important for SEO and accessibility.',
+          description: 'Critical for SEO and accessibility.',
         },
       ],
     }),
@@ -47,7 +47,7 @@ export default defineType({
       name: 'inventory',
       title: 'Inventory Stock',
       type: 'number',
-      description: 'Used for Stripe and inventory sync hooks.',
+      description: 'Synced with Stripe inventory.',
       initialValue: 0,
       validation: (Rule) => Rule.required().min(0),
     }),
@@ -73,7 +73,7 @@ export default defineType({
       name: 'stripeProductId',
       title: 'Stripe Product ID',
       type: 'string',
-      readOnly: true, // This gets populated by your sync scripts
+      readOnly: true, // Populated automatically by your sync logic
     }),
   ],
 })
