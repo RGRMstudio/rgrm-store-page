@@ -4,38 +4,16 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const tag = body?._type;
+    const tag = body._type; // Revalidates based on the Sanity schema type (product/settings)
 
     if (tag) {
-      // The 2nd argument 'page' is required in Next.js 16.2+
-      import { revalidateTag } from 'next/cache';
-import { NextResponse } from 'next/server';
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const tag = body?._type;
-
-    if (tag) {
-      // The 2nd argument 'page' is required in Next.js 16.2+
-      revalidateTag(String(tag), 'page');
-      
-      console.log(`RGRM REVALIDATE SUCCESS: ${tag}`);
-      return NextResponse.json({ revalidated: true, tag });
+      // This tells Next.js to dump the old cache and fetch the new RGRM data
+      revalidateTag(tag);
+      return NextResponse.json({ revalidated: true, now: Date.now() });
     }
 
-    return NextResponse.json({ message: 'No tag provided' }, { status: 400 });
-  } catch (err: any) {
-    return NextResponse.json({ message: 'Error', error: err.message }, { status: 500 });
-  }
-}
-      
-      console.log(`RGRM REVALIDATE SUCCESS: ${tag}`);
-      return NextResponse.json({ revalidated: true, tag });
-    }
-
-    return NextResponse.json({ message: 'No tag provided' }, { status: 400 });
-  } catch (err: any) {
-    return NextResponse.json({ message: 'Error', error: err.message }, { status: 500 });
+    return NextResponse.json({ revalidated: false, message: 'Missing tag' });
+  } catch (err) {
+    return NextResponse.json({ message: 'Error revalidating', err }, { status: 500 });
   }
 }
