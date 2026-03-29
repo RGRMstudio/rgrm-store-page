@@ -1,52 +1,41 @@
 {
-  "name": "raguiromo-store",
+  "name": "rgrm-store-page",
   "version": "1.0.0",
+  "private": true,
   "engines": {
-    "node": "20.x"
+    "node": ">=20.x"
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && npx sanity schema deploy --manifest-dir ./public/static/studio",
     "start": "next start",
-    "lint": "next lint",
-    "check": "node scripts/health-check.mjs",
-    "sync:products": "node scripts/sync-products.mjs"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.1",
-    "@sanity/client": "^6.15.20",
-    "@sanity/image-url": "^1.2.0",
-    "@sanity/ui": "^3.1.14",
-    "@sanity/vision": "^5.18.0",
-    "@stripe/react-stripe-js": "^2.4.0",
-    "@stripe/stripe-js": "^3.0.0",
-    "@vercel/analytics": "^1.2.2",
-    "@vercel/speed-insights": "^1.0.10",
-    "axios": "^1.6.7",
-    "clsx": "^2.1.1",
-    "dotenv": "^16.4.5",
-    "framer-motion": "^11.0.8",
+    "@sanity/icons": "^3.0.0",
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/vision": "^3.70.0",
     "gsap": "^3.12.5",
-    "loops": "^3.4.0",
-    "lucide-react": "^0.344.0",
-    "next": "15.1.6",
-    "next-sanity": "^12.2.1",
+    "loops": "^3.1.1",
+    "lucide-react": "^0.447.0",
+    "next": "^15.1.6",
+    "next-sanity": "^9.8.0",
+    "next-themes": "^0.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-is": "^19.2.4",
-    "react-refresh": "^0.18.0",
-    "sanity": "^5.18.0",
-    "stripe": "^14.19.0",
-    "styled-components": "^6.1.8",
-    "tailwind-merge": "^2.2.1"
+    "sanity": "^3.70.0",
+    "stripe": "^17.0.0",
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
+    "@types/node": "^22.13.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "autoprefixer": "^10.4.18",
-    "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3"
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^15.1.6",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.3"
   }
 }
