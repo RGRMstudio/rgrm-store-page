@@ -1,21 +1,27 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
-// Using 4-dots because the config is being called from src/app/selection
-import product from '../../schemas/product';
-import settings from '../../schemas/settings';
+
+// Corrected paths for Sanity schemas located in the root /schemas folder
+import product from './schemas/product';
+import settings from './schemas/settings';
 
 export default defineConfig({
   name: 'default',
   title: 'RGRM STUDIO ADMIN',
 
-  // Fallback logic to ensure it works in both local and Vercel environments
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_DATASET!,
+  // Project ID and Dataset from your Sanity Management Dashboard
+  // Uses Vercel environment variables with local fallbacks
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '055j6pls',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
 
-  basePath: '/selection', 
+  // This matches your website's admin URL: raguiromo.store/selection
+  basePath: '/selection',
 
-  plugins: [structureTool(), visionTool()],
+  plugins: [
+    structureTool(),
+    visionTool(),
+  ],
 
   schema: {
     types: [product, settings],
