@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@exodus/bytes": "^1.2.0",
-    "next": "15.1.12",
+    "next": "15.5.14",
     "next-sanity": "9.8.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
