@@ -1,27 +1,15 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 
-/**
- * RaGuiRoMo Store - Stripe Singleton
- * This client handles all payment communication for RGRMstore.
- * It ensures only one instance of Stripe is created.
- */
+// Prioritizes the Vercel-integrated "RGRMStore" Secret Key
+const stripeSecret = 
+  process.env.RGRMStore_STRIPE_SECRET_KEY || 
+  process.env.STRIPE_SECRET_KEY;
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('CRITICAL: STRIPE_SECRET_KEY is missing from Vercel Environment Variables.');
+if (!stripeSecret) {
+  throw new Error("STRIPE_SECRET_KEY is missing from environment variables.");
 }
 
-// Global augmentation for the Stripe instance to survive HMR in development
-const globalForStripe = global as unknown as { stripe: Stripe };
-
-export const stripe =
-  globalForStripe.stripe ||
-  new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-10-29.clover', // Locked for stability with your account
-    typescript: true,
-    appInfo: {
-      name: 'RaGuiRoMo Store Registry',
-      version: '1.0.0',
-    },
-  });
-
-if (process.env.NODE_ENV !== 'production') globalForStripe.stripe = stripe;
+export const stripe = new Stripe(stripeSecret, {
+  apiVersion: "2024-12-18.acacia", // Updated to latest stable version
+  typescript: true,
+});
