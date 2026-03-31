@@ -1,6 +1,6 @@
 "use server";
 
-import { stripe } from "@/lib/stripe"; // Ensure it imports from the updated lib/stripe
+import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
@@ -14,7 +14,6 @@ export async function createCheckout(
   const host = headerList.get("host") || "raguiromo.store";
   const origin = host.includes("localhost") ? `http://${host}` : `https://${host}`;
 
-  // Stripe will now use the RGRMStore key initialized in lib/stripe
   const session = await stripe.checkout.sessions.create({
     automatic_tax: { enabled: true },
     shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB'] },
