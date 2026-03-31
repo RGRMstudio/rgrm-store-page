@@ -1,28 +1,32 @@
 "use server";
 
-import { stripe } from "@/lib/stripe"; // We'll initialize this in Step 2
+import { stripe } from "@/lib/stripe"; // Ensure it imports from the updated lib/stripe
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { LoopsClient } from 'loops';
 
-const loops = new LoopsClient(process.env.LOOPS_API_KEY!);
+export async function createCheckout(
+  variantId: number, 
+  productName: string, 
+  price: number, 
+  size: string
+) {
+  const headerList = await headers();
+  const host = headerList.get("host") || "raguiromo.store";
+  const origin = host.includes("localhost") ? `http://${host}` : `https://${host}`;
 
-export async function createCheckout(variantId: number, productName: string, price: number) {
-  const host = (await headers()).get("host");
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-  const origin = `${protocol}://${host}`;
-
-  // 1. Create a "Shadow" contact in Loops to track potential abandonment
-  // Note: This works best if you collect email before this step, 
-  // but for now, it prepares the system for the Stripe data.
-  
+  // Stripe will now use the RGRMStore key initialized in lib/stripe
   const session = await stripe.checkout.sessions.create({
+    automatic_tax: { enabled: true },
+    shipping_address_collection: { allowed_countries: ['US', 'CA', 'GB'] },
     line_items: [
       {
         price_data: {
           currency: "usd",
-          product_data: { name: productName },
-          unit_amount: Math.round(price * 100), // Stripe works in cents
+          product_data: { 
+            name: `${productName} — SIZE: ${size}`,
+          },
+          unit_amount: Math.round(price * 100),
+          tax_behavior: "exclusive",
         },
         quantity: 1,
       },
@@ -30,9 +34,9 @@ export async function createCheckout(variantId: number, productName: string, pri
     mode: "payment",
     success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/`,
-    // THE MAGIC: This metadata travels to your webhook
     metadata: {
-      printful_variant_id: variantId.toString(),
+      variant_id: variantId.toString(),
+      product_size: size,
     },
   });
 
