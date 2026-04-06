@@ -1,149 +1,128 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* RaGuiRoMo Operational Blueprint v1.0 - Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&display=swap');
 
-/* --- 1. CORE VARIABLES --- */
 :root {
-  /* Hex: #000000 */
-  --background: 0 0 0;
-  /* Hex: #FFFFFF */
-  --foreground: 255 255 255;
-  /* Hex: #BC2026 (RGRM Red) */
-  --accent: 188 32 38;
+  /* Industrial Palette */
+  --background: #050505;
+  --foreground: #f0f0f0;
+  --glitch-cyan: #00fff9;
+  --glitch-magenta: #ff00c1;
+  --industrial-grey: #2a2a2a;
   
-  --font-headline: 'Oswald', sans-serif;
-  --font-body: 'Space Grotesk', sans-serif;
+  /* Layout Spacing */
+  --header-height: 80px;
 }
 
-/* --- 2. BASE RESET & TYPOGRAPHY --- */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
 html,
 body {
-  height: 100%;
-  background-color: rgb(var(--background));
-  color: rgb(var(--foreground));
-  font-family: var(--font-body); /* Default to technical font */
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  /* Technical monospace for that "Research Log" feel */
+  font-family: 'JetBrains Mono', monospace;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* Prevent horizontal scroll from large watermarks */
 }
 
-/* Headings use the condensed industrial font */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-headline);
-}
-
-/* --- 3. CUSTOM INTERACTION COLORS --- */
-/* The highlight color when selecting text */
-::selection {
-  background-color: #BC2026; /* RGRM Red */
-  color: #FFFFFF;
-}
-
-/* --- 4. INDUSTRIAL SCROLLBAR --- */
-/* Works on Chrome, Edge, and Safari */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #000000;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 0px; /* Sharp edges */
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #BC2026; /* Red on hover */
-}
-
-/* --- 5. UTILITY CLASSES --- */
-
-@layer utilities {
-  /* Hides scrollbar but allows scrolling (good for modal drawers) */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Text Stroke (Outline text) - Great for brutalist headers */
-  .text-stroke {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
-    color: transparent;
-  }
-  
-  .text-stroke-red {
-    -webkit-text-stroke: 1px #BC2026;
-    color: transparent;
-  }
-}
-
-/* --- 6. TEXTURE & FX --- */
-
-/* Film Noise Overlay (Adds texture to the black background) */
-.bg-noise {
+/* --- THE DUST/GRAIN OVERLAY --- */
+body::before {
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
+  /* High-frequency noise texture */
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+  opacity: 0.04;
   pointer-events: none;
-  z-index: 50;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  z-index: 9999;
 }
 
-/* Glitch Animation (Used for 404 Page and Errors) */
-.glitch-text {
+/* --- TYPOGRAPHY --- */
+h1, h2, h3, .gothic-font {
+  font-family: 'Inter', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--glitch-cyan);
+}
+
+/* --- REUSABLE UTILITIES --- */
+
+/* Terminal-style borders */
+.border-industrial {
+  border: 1px solid var(--industrial-grey);
+}
+
+/* Scanline Effect for Sections */
+.scanlines {
   position: relative;
-  animation: glitch 3s infinite;
+  overflow: hidden;
 }
 
-@keyframes glitch {
-  0% { transform: translate(0); }
-  2% { transform: translate(-2px, 2px); }
-  4% { transform: translate(-2px, -2px); }
-  6% { transform: translate(2px, 2px); }
-  8% { transform: translate(2px, -2px); }
-  10% { transform: translate(0); }
-  100% { transform: translate(0); }
-}
-
-/* Shimmer Animation (Used for Skeleton Loading) */
-@keyframes shimmer {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
-}
-
-/* --- 7. FORM ELEMENTS --- */
-
-/* Custom Checkbox Reset for Registry Page */
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: transparent;
-  margin: 0;
-  display: grid;
-  place-content: center;
-}
-
-input[type="checkbox"]::before {
+.scanlines::after {
   content: "";
-  width: 0.65em;
-  height: 0.65em;
-  transform: scale(0);
-  transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em white; /* The checkmark color */
-  transform-origin: center;
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none;
 }
 
-input[type="checkbox"]:checked::before {
-  transform: scale(1);
-  box-shadow: inset 1em 1em #BC2026; /* Red Checkmark */
+/* Button Component */
+.btn-rgrm {
+  background: var(--foreground);
+  color: var(--background);
+  padding: 12px 24px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 95% 100%, 0 100%);
+}
+
+.btn-rgrm:hover {
+  background: var(--glitch-cyan);
+}
+
+/* --- ANIMATIONS --- */
+@keyframes signal-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.status-online {
+  width: 8px;
+  height: 8px;
+  background: #39ff14;
+  border-radius: 50%;
+  display: inline-block;
+  animation: signal-pulse 2s infinite;
 }
