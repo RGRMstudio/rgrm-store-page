@@ -1,73 +1,66 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-01-27.acacia' as any,
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
-export async function POST(req: Request) {
+export async function POST(req) {
   const body = await req.text();
-  const signature = (await headers()).get('stripe-signature') as string;
+  const sig = req.headers.get('stripe-signature');
 
-  let event: Stripe.Event;
+  let event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-  } catch (err: any) {
-    console.error(`[RGRM_ERROR]: Webhook Signature Verification Failed: ${err.message}`);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
+  } catch (err) {
+    console.error(`[ERROR] Webhook Signature Failed: ${err.message}`);
+    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
-
-  // --- STRATEGIC LOGGING: START OF TRANSACTION ---
-  console.log(`[RGRM_REGISTRY]: Event Received: ${event.type} [ID: ${event.id}]`);
 
   if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-
-    // 1. IDENTITY AUTHENTICATION LOG
-    const customerEmail = session.customer_details?.email;
-    console.log(`[RGRM_REGISTRY]: Identity Authenticated for: ${customerEmail}`);
-    console.log(`[RGRM_REGISTRY]: Session ID: ${session.id}`);
-
-    try {
-      // 2. FULFILLMENT HANDSHAKE (PRINTFUL)
-      // Extract line items to send to the Printful Store 17181557
-      console.log(`[RGRM_REGISTRY]: Dispatching Study Data to Printful Store 17181557...`);
-      
-      const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
-      
-      // Logic here to POST to Printful API using your PRINTFUL_API_KEY
-      // (Implementation requires your specific Printful shipping logic)
-      
-      console.log(`[RGRM_SUCCESS]: Printful Manufacturing Sequence Initialized.`);
-
-      // 3. REGISTRY HANDSHAKE (LOOPS.SO)
-      console.log(`[RGRM_REGISTRY]: Registering ${customerEmail} in Loops.so Identity Database...`);
-      
-      await fetch('https://app.loops.so/api/v1/contacts/create', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
-          'Content-Type': 'application/json',
+    const session = event.data.object;
+    
+    // 1. Trigger Printful Order (Draft Mode by Default)
+    const printfulResponse = await fetch('https://api.printful.com/orders', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${process.env.PRINTFUL_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        recipient: {
+          name: session.shipping_details.name,
+          address1: session.shipping_details.address.line1,
+          city: session.shipping_details.address.city,
+          state_code: session.shipping_details.address.state,
+          country_code: session.shipping_details.address.country,
+          zip: session.shipping_details.address.postal_code,
         },
-        body: JSON.stringify({
-          email: customerEmail,
-          source: 'RGRM_STORE_ACQUISITION',
-          userGroup: 'REGISTRY_MEMBER',
-        }),
-      });
+        items: JSON.parse(session.metadata.items), // Expects Array of Variant IDs
+        confirm: false // Set to false to review in Printful dashboard first
+      })
+    });
 
-      console.log(`[RGRM_SUCCESS]: Identity Registry Updated for ${customerEmail}.`);
+    // 2. Trigger Loops Terminal Voice Email
+    await fetch('https://app.loops.so/api/v1/events/send', {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
+        eventName: 'Order_Success',
+        email: session.customer_details.email,
+        contactProperties: {
+          firstName: session.customer_details.name.split(' ')[0],
+          status: 'SIGNAL_DEPLOYED',
+          orderTotal: (session.amount_total / 100).toFixed(2)
+        }
+      })
+    });
 
-    } catch (error: any) {
-      console.error(`[RGRM_CRITICAL_FAILURE]: Post-Checkout Handshake Failed: ${error.message}`);
-      // Note: We return a 200 even on internal logic failure to prevent Stripe from retrying 
-      // indefinitely if the error is on our processing side, but we log the CRITICAL error.
-    }
+    console.log(`[STATUS] Order Processed for: ${session.customer_details.email}`);
   }
 
-  return NextResponse.json({ received: true }, { status: 200 });
+  return NextResponse.json({ received: true });
 }
