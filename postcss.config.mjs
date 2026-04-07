@@ -1,8 +1,8 @@
-// RaGuiRoMo Operational Blueprint v1.0 - PostCSS Configuration
-// Standard configuration for Next.js without Tailwind CSS
-module.exports = {
+/** @type {import('postcss-load-config').Config} */
+const config = {
   plugins: {
-    // autoprefixer adds vendor prefixes to your CSS for cross-browser compatibility
     autoprefixer: {},
   },
-}
+};
+
+export default config;
