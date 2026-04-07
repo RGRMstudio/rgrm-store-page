@@ -1,24 +1,25 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import Footer from "@/components/Footer";
-import { Analytics } from "@vercel/analytics/react";
+// src/app/layout.tsx
+import './globals.css';
+import type { Metadata } from 'next';
+import { JetBrains_Mono, Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ["latin"] });
+// Typography for the "Research Log" aesthetic
+const mono = JetBrains_Mono({ 
+  subsets: ['latin'], 
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+// Typography for the "Neo-Minimalist" headers
+const sans = Inter({ 
+  subsets: ['latin'], 
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: "RGRM STUDIO | STRUCTURAL STUDIES",
-  description: "Exclusive Manifesto Posters and design products for architectural minds.",
-  keywords: ["Manifesto Poster", "Structural Studies", "RGRM", "Design Store"],
-  metadataBase: new URL("https://www.raguiromo.store"),
-  openGraph: {
-    title: "RGRM STUDIO",
-    description: "Design products for architectural minds.",
-    url: "https://www.raguiromo.store",
-    siteName: "RGRM STUDIO",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
-    type: "website",
-  },
+  title: 'RaGuiRoMo | Industrial Art Machine',
+  description: 'Autonomous research-to-product pipeline. Industrial Grunge & Internet Decay.',
 };
 
 export default function RootLayout({
@@ -27,14 +28,51 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} antialiased bg-white`}>
-        {/* Navigation could go here */}
-        
-        {children}
-        
-        <Footer />
-        <Analytics />
+    <html lang="en" className={`${mono.variable} ${sans.variable}`}>
+      <body className="scanlines">
+        {/* Persistent Industrial Header */}
+        <header className="border-industrial" style={{ 
+          padding: '1.5rem', 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          backgroundColor: 'var(--background)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
+        }}>
+          <div className="gothic-font" style={{ fontSize: '1.8rem', letterSpacing: '-3px' }}>
+            RaGuiRoMo
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span className="status-online"></span>
+            <span style={{ 
+              fontSize: '0.65rem', 
+              color: '#39ff14', 
+              fontWeight: 'bold',
+              letterSpacing: '1px' 
+            }}>
+              STATUS: SIGNAL_DEPLOYED
+            </span>
+          </div>
+        </header>
+
+        {/* Main content area */}
+        <main style={{ minHeight: 'calc(100vh - 80px)' }}>
+          {children}
+        </main>
+
+        {/* Minimalist Industrial Footer */}
+        <footer className="border-industrial" style={{ 
+          padding: '2rem', 
+          marginTop: '4rem',
+          fontSize: '0.7rem',
+          opacity: 0.5,
+          textAlign: 'center'
+        }}>
+          <p>[RGRM_SYSTEM_v1.0] // ALL_RIGHTS_RESERVED // {new Date().getFullYear()}</p>
+        </footer>
       </body>
     </html>
   );
