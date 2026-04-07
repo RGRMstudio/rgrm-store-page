@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { JetBrains_Mono, Inter } from 'next/font/google';
+import Script from 'next/script'; // Import the Script component
 
 const mono = JetBrains_Mono({ 
   subsets: ['latin'], 
@@ -21,6 +22,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${mono.variable} ${sans.variable}`}>
+      <head>
+        {/* Load Stripe globally */}
+        <Script 
+          src="https://js.stripe.com/v3/" 
+          strategy="beforeInteractive" 
+        />
+      </head>
       <body className="scanline-effect">
         <div className="grain-overlay" />
         <nav className="nav-main">
