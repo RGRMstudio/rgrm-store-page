@@ -10,8 +10,8 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
-        // TODO: Replace with your actual Stripe Price ID from Dashboard
-        price: 'price_YOUR_STRIPE_PRICE_ID', 
+        // LOCKED: RGRM_STUDY_001 Artifact
+        price: 'price_1Sxv9bDVc7z8RC9IJfYFKr5J', 
         quantity: 1,
       }],
       mode: 'payment',
