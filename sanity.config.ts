@@ -6,8 +6,6 @@ import { structureTool } from 'sanity/structure';
 import product from './studio/schemaTypes/product';
 // @ts-ignore
 import settings from './studio/schemaTypes/settings';
-// @ts-ignore
-import waitlist from './studio/schemaTypes/waitlist';
 
 export default defineConfig({
   name: 'default',
@@ -17,6 +15,6 @@ export default defineConfig({
   basePath: '/selection',
   plugins: [structureTool()],
   schema: {
-    types: [product, settings, waitlist],
+    types: [product, settings],
   },
 });
