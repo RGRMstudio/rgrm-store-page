@@ -4,35 +4,26 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && npx sanity schema deploy --manifest-dir ./public/static/studio",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "next": "15.1.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "stripe": "^17.0.0",
-    "sanity": "^3.70.0",
-    "@sanity/client": "^6.20.0",
-    "next-sanity": "^9.8.0",
-    "framer-motion": "^11.0.0",
-    "lucide-react": "^0.450.0",
-    "gsap": "^3.12.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49"
-=======
     "@exodus/bytes": "^1.2.0",
     "@vercel/speed-insights": "^2.0.0",
+    "@sanity/client": "^6.20.0",
     "loops": "^6.2.1",
     "next": "^15.5.14",
     "next-sanity": "9.8.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "sanity": "3.70.0",
-    "stripe": "^21.0.1"
->>>>>>> f9de011 (FIX: build stability - added missing dependencies and updated package.json)
+    "stripe": "^21.0.1",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.511.0",
+    "gsap": "^3.12.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
