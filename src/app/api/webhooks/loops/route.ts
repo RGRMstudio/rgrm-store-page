@@ -1,21 +1,16 @@
-import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { LoopsClient } from "loops";
 
 /**
- * RGRMstore - Loops Feedback Webhook
+ * RGRMstore - Loops Feedback Webhook (Zero-Dependency Version)
  * Handles: delivery confirmation, bounce escalations, and registry logs.
  */
 
-const loops = new LoopsClient(process.env.LOOPS_API_KEY as string);
-
 export async function POST(req: Request) {
   const body = await req.text();
-  const headersList = await headers();
   
   // Loops sends the signature in the 'Webhook-Signature' header
-  const signature = headersList.get('Webhook-Signature');
+  const signature = req.headers.get('Webhook-Signature');
   const secret = process.env.LOOPS_WEBHOOK_SECRET;
 
   // 1. Security Check: Verify that the request actually came from Loops
@@ -37,7 +32,7 @@ export async function POST(req: Request) {
   // 2. Event Handling Logic
   switch (event.type) {
     case 'contact.created':
-      console.log(`[RGRM LOG] New Identity registered in Loops: ${event.data.email}`);
+      console.log(`[RGRM LOG] New Identity registered: ${event.data.email}`);
       break;
 
     case 'email.delivered':
@@ -45,22 +40,29 @@ export async function POST(req: Request) {
       break;
 
     case 'email.bounced':
-      console.warn(`[RGRM ALERT] Email bounced for: ${event.data.email}. Triggering Escalation.`);
+      console.warn(`[RGRM ALERT] Email bounced for: ${event.data.email}. Escalating.`);
       
-      // Trigger the Admin Escalation Flow in Loops
-      await loops.sendEvent({
-        email: "admin@raguiromo.store", // Update with your actual admin email
-        eventName: "Delivery_Escalation",
-        eventProperties: {
-          failedEmail: event.data.email,
-          reason: event.data.reason || "Hard Bounce",
-          registryNode: "17181557"
-        }
+      // Trigger the Admin Escalation via native fetch
+      await fetch('https://app.loops.so/api/v1/events/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.LOOPS_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: "admin@raguiromo.store", 
+          eventName: "Delivery_Escalation",
+          eventProperties: {
+            failedEmail: event.data.email,
+            reason: event.data.reason || "Hard Bounce",
+            registryNode: "17181557"
+          }
+        })
       });
       break;
 
     default:
-      console.log(`[RGRM INFO] Unhandled Loops event type: ${event.type}`);
+      console.log(`[RGRM INFO] Unhandled event type: ${event.type}`);
   }
 
   return NextResponse.json({ received: true });
