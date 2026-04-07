@@ -2,8 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import BlueprintGrid from '@/components/ui/BlueprintGrid';
 
 /**
  * RGRM // SUCCESS_REGISTRY_INTERFACE
@@ -12,41 +10,67 @@ import BlueprintGrid from '@/components/ui/BlueprintGrid';
 
 export default function SuccessPage() {
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-6 relative overflow-hidden">
-      <BlueprintGrid />
+    <main className="scanline-effect" style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      padding: '0 1.5rem',
+      backgroundColor: 'black'
+    }}>
+      {/* The grain-overlay is already handled by layout.tsx */}
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-xl w-full border border-white/10 p-8 md:p-12 bg-black/50 backdrop-blur-xl relative z-10 text-center"
-      >
-        {/* Success Icon - RECALIBRATED SYNTAX */}
-        <div className="w-16 h-16 border-2 border-rgrm-red rounded-full mx-auto flex items-center justify-center mb-8">
-          <motion.div 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="w-8 h-px bg-rgrm-red rotate-45 translate-y-1 translate-x-1"
-          />
-          <motion.div 
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="w-4 h-px bg-rgrm-red -rotate-45 -translate-x-2 -translate-y-1"
-          />
+      <div className="border-industrial" style={{ 
+        maxWidth: '600px', 
+        width: '100%', 
+        padding: '3rem', 
+        backgroundColor: 'rgba(255, 255, 255, 0.02)', 
+        backdropFilter: 'blur(10px)',
+        textAlign: 'center',
+        position: 'relative',
+        zIndex: 10
+      }}>
+        
+        {/* Success Icon - Simplified SVG for Industrial Look */}
+        <div style={{ 
+          width: '64px', 
+          height: '64px', 
+          border: '2px solid var(--accent)', 
+          borderRadius: '50%', 
+          margin: '0 auto 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="square">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
         </div>
 
-        <header className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4">
+        <header style={{ marginBottom: '2.5rem' }}>
+          <h1 className="logo-text" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
             Identity_Registered
           </h1>
-          <p className="text-[10px] font-mono text-rgrm-red uppercase tracking-widest">
+          <p style={{ 
+            fontSize: '10px', 
+            color: 'var(--accent)', 
+            textTransform: 'uppercase', 
+            letterSpacing: '2px',
+            fontFamily: 'var(--font-mono)'
+          }}>
             Status: Acquisition_Confirmed // Structural_Study_Locked
           </p>
         </header>
 
-        <div className="space-y-6 mb-12 text-xs text-white/60 uppercase font-mono leading-relaxed text-center">
-          <p>
+        <div style={{ 
+          fontSize: '12px', 
+          color: 'rgba(255,255,255,0.6)', 
+          lineHeight: '1.8', 
+          marginBottom: '3rem',
+          textTransform: 'uppercase',
+          fontFamily: 'var(--font-mono)'
+        }}>
+          <p style={{ marginBottom: '1.5rem' }}>
             Your acquisition has been logged into the RGRM Studio core manifest. 
             The manufacturing sequence for your specific study has been initialized.
           </p>
@@ -56,28 +80,29 @@ export default function SuccessPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link 
-            href="/selection"
-            className="border border-white/20 hover:border-rgrm-red py-4 text-[10px] font-black uppercase tracking-widest transition-all"
-          >
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <Link href="/" className="btn-industrial" style={{ fontSize: '10px', textAlign: 'center', display: 'block' }}>
             Return_To_Archive
           </Link>
-          <Link 
-            href="/"
-            className="bg-white text-black hover:bg-rgrm-red hover:text-white py-4 text-[10px] font-black uppercase tracking-widest transition-all"
-          >
+          <Link href="/" className="btn-industrial" style={{ 
+            fontSize: '10px', 
+            textAlign: 'center', 
+            display: 'block',
+            backgroundColor: 'transparent',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.2)'
+          }}>
             Return_To_Nexus
           </Link>
         </div>
 
-        <footer className="mt-12 pt-8 border-t border-white/5">
-          <p className="text-[9px] text-white/20 font-mono italic">
+        <footer style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic', fontFamily: 'var(--font-mono)' }}>
             Reference_ID: [SESSION_AUTHENTICATED] <br />
             RGRM // STUDIO_MODULE_002
           </p>
         </footer>
-      </motion.div>
+      </div>
     </main>
   );
 }
