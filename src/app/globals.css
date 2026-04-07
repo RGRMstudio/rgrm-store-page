@@ -1,128 +1,75 @@
-/* RaGuiRoMo Operational Blueprint v1.0 - Global Styles */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@900&display=swap');
 
 :root {
-  /* Industrial Palette */
-  --background: #050505;
-  --foreground: #f0f0f0;
-  --glitch-cyan: #00fff9;
-  --glitch-magenta: #ff00c1;
-  --industrial-grey: #2a2a2a;
-  
-  /* Layout Spacing */
-  --header-height: 80px;
+  --bg: #050505;
+  --fg: #f5f5f5;
+  --accent: #00fff9;
+  --industrial-border: #1a1a1a;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
 body {
-  max-width: 100vw;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono), monospace;
+  margin: 0;
   overflow-x: hidden;
-  background: var(--background);
-  color: var(--foreground);
-  /* Technical monospace for that "Research Log" feel */
-  font-family: 'JetBrains Mono', monospace;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* --- THE DUST/GRAIN OVERLAY --- */
-body::before {
-  content: "";
+/* THE GRAIN/DUST EFFECT */
+.grain-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  /* High-frequency noise texture */
+  top: 0; left: 0; width: 100%; height: 100%;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-  opacity: 0.04;
+  opacity: 0.05;
   pointer-events: none;
   z-index: 9999;
 }
 
-/* --- TYPOGRAPHY --- */
-h1, h2, h3, .gothic-font {
-  font-family: 'Inter', sans-serif;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.05em;
-  line-height: 0.9;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: var(--glitch-cyan);
-}
-
-/* --- REUSABLE UTILITIES --- */
-
-/* Terminal-style borders */
-.border-industrial {
-  border: 1px solid var(--industrial-grey);
-}
-
-/* Scanline Effect for Sections */
-.scanlines {
-  position: relative;
-  overflow: hidden;
-}
-
-.scanlines::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.1) 50%
-  );
-  background-size: 100% 4px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Button Component */
-.btn-rgrm {
-  background: var(--foreground);
-  color: var(--background);
-  padding: 12px 24px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
+/* NAVIGATION */
+.nav-main {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  clip-path: polygon(0 0, 100% 0, 100% 80%, 95% 100%, 0 100%);
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--industrial-border);
 }
 
-.btn-rgrm:hover {
-  background: var(--glitch-cyan);
+.logo-text {
+  font-family: var(--font-sans);
+  font-size: 1.7rem;
+  letter-spacing: -3px;
+  text-transform: uppercase;
 }
 
-/* --- ANIMATIONS --- */
-@keyframes signal-pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.4; }
-  100% { opacity: 1; }
-}
-
-.status-online {
-  width: 8px;
-  height: 8px;
+.status-led {
+  width: 8px; height: 8px;
   background: #39ff14;
   border-radius: 50%;
   display: inline-block;
-  animation: signal-pulse 2s infinite;
+  box-shadow: 0 0 8px #39ff14;
+}
+
+.status-label {
+  font-size: 0.6rem;
+  margin-left: 8px;
+  color: #39ff14;
+  font-weight: bold;
+}
+
+/* THE BUTTON - NOTCHED CORNER */
+.btn-industrial {
+  background: var(--fg);
+  color: var(--bg);
+  padding: 1rem 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 85% 100%, 0 100%);
+  transition: 0.2s ease;
+}
+
+.btn-industrial:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
 }
