@@ -1,22 +1,27 @@
 {
-  "name": "raguiromo-store",
+  "name": "rgrm-store",
   "version": "1.0.0",
-  "engines": {
-    "node": "22.x"
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@exodus/bytes": "^1.2.0",
-    "@vercel/speed-insights": "^2.0.0",
-    "next": "^15.5.14",
-    "next-sanity": "9.8.0",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "sanity": "3.70.0",
-    "stripe": "^21.0.1"
+    "next": "15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^17.0.0",
+    "@sanity/client": "^6.20.0",
+    "next-sanity": "^9.8.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49"
   },
-  "overrides": {
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "@portabletext/editor": "1.11.1"
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.0.0"
   }
 }
