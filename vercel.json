@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "next build && npx sanity schema deploy --manifest-dir ./public/static/studio",
+  "buildCommand": "next build",
   "installCommand": "npm install",
   "env": {
     "NODE_VERSION": "20.x"
