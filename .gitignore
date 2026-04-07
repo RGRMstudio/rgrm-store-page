@@ -25,3 +25,6 @@ Thumbs.db
 .env.local
 .env.local.save
 *.swp
+.vercel
+.env*.local
+.env.local
