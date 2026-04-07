@@ -19,8 +19,8 @@ export async function POST(req: Request) {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as any;
       
-      // Pull the specific variant from the metadata we set earlier
-      const variantId = session.metadata.printful_variant_id || '69ae86fb786ec2';
+      // Pull variant from metadata or fallback to default
+      const variantId = session.metadata?.printful_variant_id || '69ae86fb786ec2';
 
       // A. TRIGGER FACTORY (PRINTFUL)
       await fetch('https://api.printful.com/orders', {
@@ -40,10 +40,10 @@ export async function POST(req: Request) {
             zip: session.shipping_details?.address?.postal_code,
           },
           items: [{ 
-            variant_id: variantId, // RGRM_STUDY_001 / M
+            variant_id: variantId, 
             quantity: 1 
           }],
-          confirm: false // Set to true only after you've tested once manually
+          confirm: false // Recommended: Review in Printful Dashboard first
         })
       });
 
@@ -57,14 +57,17 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           email: session.customer_details.email,
           eventName: 'Order_Success',
-          contactProperties: { status: 'SIGNAL_DEPLOYED' }
+          contactProperties: { 
+            status: 'SIGNAL_DEPLOYED',
+            order_id: session.id
+          }
         })
       });
     }
 
     return NextResponse.json({ received: true });
   } catch (err: any) {
-    console.error(`[WEBHOOK_ERROR]: ${err.message}`);
+    console.error(`[CRITICAL_WEBHOOK_ERROR]: ${err.message}`);
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }
