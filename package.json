@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npx sanity schema deploy --manifest-dir ./public/static/studio",
+    "build": "next build && npx sanity schema extract --enforce-required-fields --manifest-dir ./public/static/studio",
     "start": "next start",
     "lint": "next lint"
   },
