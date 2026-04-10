@@ -1,31 +1,49 @@
-'use client';
+import { createClient } from '@sanity/client'
+import ProductCard from '@/components/ui/ProductCard'
 
-export default function Home() {
-  const handleCheckout = async () => {
-    const res = await fetch('/api/checkout', { method: 'POST' });
-    const { id } = await res.json();
-    const stripe = (window as any).Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-    await stripe.redirectToCheckout({ sessionId: id });
-  };
+const sanity = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: '2024-01-01',
+  useCdn: true
+})
+
+export default async function Home() {
+  const products = await sanity.fetch(
+    `*[_type == "product"] | order(_createdAt desc) {
+      _id,
+      name,
+      price,
+      slug,
+      "image": mainImage.asset->url,
+      description,
+      stripeProductId
+    }`
+  )
 
   return (
-    <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
-      <h1 className="logo-text" style={{ fontSize: '4rem', marginBottom: '1rem' }}>
-        01_ARTIFACT
-      </h1>
-      <p style={{ maxWidth: '600px', margin: '0 auto 3rem', opacity: 0.7 }}>
-        [HEAVYWEIGHT_TEE] // COMBS-SPUN COTTON // INDUSTRIAL GLITCH ART 
-        <br />DECAY_STATUS: ACTIVE
-      </p>
-      
-      <button className="btn-industrial" onClick={handleCheckout}>
-        INITIALIZE_PURCHASE // $45.00
-      </button>
-
-      <div style={{ marginTop: '5rem', opacity: 0.3, fontSize: '0.8rem' }}>
-        <p>RECORDS_FOUND: 1</p>
-        <p>LOCATION: SECTOR_7_VAULT</p>
+    <main style={{ padding: '2rem' }}>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: '1.5rem',
+        maxWidth: '1400px',
+        margin: '0 auto'
+      }}>
+        {products.map((product: any) => (
+          <ProductCard
+            key={product._id}
+            id={product.slug?.current || product._id}
+            name={product.name}
+            price={product.price}
+            status="AVAILABLE"
+            image={product.image}
+          />
+        ))}
       </div>
-    </div>
-  );
+      <p style={{ textAlign: 'center', opacity: 0.3, marginTop: '3rem', fontSize: '0.8rem' }}>
+        RECORDS_FOUND: {products.length}
+      </p>
+    </main>
+  )
 }
