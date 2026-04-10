@@ -23,14 +23,8 @@ export default async function Home() {
   )
 
   return (
-    <main style={{ padding: '2rem' }}>
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '1.5rem',
-        maxWidth: '1400px',
-        margin: '0 auto'
-      }}>
+    <main className="min-h-screen bg-black px-4 py-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {products.map((product: any) => (
           <ProductCard
             key={product._id}
@@ -42,7 +36,7 @@ export default async function Home() {
           />
         ))}
       </div>
-      <p style={{ textAlign: 'center', opacity: 0.3, marginTop: '3rem', fontSize: '0.8rem' }}>
+      <p className="text-center text-white/30 mt-12 text-xs font-mono">
         RECORDS_FOUND: {products.length}
       </p>
     </main>
