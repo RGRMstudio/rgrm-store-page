@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@sanity/client'
 import ProductCard from '@/components/ui/ProductCard'
 
