@@ -7,24 +7,31 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
+    const body = await req.json().catch(() => ({}))
+    const { priceId, productName, price } = body
+
+    const lineItem = priceId
+      ? { price: priceId, quantity: 1 }
+      : {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: productName || 'RGRM Product' },
+            unit_amount: Math.round((price || 45) * 100),
+          },
+          quantity: 1,
+        }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [{
-        // LOCKED: RGRM_STUDY_001 Artifact
-        price: 'price_1Sxv9bDVc7z8RC9IJfYFKr5J', 
-        quantity: 1,
-      }],
+      line_items: [lineItem],
       mode: 'payment',
-      metadata: {
-        // RGRM_STUDY_001 / M
-        printful_variant_id: '69ae86fb786ec2', 
-      },
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://raguiromo.store'}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://raguiromo.store'}/`,
     });
 
     return NextResponse.json({ id: session.id });
   } catch (err: any) {
+    console.error('Checkout error:', err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
