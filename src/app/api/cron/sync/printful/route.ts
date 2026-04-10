@@ -56,16 +56,7 @@ async function upsertSanityProduct(syncProduct: any, syncVariants: any[]) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
 
-  let mainImage = existing?.mainImage
-  if (!mainImage?.asset && syncProduct.thumbnail_url) {
-    const assetId = await uploadImageFromUrl(syncProduct.thumbnail_url)
-    if (assetId) {
-      mainImage = {
-        _type: 'image',
-        asset: { _type: 'reference', _ref: assetId }
-      }
-    }
-  }
+  const mainImage = existing?.mainImage
 
   if (existing) {
     await sanity.patch(existing._id).set({
