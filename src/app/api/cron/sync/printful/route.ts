@@ -56,7 +56,6 @@ async function upsertSanityProduct(syncProduct: any, syncVariants: any[]) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
 
-  // Upload image if needed
   let mainImage = existing?.mainImage
   if (!mainImage?.asset && syncProduct.thumbnail_url) {
     const assetId = await uploadImageFromUrl(syncProduct.thumbnail_url)
@@ -68,27 +67,25 @@ async function upsertSanityProduct(syncProduct: any, syncVariants: any[]) {
     }
   }
 
-  const doc = {
-    _type: 'product' as const,
-    name: syncProduct.name,
-    slug: { _type: 'slug' as const, current: slug },
-    price,
-    printfulId: String(syncProduct.id),
-    mainImage,
-    inventory: 0,
-  }
-
   if (existing) {
     await sanity.patch(existing._id).set({
-      name: doc.name,
-      price: doc.price,
-      printfulId: doc.printfulId,
+      name: syncProduct.name,
+      price,
+      printfulId: String(syncProduct.id),
       ...(mainImage && !existing.mainImage?.asset ? { mainImage } : {})
     }).commit()
-    return { action: 'updated', name: doc.name }
+    return { action: 'updated', name: syncProduct.name }
   } else {
-    await sanity.create(doc)
-    return { action: 'created', name: doc.name }
+    await sanity.create({
+      _type: 'product',
+      name: syncProduct.name,
+      slug: { _type: 'slug', current: slug },
+      price,
+      printfulId: String(syncProduct.id),
+      mainImage,
+      inventory: 0,
+    })
+    return { action: 'created', name: syncProduct.name }
   }
 }
 
