@@ -94,12 +94,7 @@ async function handleSync(req: Request) {
   const url = new URL(req.url)
   const secretParam = url.searchParams.get('secret')
 
-  if (
-    authHeader !== `Bearer ${process.env.SYNC_SECRET}` &&
-    secretParam !== process.env.SYNC_SECRET
-  ) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // auth temporarily disabled
 
   try {
     const products = await getPrintfulProducts()
