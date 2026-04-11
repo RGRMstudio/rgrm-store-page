@@ -1,12 +1,13 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  // CONTENT SCANNING — ensure it catches the root and subfolders
+  // Focus exclusively on the src directory to avoid path conflicts
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+
+  // This ensures Tailwind styles override any remaining CSS ghosts
+  important: true,
 
   theme: {
     extend: {
@@ -17,7 +18,7 @@ const config: Config = {
         "rgrm-light": "#F5F5F5",
       },
       fontFamily: {
-        // MATCHING YOUR layout.tsx VARIABLES
+        // These match the variables you set in your layout.tsx
         mono: ["var(--font-mono)", "Menlo", "monospace"],
         sans: ["var(--font-sans)", "Inter", "sans-serif"],
       },
