@@ -1,16 +1,22 @@
+/* 1. TAILWIND CORE - REQUIRED FOR UTILITY CLASSES TO WORK */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@900&display=swap');
 
 :root {
   --bg: #050505;
   --fg: #f5f5f5;
-  --accent: #00fff9;
+  --accent: #bc2026; /* RaGuiRoMo Red */
   --industrial-border: #1a1a1a;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-mono), monospace;
+  /* Use the CSS variables from Next Font */
+  font-family: var(--font-mono), monospace; 
   margin: 0;
   overflow-x: hidden;
 }
@@ -32,6 +38,8 @@ body {
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid var(--industrial-border);
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(10px);
 }
 
 .logo-text {
@@ -39,21 +47,30 @@ body {
   font-size: 1.7rem;
   letter-spacing: -3px;
   text-transform: uppercase;
+  font-weight: 900;
 }
 
 .status-led {
   width: 8px; height: 8px;
-  background: #39ff14;
+  background: #bc2026; /* Changed to red to match signal */
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 8px #39ff14;
+  box-shadow: 0 0 8px #bc2026;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
 }
 
 .status-label {
   font-size: 0.6rem;
   margin-left: 8px;
-  color: #39ff14;
+  color: #bc2026;
   font-weight: bold;
+  letter-spacing: 0.1em;
 }
 
 /* THE BUTTON - NOTCHED CORNER */
@@ -71,6 +88,6 @@ body {
 
 .btn-industrial:hover {
   background: var(--accent);
+  color: white;
   transform: translateY(-2px);
 }
-/* force rebuild Sat Apr 11 03:21:01 UTC 2026 */
