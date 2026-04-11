@@ -1,24 +1,25 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  // CONTENT SCANNING — fixed to match your actual folder structure
+  // CONTENT SCANNING — ensure it catches the root and subfolders
   content: [
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
 
   theme: {
     extend: {
       colors: {
-        "rgrm-red": "#BC2026",    // matches your selection:bg-[#BC2026] in page.tsx
+        "rgrm-red": "#BC2026",
         "rgrm-black": "#000000",
         "rgrm-gray": "#1A1A1A",
         "rgrm-light": "#F5F5F5",
       },
       fontFamily: {
-        mono: ["var(--font-geist-mono)", "Menlo", "monospace"],
-        sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],
+        // MATCHING YOUR layout.tsx VARIABLES
+        mono: ["var(--font-mono)", "Menlo", "monospace"],
+        sans: ["var(--font-sans)", "Inter", "sans-serif"],
       },
       letterSpacing: {
         tightest: "-.075em",
