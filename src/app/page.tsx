@@ -1,44 +1,30 @@
-export const dynamic = 'force-dynamic'
-import { createClient } from '@sanity/client'
-import ProductCard from '@/components/ui/ProductCard'
-
-const sanity = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  apiVersion: '2024-01-01',
-  useCdn: true
-})
-
-export default async function Home() {
-  const products = await sanity.fetch(
-    `*[_type == "product"] | order(_createdAt desc) {
-      _id,
-      name,
-      price,
-      slug,
-      "image": mainImage.asset->url,
-      description,
-      stripeProductId
-    }`
-  )
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black px-4 py-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {products.map((product: any) => (
-          <ProductCard
-            key={product._id}
-            id={product.slug?.current || product._id}
-            name={product.name}
-            price={product.price}
-            status="AVAILABLE"
-            image={product.image}
-          />
-        ))}
+    <main className="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
+      <div className="space-y-6 max-w-2xl">
+        <h2 className="text-[var(--fg)] font-sans text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.8] mb-8">
+          NOT STYLE.<br/>IDENTITY.
+        </h2>
+        
+        <p className="text-[#BC2026] font-mono text-xs uppercase tracking-[0.5em] mb-12">
+          [ Q4_2026_COLLECTION_LIVE ]
+        </p>
+
+        <a 
+          href="/selection" 
+          className="btn-industrial inline-block border border-[var(--fg)] px-12 py-4 hover:bg-[#BC2026] hover:border-[#BC2026] transition-all duration-500"
+        >
+          INITIATE_COLLECTION
+        </a>
       </div>
-      <p className="text-center text-white/30 mt-12 text-xs font-mono">
-        RECORDS_FOUND: {products.length}
-      </p>
+
+      <div className="absolute bottom-12 left-12 hidden md:block">
+        <p className="font-mono text-[10px] text-gray-600 uppercase tracking-widest leading-relaxed">
+          Industrial Art Machine<br/>
+          RGRM_v01.0 // Dead Link Theory<br/>
+          Proprietary Research Pipeline
+        </p>
+      </div>
     </main>
-  )
+  );
 }
