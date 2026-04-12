@@ -1,38 +1,21 @@
 import { defineConfig } from 'sanity';
-import { structureTool } from 'sanity/structure';
-
-/**
- * RGRM // STUDIO_CORE_CONFIGURATION
- * Management interface for Artifact Registry.
- */
-
-// @ts-ignore
-import product from './studio/schemaTypes/product';
-// @ts-ignore
-import settings from './studio/schemaTypes/settings';
+import { deskTool } from 'sanity/desk';
+import { visionTool } from '@sanity/vision';
+import { schemaTypes } from './studio/schemas';
 
 export default defineConfig({
   name: 'default',
-  title: 'RGRM STUDIO ADMIN',
+  title: 'RaGuiRoMo Studio',
 
-  // Grounded Project Data
-  projectId: '055j6pls',
-  dataset: 'production',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
 
-  // The 'Selection' directory is our admin gateway
-  basePath: '/selection',
+  // CHANGE: Moved from /selection to /admin to prevent path collision
+  basePath: '/admin',
 
-  plugins: [structureTool()],
+  plugins: [deskTool(), visionTool()],
 
   schema: {
-    // Filter Boolean ensures that if an import fails, the build doesn't crash
-    types: [product, settings].filter(Boolean),
+    types: schemaTypes,
   },
-
-  // Optimized for Next.js 15
-  form: {
-    components: {
-      // Custom branding or logic can go here later
-    }
-  }
 });
