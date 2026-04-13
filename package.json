@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@exodus/bytes": "^1.2.0",
-    "@portabletext/editor": "^1.21.5",
+    "@portabletext/editor": "^6.6.2",
     "@sanity/client": "^6.20.0",
     "@sanity/image-url": "2.1.1",
     "@sanity/vision": "5.20.0",
