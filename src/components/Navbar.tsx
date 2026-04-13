@@ -1,30 +1,40 @@
-'use client';
+"use client";
+import Link from "next/link";
 
-import React from 'react';
-import Link from 'next/link';
-
-const Navbar = () => {
+export default function Navbar() {
   return (
-    <nav className="fixed top-0 w-full z-50 mix-blend-difference px-6 py-8 flex justify-between items-end">
-      <div className="flex flex-col">
-        <Link href="/" className="text-white text-2xl font-black leading-none">
-          RGRM&apos;S REGISTRY
-        </Link>
-        <span className="text-white text-[8px] uppercase tracking-[0.3em] mt-1">
-          The Artist&apos;s Essential
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+      {/* LEFT — Status signal */}
+      <div className="flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-rgrm-red shadow-[0_0_8px_#BC2026] animate-pulse" />
+        <span className="text-[10px] font-mono text-rgrm-red tracking-widest uppercase">
+          Signal Active
         </span>
       </div>
 
-      <div className="flex gap-8 text-white text-[10px] uppercase tracking-widest font-bold">
-        <Link href="/archive" className="hover:line-through transition-all">
-          Archive
+      {/* CENTER — Wordmark */}
+      <Link
+        href="/"
+        className="absolute left-1/2 -translate-x-1/2 font-sans font-black text-xl uppercase tracking-[-0.06em] text-rgrm-light hover:text-rgrm-red transition-colors duration-200"
+      >
+        RaGuiRoMo
+      </Link>
+
+      {/* RIGHT — Nav links */}
+      <div className="flex items-center gap-6">
+        <Link
+          href="/selection"
+          className="text-[11px] font-mono uppercase tracking-widest text-white/50 hover:text-white transition-colors duration-200"
+        >
+          Selection
         </Link>
-        <Link href="/cart" className="hover:line-through transition-all">
-          My &quot;Selection&quot;
+        <Link
+          href="/about"
+          className="text-[11px] font-mono uppercase tracking-widest text-white/50 hover:text-white transition-colors duration-200"
+        >
+          Studio
         </Link>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}
