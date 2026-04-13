@@ -11,7 +11,7 @@ const client = createClient({
 
 async function getProducts() {
   return client.fetch(`
-    *[_type == "product" && isActive == true] | order(name asc) {
+    *[_type == "product"] | order(name asc) {
       _id,
       name,
       thumbnail,
