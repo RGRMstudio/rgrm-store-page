@@ -30,7 +30,6 @@ export default async function SelectionPage() {
     <main className="min-h-screen bg-[#050505] text-rgrm-light pt-24 pb-24">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* PAGE HEADER */}
         <div className="mb-16 pt-8">
           <div className="flex items-end justify-between border-b border-white/5 pb-6">
             <div>
@@ -47,15 +46,13 @@ export default async function SelectionPage() {
           </div>
         </div>
 
-        {/* PRODUCT GRID */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-white/5">
           {products.map((product: any, index: number) => (
             <Link
               key={product._id}
-              href={`/product/${product.slug}`}
+              href={`/selection/${product.slug}`}
               className="group block bg-[#050505] relative overflow-hidden"
             >
-              {/* IMAGE */}
               <div className="aspect-[3/4] relative bg-rgrm-gray overflow-hidden">
                 {product.thumbnail ? (
                   <Image
@@ -71,26 +68,18 @@ export default async function SelectionPage() {
                     <span className="font-black text-white/10 text-4xl">—</span>
                   </div>
                 )}
-
-                {/* INDEX NUMBER */}
                 <span className="absolute top-3 left-3 font-mono text-[10px] text-white/30 tracking-widest">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-
-                {/* HOVER OVERLAY */}
                 <div className="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span
                     className="w-full text-center font-mono text-xs uppercase tracking-[0.2em] bg-rgrm-red text-white py-3"
-                    style={{
-                      clipPath: "polygon(0 0, 100% 0, 100% 70%, 93% 100%, 0 100%)",
-                    }}
+                    style={{ clipPath: "polygon(0 0, 100% 0, 100% 70%, 93% 100%, 0 100%)" }}
                   >
                     Acquire
                   </span>
                 </div>
               </div>
-
-              {/* METADATA */}
               <div className="p-4 border-t border-white/5">
                 <h2 className="font-sans font-black text-sm uppercase tracking-tight leading-tight mb-2 group-hover:text-white/60 transition-colors duration-200 line-clamp-2">
                   {product.name}
