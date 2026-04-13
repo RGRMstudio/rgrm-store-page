@@ -91,3 +91,7 @@ body {
   color: white;
   transform: translateY(-2px);
 }
+main {
+  background-color: #050505;
+  color: #f5f5f5;
+}
