@@ -21,11 +21,11 @@
     "loops": "^6.2.1",
     "lucide-react": "^0.511.0",
     "next": "^15.5.14",
-    "next-sanity": "^9.9.3",
+    "next-sanity": "^12.2.2",
     "postcss": "^8.4.49",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "sanity": "5.20.0",
+    "sanity": "^5.20.0",
     "stripe": "^21.0.1",
     "styled-components": "^6.3.12",
     "vercel": "^50.41.0"
