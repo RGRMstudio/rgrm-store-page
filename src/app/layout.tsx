@@ -1,60 +1,60 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { JetBrains_Mono, Inter } from 'next/font/google';
-import Script from 'next/script';
+import type { Metadata } from "next";
+import { JetBrains_Mono, Inter } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/Navbar";
 
-const mono = JetBrains_Mono({ 
-  subsets: ['latin'], 
-  variable: '--font-mono' 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
-const sans = Inter({ 
-  subsets: ['latin'], 
-  variable: '--font-sans', 
-  weight: ['900'] 
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["900"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: 'RaGuiRoMo | Industrial Art Machine',
-  description: 'Autonomous research-to-product pipeline.',
+export const meta Metadata = {
+  title: "RaGuiRoMo Store",
+  description:
+    "Structural Studies by RaGuiRoMo Studio. Industrial art clothing manufactured on demand.",
+  openGraph: {
+    title: "RaGuiRoMo Store",
+    description: "Structural Studies by RaGuiRoMo Studio.",
+    url: "https://www.raguiromo.store",
+    siteName: "RaGuiRoMo Store",
+    locale: "en_US",
+    type: "website",
+  },
+  metadataBase: new URL("https://www.raguiromo.store"),
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${mono.variable} ${sans.variable} antialiased`}>
-      <head>
-        {/* Load Stripe globally with strategy to prevent hydration errors */}
-        <Script 
-          src="https://js.stripe.com/v3/" 
-          strategy="beforeInteractive" 
+    <html lang="en" className={`${jetbrainsMono.variable} ${inter.variable}`}>
+      <body>
+        {/* Global grain/dust texture overlay */}
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "url('https://grainy-gradients.vercel.app/noise.svg')",
+          }}
         />
-      </head>
-      
-      {/* Background is set to var(--bg) from globals.css to ensure industrial dark theme */}
-      <body className="scanline-effect bg-[var(--bg)] text-[var(--fg)] min-h-screen font-mono">
-        
-        {/* Grain overlay for the Industrial Grunge aesthetic */}
-        <div className="grain-overlay pointer-events-none fixed inset-0 z-50 opacity-[0.05]" />
-        
-        {/* Nav optimized for dark mode with industrial borders */}
-        <nav className="nav-main sticky top-0 z-40 w-full border-b border-[var(--industrial-border)] bg-[var(--bg)]/80 backdrop-blur-md px-6 py-4 flex justify-between items-center">
-          <span className="logo-text font-black uppercase tracking-tighter text-2xl">
-            RaGuiRoMo
-          </span>
-          
-          <div className="status-container flex items-center gap-2">
-            <span className="status-led w-2 h-2 rounded-full bg-[#BC2026] shadow-[0_0_8px_#BC2026] animate-pulse" />
-            <span className="status-label font-mono text-[10px] tracking-widest uppercase text-[#BC2026]">
-              SIGNAL_DEPLOYED
-            </span>
-          </div>
-        </nav>
 
-        {/* Main content area */}
-        <div className="relative z-10">
-          {children}
-        </div>
+        {/* Global navigation */}
+        <Navbar />
 
+        {/* Page content */}
+        {children}
       </body>
     </html>
   );
