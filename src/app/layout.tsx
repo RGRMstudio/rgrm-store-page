@@ -17,7 +17,7 @@ const inter = Inter({
   display: "swap",
 });
 
-export const meta Metadata = {
+export const metadata: Metadata = {
   title: "RaGuiRoMo Store",
   description:
     "Structural Studies by RaGuiRoMo Studio. Industrial art clothing manufactured on demand.",
@@ -40,7 +40,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jetbrainsMono.variable} ${inter.variable}`}>
       <body>
-        {/* Global grain/dust texture overlay */}
         <div
           aria-hidden="true"
           className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.04]"
@@ -49,11 +48,7 @@ export default function RootLayout({
               "url('https://grainy-gradients.vercel.app/noise.svg')",
           }}
         />
-
-        {/* Global navigation */}
         <Navbar />
-
-        {/* Page content */}
         {children}
       </body>
     </html>
