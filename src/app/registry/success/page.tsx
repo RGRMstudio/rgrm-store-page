@@ -1,99 +1,69 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
-
-/**
- * RGRM // SUCCESS_INTERFACE
- * Status: Transaction Confirmed.
- */
 
 export default function SuccessPage() {
   return (
-    <main style={{ 
-      minHeight: '80vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      padding: '2rem' 
-    }}>
-      <div className="border-industrial" style={{ 
-        maxWidth: '600px', 
-        width: '100%', 
-        padding: '3rem', 
-        backgroundColor: 'rgba(255,255,255,0.02)',
-        textAlign: 'center' 
-      }}>
-        
-        {/* Success Icon */}
-        <div style={{ 
-          width: '60px', 
-          height: '60px', 
-          border: '2px solid var(--glitch-cyan)', 
-          borderRadius: '50%', 
-          margin: '0 auto 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--glitch-cyan)',
-          fontSize: '1.5rem'
-        }}>
-          ✓
+    <main className="min-h-screen bg-[#050505] text-rgrm-light flex items-center justify-center px-6 pt-24">
+      <div className="max-w-lg w-full border border-white/5 p-10 md:p-14 text-center">
+
+        {/* Confirm icon */}
+        <div className="w-14 h-14 border border-rgrm-red rounded-full flex items-center justify-center mx-auto mb-10">
+          <span className="text-rgrm-red font-mono text-xl">✓</span>
         </div>
 
-        <header style={{ marginBottom: '2.5rem' }}>
-          <h1 className="logo-text" style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
-            Identity_Registered
-          </h1>
-          <p style={{ 
-            fontSize: '0.6rem', 
-            color: 'var(--glitch-cyan)', 
-            textTransform: 'uppercase', 
-            letterSpacing: '2px' 
-          }}>
-            Status: Acquisition_Confirmed // Shipment_Initialized
-          </p>
-        </header>
+        {/* Headline */}
+        <p className="font-mono text-[10px] text-rgrm-red tracking-[0.3em] uppercase mb-4">
+          ACQUISITION CONFIRMED
+        </p>
+        <h1 className="font-sans font-black text-4xl md:text-5xl uppercase tracking-[-0.04em] leading-none mb-6">
+          Identity_<br/>Registered
+        </h1>
 
-        <div style={{ 
-          fontSize: '0.75rem', 
-          lineHeight: '1.6', 
-          opacity: 0.7, 
-          marginBottom: '3rem',
-          textTransform: 'uppercase'
-        }}>
-          <p style={{ marginBottom: '1rem' }}>
-            Your acquisition has been logged into the RaGuiRoMo core manifest. 
-            The manufacturing sequence for your artifact has been triggered.
-          </p>
-          <p>
-            A digital dossier and receipt have been dispatched to your registered email.
-          </p>
+        {/* Spec lines */}
+        <div className="border-t border-white/5 text-left space-y-0 mb-10">
+          <div className="flex justify-between py-3 border-b border-white/5">
+            <span className="font-mono text-[10px] text-white/30 uppercase tracking-widest">Status</span>
+            <span className="font-mono text-[10px] text-rgrm-red flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-rgrm-red animate-pulse" />
+              Shipment Initialized
+            </span>
+          </div>
+          <div className="flex justify-between py-3 border-b border-white/5">
+            <span className="font-mono text-[10px] text-white/30 uppercase tracking-widest">Fulfillment</span>
+            <span className="font-mono text-[10px] text-white/40">Printful // Made to Order</span>
+          </div>
+          <div className="flex justify-between py-3 border-b border-white/5">
+            <span className="font-mono text-[10px] text-white/30 uppercase tracking-widest">Receipt</span>
+            <span className="font-mono text-[10px] text-white/40">Dispatched to your email</span>
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <Link href="/" className="btn-rgrm" style={{ fontSize: '0.7rem', justifyContent: 'center' }}>
-            Return_To_Nexus
+        <p className="font-mono text-xs text-white/40 leading-relaxed mb-10">
+          Your acquisition has been logged into the RGRM core manifest.
+          The manufacturing sequence has been triggered.
+        </p>
+
+        {/* Actions */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            href="/"
+            className="border border-white/20 font-mono text-[10px] uppercase tracking-widest text-white py-4 hover:border-white transition-colors text-center"
+          >
+            Return_To_Base
           </Link>
-          <Link href="/" style={{ 
-            border: '1px solid var(--border-grey)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            fontSize: '0.7rem',
-            textTransform: 'uppercase',
-            color: 'white'
-          }}>
-            View_Manifest
+          <Link
+            href="/selection"
+            className="bg-rgrm-red font-mono text-[10px] uppercase tracking-widest text-white py-4 hover:bg-white hover:text-black transition-colors text-center"
+          >
+            Continue_Acquiring
           </Link>
         </div>
 
-        <footer style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--border-grey)' }}>
-          <p style={{ fontSize: '0.6rem', opacity: 0.3, fontStyle: 'italic' }}>
-            Reference_ID: [SESSION_AUTHENTICATED] <br />
-            RGRM // STUDIO_MODULE_002
-          </p>
-        </footer>
+        <p className="font-mono text-[9px] text-white/10 uppercase tracking-widest mt-10">
+          RGRM // STUDIO_MODULE_002 // SESSION_AUTHENTICATED
+        </p>
+
       </div>
     </main>
   );
