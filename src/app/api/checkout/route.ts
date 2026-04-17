@@ -18,7 +18,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing price or priceId' }, { status: 400 });
     }
 
-    // Use Stripe Price ID if available, otherwise create dynamic price from amount
     const lineItem = priceId
       ? { price: priceId, quantity }
       : {
