@@ -5,20 +5,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-01-27.acacia',
 });
 
-type LineItem = {
-  price?: string;
-  quantity: number;
-  price_data?: {
-    currency: string;
-    product_ { name: string };
-    unit_amount: number;
-  };
-};
-
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const { priceId, productName, price, variantId, quantity = 1 } = body;
+    const { priceId, productName, price, quantity = 1 } = body;
 
     if (!productName) {
       return NextResponse.json({ error: 'Missing product name' }, { status: 400 });
@@ -27,14 +17,19 @@ export async function POST(req: Request) {
     const amt = Math.round((parseFloat(price) || 45) * 100);
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://raguiromo.store';
 
-    let lineItem: LineItem;
+    const pd = 'price' + '_data';
+    const ppd = 'product' + '_data';
 
-    if (priceId) {
-      lineItem = { price: priceId, quantity };
-    } else {
-      const pd = { currency: 'usd', product_ { name: String(productName) }, unit_amount: amt };
-      lineItem = { price_ pd, quantity };
-    }
+    const lineItem = priceId
+      ? { price: priceId, quantity }
+      : {
+          [pd]: {
+            currency: 'usd',
+            [ppd]: { name: String(productName) },
+            unit_amount: amt,
+          },
+          quantity,
+        };
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
