@@ -1,3 +1,4 @@
+cat > src/app/api/checkout/route.ts << 'ENDOFFILE'
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
@@ -55,3 +56,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+ENDOFFILE
