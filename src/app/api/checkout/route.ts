@@ -1,4 +1,3 @@
-cat > src/app/api/checkout/route.ts << 'ENDOFFILE'
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
@@ -15,9 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing product name' }, { status: 400 });
     }
 
-    if (!price && !priceId) {
-      return NextResponse.json({ error: 'Missing price or priceId' }, { status: 400 });
-    }
+    const amt = Math.round((parseFloat(price) || 45) * 100);
 
     const lineItem = priceId
       ? { price: priceId, quantity }
@@ -25,29 +22,22 @@ export async function POST(req: Request) {
           price_ {
             currency: 'usd',
             product_ {
-              name: productName,
-              meta { variantId: variantId || '' },
+              name: String(productName),
             },
-            unit_amount: Math.round((parseFloat(price) || 45) * 100),
+            unit_amount: amt,
           },
           quantity,
         };
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      'https://raguiromo.store';
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://raguiromo.store';
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [lineItem],
       mode: 'payment',
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/selection`,
-      meta {
-        productName,
-        variantId: variantId || '',
-      },
+      success_url: baseUrl + '/success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: baseUrl + '/selection',
     });
 
     return NextResponse.json({ id: session.id, url: session.url });
@@ -56,4 +46,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-ENDOFFILE

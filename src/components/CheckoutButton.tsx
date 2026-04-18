@@ -1,5 +1,3 @@
-mkdir -p src/components
-cat > src/components/CheckoutButton.tsx << 'EOF'
 'use client';
 
 import { useState } from 'react';
@@ -56,17 +54,15 @@ export default function CheckoutButton({ productName, price, priceId, variantId 
           cursor: loading ? 'not-allowed' : 'pointer',
           fontFamily: 'monospace',
           transition: 'background 0.2s',
-          clipPath: 'polygon(0 0, 100% 0, 100% 70%, 96% 100%, 0 100%)',
         }}
       >
         {loading ? 'INITIALIZING...' : 'INITIATE ACQUISITION'}
       </button>
       {error && (
         <p style={{ color: '#bc2026', fontFamily: 'monospace', fontSize: '11px', marginTop: '0.5rem' }}>
-          ⚠ {error}
+          error: {error}
         </p>
       )}
     </div>
   );
 }
-EOF
