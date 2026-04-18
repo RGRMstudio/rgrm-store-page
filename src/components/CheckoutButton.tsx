@@ -1,3 +1,5 @@
+mkdir -p src/components
+cat > src/components/CheckoutButton.tsx << 'EOF'
 'use client';
 
 import { useState } from 'react';
@@ -42,11 +44,18 @@ export default function CheckoutButton({ productName, price, priceId, variantId 
         onClick={handleCheckout}
         disabled={loading}
         style={{
-          width: '100%', backgroundColor: loading ? '#333' : '#f5f5f5',
-          color: '#050505', padding: '1.25rem 2rem', fontWeight: 700,
-          textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '13px',
-          border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-          fontFamily: 'monospace', transition: 'background 0.2s',
+          width: '100%',
+          backgroundColor: loading ? '#333' : '#f5f5f5',
+          color: '#050505',
+          padding: '1.25rem 2rem',
+          fontWeight: 700,
+          textTransform: 'uppercase' as const,
+          letterSpacing: '0.2em',
+          fontSize: '13px',
+          border: 'none',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          fontFamily: 'monospace',
+          transition: 'background 0.2s',
           clipPath: 'polygon(0 0, 100% 0, 100% 70%, 96% 100%, 0 100%)',
         }}
       >
@@ -60,3 +69,4 @@ export default function CheckoutButton({ productName, price, priceId, variantId 
     </div>
   );
 }
+EOF
