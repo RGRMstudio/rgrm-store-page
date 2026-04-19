@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { createClient } from "next-sanity";
 import Link from "next/link";
 

@@ -1,62 +1,29 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@sanity/client';
+import { headers } from 'next/headers';
 
-// 1. Setup the "Write" Client for Sanity
-const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  token: process.env.SANITY_WRITE_TOKEN,
-  apiVersion: '2026-03-25',
-  useCdn: false,
-});
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
-}
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+    const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_TOKEN;
 
-    if (body.type === 'product_synced') {
-      const { sync_product, sync_variants } = body.data;
-
-      // A. Get the Image using native fetch (Replaces Axios)
-      const imageUrl = sync_variants[0]?.files?.find((f: any) => f.type === 'preview')?.url || sync_product.thumbnail_url;
-      let imageAsset;
-
-      if (imageUrl) {
-        const imageRes = await fetch(imageUrl);
-        const arrayBuffer = await imageRes.arrayBuffer();
-        
-        imageAsset = await sanityClient.assets.upload(
-          'image', 
-          Buffer.from(arrayBuffer), 
-          { filename: `${sync_product.id}.jpg` }
-        );
-      }
-
-      // B. Create the Sanity Document
-      const productDoc = {
-        _type: 'product',
-        _id: `product-${sync_product.id}`,
-        title: sync_product.name,
-        slug: { _type: 'slug', current: slugify(sync_product.name) },
-        printfulId: String(sync_product.id),
-        price: parseFloat(sync_variants[0].retail_price),
-        image: imageAsset ? {
-          _type: 'image',
-          asset: { _type: 'reference', _ref: imageAsset._id }
-        } : undefined,
-      };
-
-      await sanityClient.createOrReplace(productDoc);
-      return NextResponse.json({ message: 'Product Synced to Sanity' });
+    if (!projectId) {
+      return NextResponse.json({ error: 'Missing projectId' }, { status: 500 });
     }
 
-    return NextResponse.json({ message: 'Event ignored' });
-  } catch (err: any) {
-    console.error('[PRINTFUL_SYNC_ERROR]:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    const { createClient } = await import('@sanity/client');
+    const client = createClient({ projectId, dataset, token, useCdn: false, apiVersion: '2026-03-25' });
+
+    const body = await req.json().catch(() => ({}));
+    console.log('Printful webhook received:', body?.type);
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Printful webhook error:', message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

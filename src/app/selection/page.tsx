@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { createClient } from '@sanity/client';
 import Image from 'next/image';
