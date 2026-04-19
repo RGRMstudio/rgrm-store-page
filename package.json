@@ -31,7 +31,7 @@
     "sanity": "^3.65.0",
     "stripe": "^21.0.1",
     "styled-components": "^6.3.12",
-    "vercel": "^50.41.0"
+    "vercel": "^51.7.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
