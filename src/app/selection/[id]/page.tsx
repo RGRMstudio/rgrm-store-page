@@ -13,7 +13,7 @@ const client = createClient({
 
 export async function generateStaticParams() {
   const products = await client.fetch(
-    `*[_type == "product"]{ "slug": slug.current }`
+    `*[_type == "product" && defined(slug.current)]{ "slug": slug.current }`
   );
   return products.map((p: { slug: string }) => ({ id: p.slug }));
 }
@@ -47,6 +47,10 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
+  // Guard: if slug is missing or undefined, show 404 instead of crashing
+  if (!id || id === 'undefined') notFound();
+
   const product = await getProduct(id);
   if (!product) notFound();
 
