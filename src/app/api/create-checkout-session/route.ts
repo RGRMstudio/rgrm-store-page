@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
-
 export async function POST(req: NextRequest) {
+  // ✅ Initialize inside handler so env var is always available at runtime
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2024-06-20',
+  });
+
   try {
     const body = await req.json();
     const { productName, price, quantity = 1, variantId, image, email } = body;
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
             product_ {
               name: productName,
               ...(image ? { images: [image] } : {}),
-              metadata: {
+              meta {
                 ...(variantId ? { variantId } : {}),
               },
             },
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
         promotions: 'auto',
       },
       customer_email: email || undefined,
-      metadata: {
+      meta {
         cart_id: cartId,
         item_count: quantity.toString(),
         store: 'raguiromo',
@@ -67,17 +68,20 @@ export async function POST(req: NextRequest) {
 
     console.log(`[CHECKOUT_CREATED] Session: ${session.id}, Cart: ${cartId}`);
 
-    return NextResponse.json({ 
-      id: session.id, 
+    return NextResponse.json({
+      id: session.id,
       url: session.url,
-      cartId 
+      cartId,
     });
-    
-  } catch (error: any) {
+
+  } catch (error: unknown) {
     console.error('[CHECKOUT_ERROR]:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    const message =
+      error instanceof Stripe.errors.StripeError
+        ? error.message
+        : error instanceof Error
+        ? error.message
+        : 'Failed to create checkout session';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
