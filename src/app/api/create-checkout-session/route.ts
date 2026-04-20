@@ -48,10 +48,10 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           quantity,
-          price_ {
+          price_:
             currency: 'usd',
             unit_amount: unitAmount,
-            product_ {
+            product_:
               name: productName,
               ...(image ? { images: [image] } : {}),
               meta {
@@ -165,10 +165,10 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           quantity,
-          price_ {
+          price_:
             currency: 'usd',
             unit_amount: unitAmount,
-            product_ {
+            product_:
               name: productName,
               ...(image ? { images: [image] } : {}),
               meta {
