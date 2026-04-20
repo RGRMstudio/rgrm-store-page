@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           quantity,
-          price_ {
+          price_ ;
             currency: 'usd',
             unit_amount: unitAmount,
             product_ {
