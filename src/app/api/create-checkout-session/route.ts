@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2024-06-20',
   });
 
@@ -9,6 +10,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { productName, price, quantity = 1, variantId, image, email } = body;
 
+    if (!productName || !price) {
       return NextResponse.json(
         { error: 'Missing required fields: productName and price' },
         { status: 400 }
@@ -44,10 +46,16 @@ export async function POST(req: NextRequest) {
           },
         },
       ],
-      after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } },
+      after_expiration: {
+        recovery: { enabled: true, allow_promotion_codes: true },
+      },
       consent_collection: { promotions: 'auto' },
       customer_email: email || undefined,
-      meta { cart_id: cartId, item_count: quantity.toString(), store: 'raguiromo' },
+      meta {
+        cart_id: cartId,
+        item_count: quantity.toString(),
+        store: 'raguiromo',
+      },
       success_url: `${process.env.NEXT_PUBLIC_SITE || 'https://raguiromo.store'}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE || 'https://raguiromo.store'}/selection`,
     });
