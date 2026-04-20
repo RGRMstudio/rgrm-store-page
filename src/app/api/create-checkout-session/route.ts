@@ -33,13 +33,13 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           quantity,
-          price_ ;
+          price_ {
             currency: 'usd',
             unit_amount: unitAmount,
             product_ {
               name: productName,
               ...(image ? { images: [image] } : {}),
-              meta {
+              metadata: {
                 ...(variantId ? { variantId } : {}),
               },
             },
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         promotions: 'auto',
       },
       customer_email: email || undefined,
-      meta {
+      metadata: {
         cart_id: cartId,
         item_count: quantity.toString(),
         store: 'raguiromo',
