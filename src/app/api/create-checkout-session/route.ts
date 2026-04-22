@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           quantity,
-          price_ {
+          price_data: {
             currency: "usd",
             unit_amount: Math.round(parseFloat(price) * 100),
-            product_ {
+            product_data: {
               name: productName,
             },
           },
