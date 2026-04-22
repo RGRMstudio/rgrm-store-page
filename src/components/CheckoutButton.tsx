@@ -1,9 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface Props {
   productName: string;
@@ -12,24 +9,47 @@ interface Props {
   variantId?: string;
 }
 
-export default function CheckoutButton({ productName, price, priceId, variantId }: Props) {
+export default function CheckoutButton({ 
+  productName, 
+  price, 
+  priceId, 
+  variantId 
+}: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleCheckout = async () => {
     setLoading(true);
     setError('');
+    
     try {
-      const res = await fetch('/api/checkout', {
+      // Use the correct endpoint
+      const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productName, price, priceId, variantId }),
+        body: JSON.stringify({ 
+          productName, 
+          price: price.toString(),
+          quantity: 1,
+          email: undefined
+        }),
       });
+      
       const data = await res.json();
-      if (data.error) { setError(data.error); setLoading(false); return; }
-      if (data.url) { window.location.href = data.url; return; }
-      const stripe = await stripePromise;
-      await stripe?.redirectToCheckout({ sessionId: data.id });
+      
+      if (data.error) { 
+        setError(data.error); 
+        setLoading(false); 
+        return; 
+      }
+      
+      if (data.url) { 
+        window.location.href = data.url; 
+        return; 
+      }
+      
+      setError('No checkout URL received');
+      setLoading(false);
     } catch (e: any) {
       setError(e.message);
       setLoading(false);
