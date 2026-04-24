@@ -1,38 +1,43 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { createClient } from '@sanity/client';
 import Image from 'next/image';
 import CheckoutButton from '@/components/CheckoutButton';
 
 const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  apiVersion: '2024-01-01',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  dataset: 'production',
   useCdn: false,
+  apiVersion: '2026-03-25',
 });
 
-async function getProduct(slug: string) {
-  try {
-    return await client.fetch(
-      `*[_type == "product" && slug.current == $slug][0]{
-        _id, name, thumbnail, "slug": slug.current,
-        printfulId, description,
-        variants[]{ _key, variantId, name, size, price, inStock, stripePriceId, previewImage }
-      }`,
-      { slug }
-    );
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    return null;
-  }
+export async function generateStaticParams() {
+  const products = await client.fetch(
+    `*[_type == "product"]{ "slug": slug.current }`
+  );
+  return products.map((p: { slug: string }) => ({ id: p.slug }));
 }
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+async function getProduct(slug: string) {
+  return client.fetch(
+    `*[_type == "product" && slug.current == $slug][0]{
+      _id, name, thumbnail, "slug": slug.current,
+      printfulId, description,
+      variants[]{ _key, variantId, name, size, price, inStock, stripePriceId, previewImage }
+    }`,
+    { slug }
+  );
+}
+
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const product = await getProduct(id);
-
-  if (!product) {
-    notFound();
-  }
+  if (!product) notFound();
 
   const firstVariant = product.variants?.[0];
   const price = firstVariant?.price ?? 0;
@@ -41,7 +46,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   return (
     <main style={{ backgroundColor: '#050505', minHeight: '100vh', color: '#f5f5f5' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '7rem 1.5rem 4rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'start' }}>
-        {/* Image */}
+
+        {/* IMAGE */}
         <div style={{ position: 'relative', aspectRatio: '1/1', backgroundColor: '#0a0a0a', border: '1px solid rgba(255,255,255,0.06)' }}>
           {product.thumbnail && (
             <Image
@@ -54,7 +60,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           )}
         </div>
 
-        {/* Info */}
+        {/* INFO */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div>
             <p style={{ fontFamily: 'monospace', fontSize: '10px', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '1rem' }}>
@@ -83,6 +89,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             variantId={firstVariant?.variantId}
           />
         </div>
+
       </div>
     </main>
   );
