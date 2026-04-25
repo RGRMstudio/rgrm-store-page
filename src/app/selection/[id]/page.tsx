@@ -1,33 +1,56 @@
 import { notFound } from 'next/navigation';
-import { createClient } from '@sanity/client';
 import Image from 'next/image';
 import CheckoutButton from '@/components/CheckoutButton';
 
-const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  apiVersion: '2024-01-01',
-  useCdn: false,
-});
-
+// Use direct fetch instead of Sanity client to avoid query issues
 async function getProduct(slug: string) {
   try {
-    return await client.fetch(
-      `*[_type == "product" && slug.current == $slug][0]{
-        _id, name, thumbnail, "slug": slug.current,
-        printfulId, description,
-        variants[]{ _key, variantId, name, size, price, inStock, stripePriceId, previewImage }
-      }`,
-      { slug }
-    );
-  } catch (error) {
-    console.error('Error fetching product:', error);
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+    const apiVersion = '2024-01-01';
+    
+    if (!projectId || !slug) {
+      console.error('Missing projectId or slug');
+      return null;
+    }
+    
+    // Properly encode the query parameter
+    const query = encodeURIComponent(`*[_type == "product" && slug.current == "${slug}"][0]{
+      _id, name, thumbnail, "slug": slug.current,
+      printfulId, description,
+      variants[]{ _key, variantId, name, size, price, inStock, stripePriceId, previewImage }
+    }`);
+    
+    const url = `https://${projectId}.api.sanity.io/v${apiVersion}/data/query/${dataset}?query=${query}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${process.env.SANITY_READ_TOKEN || ''}`,
+      },
+      next: { revalidate: 60 }
+    });
+    
+    if (!response.ok) {
+      console.error('Sanity fetch failed:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.result?.[0] || null;
+  } catch (error: any) {
+    console.error('Error fetching product:', error.message);
     return null;
   }
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  
+  // Validate the id/slug
+  if (!id || typeof id !== 'string') {
+    notFound();
+  }
+  
   const product = await getProduct(id);
 
   if (!product) {
