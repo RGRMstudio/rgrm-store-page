@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const meta Metadata = {
+export const metadata: Metadata = {
   title: "RaGuiRoMo | Industrial Art Machine",
   description: "Structural Studies by RaGuiRoMo Studio",
 };
