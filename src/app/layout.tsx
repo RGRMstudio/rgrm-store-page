@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import "../styles/globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "RaGuiRoMo | Industrial Art Machine",
@@ -14,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white font-mono">
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
