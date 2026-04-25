@@ -1,3 +1,4 @@
+// REBUILD: 2026-04-25
 export const dynamic = 'force-dynamic';
 
 export default async function SelectionPage() {
@@ -14,9 +15,6 @@ export default async function SelectionPage() {
         <div className="border border-white/10 p-8 rounded-lg">
           <p className="text-gray-300 font-mono mb-4">
             Products coming soon...
-          </p>
-          <p className="text-gray-500 text-xs font-mono">
-            Check back soon for new drops
           </p>
         </div>
       </div>
