@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Footer from "../components/Footer";
-import "./globals.css";
 
-export const metadata: Metadata = {
+export const meta Metadata = {
   title: "RaGuiRoMo | Industrial Art Machine",
   description: "Structural Studies by RaGuiRoMo Studio",
 };
@@ -14,9 +12,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-black text-white font-mono">
+      <body style={{ background: 'black', color: 'white', margin: 0 }}>
         {children}
-        <Footer />
       </body>
     </html>
   );
