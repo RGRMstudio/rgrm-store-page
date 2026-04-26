@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const meta Metadata = {
   title: "RaGuiRoMo | Industrial Art Machine",
   description: "Structural Studies by RaGuiRoMo Studio",
 };
