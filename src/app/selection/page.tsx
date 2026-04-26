@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 export default function SelectionPage() {
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
@@ -10,14 +8,9 @@ export default function SelectionPage() {
         <p className="text-gray-400 font-mono text-sm uppercase tracking-widest mb-12">
           Q4_2026_COLLECTION_LIVE
         </p>
-        
         <div className="border border-white/10 p-8 rounded-lg">
-          <p className="text-gray-300 font-mono mb-4">
-            Products coming soon...
-          </p>
-          <p className="text-gray-500 text-xs font-mono">
-            We're preparing something amazing
-          </p>
+          <p className="text-gray-300 font-mono mb-4">Products coming soon...</p>
+          <p className="text-gray-500 text-xs font-mono">Collection is being prepared</p>
         </div>
       </div>
     </main>
