@@ -6,15 +6,7 @@ export default defineCliConfig({
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   },
   deployment: {
-    /**
-     * Get the appId for a previously deployed Studio under the "Studio" tab for your project in sanity.io/manage
-     * Note: this is required for fine-grained version selection
-     */
-    appId: 'mq59zdc80cqsopzchkozfof3',
-    /**
-     * Enable auto-updates.
-     * Learn more at https://www.sanity.io/docs/studio/latest-version-of-sanity
-     */
+    appId: 'mq59zdc80cqsopzchkozfof3', // Your App ID from earlier
     autoUpdates: true,
   },
 })
