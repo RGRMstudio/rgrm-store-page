@@ -9,16 +9,14 @@ async function getProducts() {
       return { error: 'Missing Sanity Project ID' };
     }
 
-    // 1. Use standard GROQ syntax (easier to debug than URL encoding)
-    const query = '*[_type == "product"] { _id, name, slug, thumbnail, price, description }';
+    // Query only products where name starts with "RGRM"
+    const query = '*[_type == "product" && name match "RGRM*"] | order(name asc) {_id, name, slug, thumbnail, price, description}';
     
-    // 2. Construct the URL cleanly
     const url = new URL(`https://${projectId}.api.sanity.io/v2024-01-01/data/query/${dataset}`);
     url.searchParams.append('query', query);
 
-    // 3. Fetch without headers (since dataset is Public, no Auth header needed)
     const res = await fetch(url.toString(), {
-      next: { revalidate: 60 }, // Revalidate every minute
+      next: { revalidate: 60 },
     });
 
     if (!res.ok) {
@@ -30,7 +28,7 @@ async function getProducts() {
     const products = data.result || [];
 
     if (products.length === 0) {
-      return { error: 'No products found in Sanity' };
+      return { error: 'No RGRM products found in Sanity' };
     }
 
     return { products };
