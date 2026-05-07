@@ -81,7 +81,10 @@ export default async function ProductPage({ params }: { params: { id: string } }
             </select>
           </div>
 
-          <button className="bg-[#BC2026] hover:bg-red-700 text-white px-8 py-4 uppercase tracking-wider font-bold transition-colors cursor-pointer">
+          <button 
+            onClick={() => alert('Checkout coming soon!')}
+            className="bg-[#BC2026] hover:bg-red-700 text-white px-8 py-4 uppercase tracking-wider font-bold transition-colors cursor-pointer"
+          >
             Add to Cart
           </button>
 
