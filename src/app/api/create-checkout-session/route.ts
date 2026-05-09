@@ -14,16 +14,16 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price_ {
+          price_data: {
             currency: 'usd',
-            product_ {
+            product_data: {
               name: name,
               images: thumbnail ? [thumbnail] : [],
               metadata: {
                 productId: productId,
               },
             },
-            unit_amount: Math.round(parseFloat(price) * 100), // Convert to cents
+            unit_amount: Math.round(parseFloat(price) * 100), // Convert dollars to cents
           },
           quantity: 1,
         },
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_STRIPE_SUCCESS_URL}`,
       cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_CANCEL_URL}`,
-      meta {
+      metadata: {
         productId: productId,
         storeId: '17181557', // Your Printful store ID
       },
