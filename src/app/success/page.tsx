@@ -1,31 +1,63 @@
-import Link from "next/link";
-import SuccessAnimation from "@/components/SuccessAnimation";
+'use client';
 
-export default async function SuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ session_id: string }>;
-}) {
-  const { session_id } = await searchParams;
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+export default function SuccessPage() {
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+
+  useEffect(() => {
+    if (sessionId) {
+      // Optional: Verify the session with your backend
+      fetch(`/api/verify-session?session_id=${sessionId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            setStatus('success');
+          } else {
+            setStatus('error');
+          }
+        })
+        .catch(() => setStatus('error'));
+    }
+  }, [sessionId]);
+
+  if (status === 'loading') {
+    return (
+      <main className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p className="text-xl font-mono">Verifying your order...</p>
+      </main>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <main className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p className="text-red-400 font-mono">⚠️ Could not verify order. Please contact support.</p>
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
-      <SuccessAnimation />
-
-      <div className="space-y-6 max-w-sm">
-        <h1 className="text-4xl font-black uppercase tracking-tighter">Order Confirmed</h1>
-        <p className="text-gray-500 font-mono text-xs uppercase">
-          ID: {session_id?.slice(-12)}
+    <main className="min-h-screen bg-black text-white px-6 py-12 flex items-center justify-center">
+      <div className="text-center max-w-lg">
+        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4 text-[#BC2026]">
+          Order Confirmed
+        </h1>
+        <p className="text-gray-400 mb-8">
+          Thank you for your purchase! Your order is being processed and will ship soon.
         </p>
-        <p className="text-lg">
-          Your structural study is entering production. Watch your email for updates from Loops.
+        <p className="text-sm font-mono text-gray-500 mb-8">
+          Session ID: {sessionId?.slice(0, 8)}...
         </p>
-        
-        <div className="pt-8">
-          <Link href="/" className="border-b-2 border-black pb-1 hover:text-gray-400 transition-all uppercase font-bold text-sm">
-            Back to Studio
-          </Link>
-        </div>
+        <a
+          href="/selection"
+          className="inline-block bg-white/10 hover:bg-white/20 px-6 py-3 uppercase font-bold transition-colors"
+        >
+          Continue Shopping
+        </a>
       </div>
     </main>
   );
