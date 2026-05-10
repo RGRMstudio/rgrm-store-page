@@ -12,12 +12,13 @@ export async function subscribeToNewsletter(formData: FormData) {
   }
 
   try {
-    // This adds the person to your Loops contact list
-    // Fixed: Passing a single object to match the updated SDK type definition
+    // Loops SDK v3 requires custom fields to be inside the 'properties' object
     await loops.createContact({
       email: email,
-      source: 'Website Footer',
-      userGroup: 'Newsletter'
+      properties: {
+        source: 'Website Footer',
+        userGroup: 'Newsletter'
+      }
     });
 
     return { success: true };
