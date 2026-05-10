@@ -2,28 +2,28 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // apiVersion removed - Stripe will use the default version for your SDK
+  apiVersion: '2024-12-18.acacia',
 });
 
 export async function POST(request: Request) {
   try {
-    const { productId, price, name, thumbnail } = await request.json();
+    const { productId, variantId, price, name, thumbnail, size } = await request.json();
 
-    // Create a Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
+          price_ {
             currency: 'usd',
-            product_data: {
-              name: name,
+            product_ {
+              name: `${name} ${size ? `- Size: ${size}` : ''}`,
               images: thumbnail ? [thumbnail] : [],
-              metadata: {
-                productId: productId,
+              meta {
+                productId,
+                variantId,
               },
             },
-            unit_amount: Math.round(parseFloat(price) * 100), // Convert dollars to cents
+            unit_amount: Math.round(parseFloat(price) * 100),
           },
           quantity: 1,
         },
@@ -31,9 +31,10 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_STRIPE_SUCCESS_URL}`,
       cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_CANCEL_URL}`,
-      metadata: {
-        productId: productId,
-        storeId: '17181557', // Your Printful store ID
+      meta {
+        productId,
+        variantId,
+        price,
       },
     });
 
