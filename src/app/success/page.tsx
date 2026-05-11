@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function SuccessPage() {
   const searchParams = useSearchParams();
@@ -10,15 +10,11 @@ export default function SuccessPage() {
 
   useEffect(() => {
     if (sessionId) {
-      // Optional: Verify the session with your backend
+      // Optional: Verify session with your backend
       fetch(`/api/verify-session?session_id=${sessionId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.valid) {
-            setStatus('success');
-          } else {
-            setStatus('error');
-          }
+        .then(res => res.json())
+        .then(data => {
+          setStatus(data.valid ? 'success' : 'error');
         })
         .catch(() => setStatus('error'));
     }
