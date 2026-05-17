@@ -1,85 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 
-/**
- * RGRM // ACQUISITION_TRIGGER
- * Status: Manual Registry Entry Node
- */
+export default function AddToCartButton({ product }: { product: any }) {
+  const { addToCart } = useCart();
 
-interface ProductProps {
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    image?: string;
-  };
-}
+  const handleAddToCart = () => {
+    // 1. Create cart item object matching CartItem type
+    const cartItem = {
+      id: product._id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      thumbnail: product.thumbnail, // ✅ Use 'thumbnail' not 'image'
+      variantId: product.variants?.[0]?.printfulVariantId,
+      size: product.variants?.[0]?.size,
+    };
 
-export default function AddToCartButton({ product }: ProductProps) {
-  const { addToCart, setIsCartOpen } = useCart();
-  const [status, setStatus] = useState<'IDLE' | 'SYNCING'>('IDLE');
+    // 2. Add to cart
+    addToCart(cartItem);
 
-  const handleAcquire = () => {
-    // 1. Initialize Sync State
-    setStatus('SYNCING');
-
-    // 2. Execute Registry Entry
-    // Simulated delay for the technical "Processing" aesthetic
-    setTimeout(() => {
-      addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-      });
-
-      // 3. Open the Manifest Manifest
-      setIsCartOpen(true);
-      setStatus('IDLE');
-    }, 600);
+    // 3. Optional: Show feedback to user
+    alert('Added to cart!');
   };
 
   return (
-    <div className="w-full relative group">
-      {/* Decorative Glitch Border */}
-      <div className="absolute -inset-0.5 bg-rgrm-red opacity-0 group-hover:opacity-20 transition-opacity blur-[2px]" />
-      
-      <button 
-        onClick={handleAcquire}
-        disabled={status === 'SYNCING'}
-        className={`
-          relative w-full py-4 px-8 text-xs font-black uppercase tracking-[0.2em]
-          transition-all duration-300 border border-white/10
-          ${status === 'SYNCING' 
-            ? 'bg-white text-black cursor-wait' 
-            : 'bg-rgrm-red text-white hover:bg-white hover:text-black active:scale-[0.98]'
-          }
-          disabled:opacity-80
-        `}
-      >
-        <span className="flex items-center justify-center gap-2">
-          {status === 'SYNCING' ? (
-            <>
-              <span className="animate-pulse">●</span>
-              INITIALIZING_REGISTRY...
-            </>
-          ) : (
-            'Acquire_Study'
-          )}
-        </span>
-      </button>
-
-      {/* Technical Metadata Footer */}
-      <div className="mt-3 flex justify-between items-center opacity-30 group-hover:opacity-60 transition-opacity">
-        <span className="text-[8px] font-mono uppercase tracking-tighter">
-          Auth_Required: [TRUE]
-        </span>
-        <span className="text-[8px] font-mono uppercase tracking-tighter">
-          ID: {product.id.substring(0, 12)}
-        </span>
-      </div>
-    </div>
+    <button
+      onClick={handleAddToCart}
+      className="bg-white text-black px-8 py-4 uppercase font-bold hover:bg-gray-200 transition-colors"
+    >
+      Add to Cart
+    </button>
   );
 }
