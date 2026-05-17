@@ -1,74 +1,93 @@
 import { notFound } from 'next/navigation';
+import { createClient } from 'next-sanity';
 import BuyButton from '@/components/BuyButton';
 
-async function getProduct(id: string) {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+const client = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: '2024-01-01',
+  useCdn: false,
+});
 
-  if (!projectId) {
-    console.error('❌ Missing Sanity Project ID');
+async function getProduct(id: string) {
+  try {
+    console.log('🔍 Searching for product with ID/slug:', id);
+
+    // Query 1: Try by slug.current
+    const product = await client.fetch(`
+      *[_type == "product" && slug.current == $id][0]{
+        _id, 
+        name, 
+        "slug": slug.current,
+        thumbnail, 
+        price, 
+        description,
+        variants[] { 
+          _key, 
+          printfulVariantId, 
+          size, 
+          price, 
+          inStock 
+        }
+      }
+    `, { id });
+
+    if (product) {
+      console.log('✅ Found product:', product.name);
+      console.log('Product data:', JSON.stringify(product, null, 2));
+      return product;
+    }
+
+    // Query 2: Try by _id
+    const productById = await client.fetch(`
+      *[_type == "product" && _id == $id][0]{
+        _id, 
+        name, 
+        "slug": slug.current,
+        thumbnail, 
+        price, 
+        description,
+        variants[] { 
+          _key, 
+          printfulVariantId, 
+          size, 
+          price, 
+          inStock 
+        }
+      }
+    `, { id });
+
+    if (productById) {
+      console.log('✅ Found product by ID:', productById.name);
+      return productById;
+    }
+
+    // Debug: Show all available products
+    const allProducts = await client.fetch(`
+      *[_type == "product"]{
+        _id, 
+        name, 
+        "slugValue": slug.current
+      }
+    `);
+    
+    console.log('📋 All products in Sanity:');
+    allProducts.forEach((p: any) => {
+      console.log(`  - ${p.name}: slug="${p.slugValue}", _id="${p._id}"`);
+    });
+
+    console.log('❌ Product not found for:', id);
+    return null;
+  } catch (error: any) {
+    console.error('❌ Sanity error:', error.message);
     return null;
   }
-
-  // Try multiple query approaches
-  const queries = [
-    // Query 1: By slug (most common)
-    `*[_type == "product" && slug.current == "${id}"][0]{
-      _id, name, "slug": slug.current, thumbnail, price, description,
-      variants[] { _key, printfulVariantId, size, price, inStock }
-    }`,
-    // Query 2: By _id
-    `*[_type == "product" && _id == "${id}"][0]{
-      _id, name, "slug": slug.current, thumbnail, price, description,
-      variants[] { _key, printfulVariantId, size, price, inStock }
-    }`,
-    // Query 3: Fallback - get all RGRM products
-    `*[_type == "product" && name match "RGRM*"][0]{
-      _id, name, "slug": slug.current, thumbnail, price, description,
-      variants[] { _key, printfulVariantId, size, price, inStock }
-    }`,
-  ];
-
-  for (let i = 0; i < queries.length; i++) {
-    const url = new URL(`https://${projectId}.api.sanity.io/v2024-01-01/data/query/${dataset}`);
-    url.searchParams.append('query', queries[i]);
-
-    try {
-      console.log(`🔍 Trying query ${i + 1}...`);
-      const res = await fetch(url.toString(), { next: { revalidate: 0 } });
-      
-      if (!res.ok) {
-        console.error(`Query ${i + 1} failed:`, res.status, await res.text());
-        continue;
-      }
-      
-      const data = await res.json();
-      const product = data.result?.[0];
-      
-      if (product) {
-        console.log('✅ Found product:', product.name);
-        console.log('Product data:', JSON.stringify(product, null, 2));
-        return product;
-      }
-      
-      console.log(`Query ${i + 1} returned no results`);
-    } catch (error: any) {
-      console.error(`Query ${i + 1} error:`, error.message);
-      continue;
-    }
-  }
-
-  console.error('❌ Product not found after all queries');
-  return null;
 }
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
-  console.log('🔍 Looking for product with ID/slug:', params.id);
-  
   const product = await getProduct(params.id);
 
   if (!product) {
-    console.error('❌ Product not found:', params.id);
     notFound();
   }
 
