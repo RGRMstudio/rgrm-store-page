@@ -13,7 +13,7 @@ const client = createClient({
 const builder = createImageUrlBuilder(client);
 
 export function urlFor(source: any) {
-  return builder.source(source);
+  return builder.image(source);
 }
 
 export function sanityImage(url: string) {
