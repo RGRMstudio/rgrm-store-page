@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // Using SDK default API version to avoid syntax conflicts
+  // No apiVersion - Stripe will use the default version for your SDK
 });
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { productId, variantId, price, name, thumbnail, size } = await request.json();
+    const { productId, variantId, price, name, thumbnail, size } = await req.json();
+
+    // Determine the base URL based on environment
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://www.raguiromo.store'
+      : 'http://localhost:3000';
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -16,31 +21,30 @@ export async function POST(request: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `${name} ${size ? `- Size: ${size}` : ''}`,
+              name: name,
               images: thumbnail ? [thumbnail] : [],
-              metadata: {
-                productId,
-                variantId,
-              },
             },
-            unit_amount: Math.round(parseFloat(price) * 100),
+            unit_amount: Math.round(Number(price) * 100), // Convert to cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_STRIPE_SUCCESS_URL}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_CANCEL_URL}`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/selection/${productId}`,
       metadata: {
-        productId,
-        variantId,
-        price,
+        productId: productId,
+        variantId: variantId,
+        size: size || 'One Size',
+      },
+      shipping_address_collection: {
+        allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'ES', 'IT'],
       },
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error: any) {
-    console.error('Stripe error:', error);
+    console.error('Error creating checkout session:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
