@@ -2,17 +2,19 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  // No apiVersion - Stripe will use the default version for your SDK
 });
 
-export async function POST(request: Request) {
-  const body = await request.text();
-  const signature = request.headers.get('stripe-signature')!;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+export async function POST(req: Request) {
+  const body = await req.text();
+  const signature = req.headers.get('stripe-signature')!;
 
   let event: Stripe.Event;
+
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
   } catch (err: any) {
     console.error('Webhook signature verification failed:', err.message);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -20,6 +22,8 @@ export async function POST(request: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
+    
+    // Create Printful order
     await createPrintfulOrder(session);
   }
 
@@ -28,24 +32,32 @@ export async function POST(request: Request) {
 
 async function createPrintfulOrder(session: Stripe.Checkout.Session) {
   const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
-  const STORE_ID = '17181557';
+  const STORE_ID = process.env.PRINTFUL_STORE_ID || '17181557';
   
   const variantId = session.metadata?.variantId;
   
   if (!variantId) {
-    throw new Error('No variant ID found in session metadata');
+    console.error('No variant ID found in session metadata');
+    return;
   }
+
+  // ✅ Safe access using type assertion for optional properties
+  const sessionAny = session as any;
+  const shippingAddress = sessionAny.shipping?.address || sessionAny.customer_details?.address;
+  const customerEmail = session.customer_details?.email || '';
+  const customerName = session.customer_details?.name || 'Customer';
+  const customerPhone = session.customer_details?.phone || '';
 
   const orderPayload = {
     recipient: {
-      name: session.customer_details?.name || 'Customer',
-      address1: session.shipping_details?.address?.line1 || '',
-      city: session.shipping_details?.address?.city || '',
-      state_code: session.shipping_details?.address?.state || '',
-      country_code: session.shipping_details?.address?.country || '',
-      zip: session.shipping_details?.address?.postal_code || '',
-      email: session.customer_details?.email || '',
-      phone: session.customer_details?.phone || '',
+      name: customerName,
+      address1: shippingAddress?.line1 || '',
+      city: shippingAddress?.city || '',
+      state_code: shippingAddress?.state || '',
+      country_code: shippingAddress?.country || '',
+      zip: shippingAddress?.postal_code || '',
+      email: customerEmail,
+      phone: customerPhone,
     },
     items: [
       {
@@ -56,22 +68,26 @@ async function createPrintfulOrder(session: Stripe.Checkout.Session) {
     external_id: session.id,
   };
 
-  const response = await fetch('https://api.printful.com/orders', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${PRINTFUL_API_KEY}`,
-      'X-PF-Store-ID': STORE_ID,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(orderPayload),
-  });
+  try {
+    const response = await fetch('https://api.printful.com/orders', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${PRINTFUL_API_KEY}`,
+        'X-PF-Store-ID': STORE_ID,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderPayload),
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Printful API error: ${response.status} - ${error}`);
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Printful API error: ${response.status} - ${error}`);
+    }
+
+    const result = await response.json();
+    console.log(`✅ Printful order created: ${result.result.id}`);
+    return result;
+  } catch (error: any) {
+    console.error('Error creating Printful order:', error.message);
   }
-
-  const result = await response.json();
-  console.log(`✅ Printful order created: ${result.result.id}`);
-  return result;
 }
