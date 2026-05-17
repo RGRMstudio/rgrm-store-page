@@ -62,44 +62,49 @@ export default async function SelectionPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {result.products?.map((product: any) => (
-              <Link
-                key={product._id}
-                href={`/selection/${product._id}`}
-                className="group block bg-white/5 border border-white/10 hover:border-[#BC2026] transition-all duration-300"
-              >
-                <div className="aspect-square bg-[#0a0a0a] relative overflow-hidden">
-                  {product.thumbnail ? (
-                    <img
-                      src={product.thumbnail}
-                      alt={product.name}
-                      className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-600 text-xs font-mono">
-                      NO IMAGE
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <h2 className="text-xl font-black uppercase mb-2 group-hover:text-[#BC2026] transition-colors">
-                    {product.name}
-                  </h2>
-                  <div className="flex justify-between items-end">
-                    {product.price && (
-                      <p className="text-2xl font-mono text-white">
-                        ${Number(product.price).toFixed(2)}
-                      </p>
-                    )}
-                    {product.description && (
-                      <p className="text-gray-400 text-sm line-clamp-2 max-w-[70%]">
-                        {product.description}
-                      </p>
+            {result.products?.map((product: any) => {
+              // Ensure we have a valid slug
+              const slug = product.slug?.current || product._id;
+              
+              return (
+                <Link
+                  key={product._id}
+                  href={`/selection/${slug}`}
+                  className="group block bg-white/5 border border-white/10 hover:border-[#BC2026] transition-all duration-300"
+                >
+                  <div className="aspect-square bg-[#0a0a0a] relative overflow-hidden">
+                    {product.thumbnail ? (
+                      <img
+                        src={product.thumbnail}
+                        alt={product.name}
+                        className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-600 text-xs font-mono">
+                        NO IMAGE
+                      </div>
                     )}
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-6">
+                    <h2 className="text-xl font-black uppercase mb-2 group-hover:text-[#BC2026] transition-colors">
+                      {product.name}
+                    </h2>
+                    <div className="flex justify-between items-end">
+                      {product.price && (
+                        <p className="text-2xl font-mono text-white">
+                          ${Number(product.price).toFixed(2)}
+                        </p>
+                      )}
+                      {product.description && (
+                        <p className="text-gray-400 text-sm line-clamp-2 max-w-[70%]">
+                          {product.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
