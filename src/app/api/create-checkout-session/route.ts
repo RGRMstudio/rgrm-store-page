@@ -2,24 +2,23 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // Use default API version from SDK
+  // Using SDK default API version to avoid conflicts
 });
 
 export async function POST(request: Request) {
   try {
-    const { productId, variantId, price, name, thumbnail, size, description } = await request.json();
+    const { productId, variantId, price, name, thumbnail, size } = await request.json();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price_ {
+          price_data: {
             currency: 'usd',
-            product_ {
+            product_data: {
               name: `${name}${size ? ` - Size: ${size}` : ''}`,
-              description: description || '',
               images: thumbnail ? [thumbnail] : [],
-              meta {
+              metadata: {
                 productId,
                 variantId,
               },
@@ -32,14 +31,11 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_STRIPE_SUCCESS_URL}`,
       cancel_url: `${process.env.NEXT_PUBLIC_STRIPE_CANCEL_URL}`,
-      meta {
+      metadata: {
         productId,
         variantId,
         price,
-        storeId: process.env.PRINTFUL_STORE_ID,
       },
-      // Optional: Add customer email collection
-      customer_email: 'auto',
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
