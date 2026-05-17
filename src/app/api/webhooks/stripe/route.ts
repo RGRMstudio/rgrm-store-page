@@ -41,7 +41,7 @@ async function createPrintfulOrder(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // ✅ Safe access using type assertion for optional properties
+  // Safe access using type assertion for optional properties
   const sessionAny = session as any;
   const shippingAddress = sessionAny.shipping?.address || sessionAny.customer_details?.address;
   const customerEmail = session.customer_details?.email || '';
