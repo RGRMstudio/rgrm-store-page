@@ -1,14 +1,19 @@
 import { notFound } from 'next/navigation';
 import BuyButton from '@/components/BuyButton';
 
-async function getProduct(id: string) {
+async function getProduct(slug: string) {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
 
-  if (!projectId) return null;
+  if (!projectId) {
+    console.error('Missing Sanity Project ID');
+    return null;
+  }
 
-  // Try to find by slug first, then by _id
-  const query = `*[_type == "product" && (slug.current == "${id}" || _id == "${id}")][0]{
+  // Sanitize slug for GROQ query (escape special characters)
+  const safeSlug = slug.replace(/"/g, '\\"');
+
+  const query = `*[_type == "product" && slug.current == "${safeSlug}"][0]{
     _id, 
     name, 
     slug, 
@@ -29,15 +34,31 @@ async function getProduct(id: string) {
 
   try {
     const res = await fetch(url.toString(), { next: { revalidate: 60 } });
-    if (!res.ok) return null;
+    
+    if (!res.ok) {
+      console.error('Sanity API error:', res.status, await res.text());
+      return null;
+    }
+    
     const data = await res.json();
-    return data.result?.[0] || null;
-  } catch {
+    const product = data.result?.[0];
+    
+    if (product) {
+      console.log('✅ Found product:', product.name);
+      return product;
+    }
+    
+    console.error('❌ Product not found for slug:', slug);
+    return null;
+  } catch (error: any) {
+    console.error('Fetch error:', error.message);
     return null;
   }
 }
 
 export default async function ProductPage({ params }: { params: { id: string } }) {
+  console.log('🔍 Looking for product with slug:', params.id);
+  
   const product = await getProduct(params.id);
 
   if (!product) {
