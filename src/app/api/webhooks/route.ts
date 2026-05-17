@@ -44,11 +44,11 @@ async function createPrintfulOrder(session: Stripe.Checkout.Session) {
   const orderPayload = {
     recipient: {
       name: session.customer_details?.name || 'Customer',
-      address1: session.shipping_details?.address?.line1 || '',
-      city: session.shipping_details?.address?.city || '',
-      state_code: session.shipping_details?.address?.state || '',
-      country_code: session.shipping_details?.address?.country || '',
-      zip: session.shipping_details?.address?.postal_code || '',
+      address1: session.shipping?.address?.line1 || '',
+      city: session.shipping?.address?.city || '',
+      state_code: session.shipping?.address?.state || '',
+      country_code: session.shipping?.address?.country || '',
+      zip: session.shipping?.address?.postal_code || '',
       email: session.customer_details?.email || '',
       phone: session.customer_details?.phone || '',
     },
