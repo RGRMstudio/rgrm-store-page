@@ -41,16 +41,22 @@ async function createPrintfulOrder(session: Stripe.Checkout.Session) {
     return;
   }
 
+  // ✅ CORRECT: Use shipping_details (not shipping)
+  const shippingAddress = session.shipping_details?.address;
+  const customerEmail = session.customer_details?.email;
+  const customerName = session.customer_details?.name;
+  const customerPhone = session.customer_details?.phone;
+
   const orderPayload = {
     recipient: {
-      name: session.customer_details?.name || 'Customer',
-      address1: session.shipping?.address?.line1 || '',
-      city: session.shipping?.address?.city || '',
-      state_code: session.shipping?.address?.state || '',
-      country_code: session.shipping?.address?.country || '',
-      zip: session.shipping?.address?.postal_code || '',
-      email: session.customer_details?.email || '',
-      phone: session.customer_details?.phone || '',
+      name: customerName || 'Customer',
+      address1: shippingAddress?.line1 || '',
+      city: shippingAddress?.city || '',
+      state_code: shippingAddress?.state || '',
+      country_code: shippingAddress?.country || '',
+      zip: shippingAddress?.postal_code || '',
+      email: customerEmail || '',
+      phone: customerPhone || '',
     },
     items: [
       {
