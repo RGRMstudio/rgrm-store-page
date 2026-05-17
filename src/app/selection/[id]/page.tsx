@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation';
 import BuyButton from '@/components/BuyButton';
 
-async function getProduct(slug: string) {
+async function getProduct(id: string) {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
 
   if (!projectId) return null;
 
-  const query = `*[_type == "product" && slug.current == "${slug}"][0]{
+  // Try to find by slug first, then by _id
+  const query = `*[_type == "product" && (slug.current == "${id}" || _id == "${id}")][0]{
     _id, 
     name, 
     slug, 
@@ -79,7 +80,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
             <p className="text-white font-mono">{selectedVariant.size || 'One Size'}</p>
           </div>
 
-          {/* Client Component for Checkout */}
+          {/* Buy Button */}
           <BuyButton
             productId={product._id}
             variantId={selectedVariant.printfulVariantId}
