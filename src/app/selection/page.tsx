@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -66,7 +65,7 @@ export default async function SelectionPage() {
             {result.products?.map((product: any) => (
               <Link
                 key={product._id}
-                href={`/selection/${product.slug?.current || product._id}`}
+                href={`/selection/${product._id}`}
                 className="group block bg-white/5 border border-white/10 hover:border-[#BC2026] transition-all duration-300"
               >
                 <div className="aspect-square bg-[#0a0a0a] relative overflow-hidden">
