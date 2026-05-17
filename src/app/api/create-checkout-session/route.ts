@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // Using SDK default API version to avoid conflicts
+  // Using SDK default API version to avoid syntax conflicts
 });
 
 export async function POST(request: Request) {
@@ -16,14 +16,14 @@ export async function POST(request: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `${name}${size ? ` - Size: ${size}` : ''}`,
+              name: `${name} ${size ? `- Size: ${size}` : ''}`,
               images: thumbnail ? [thumbnail] : [],
               metadata: {
                 productId,
                 variantId,
               },
             },
-            unit_amount: Math.round(parseFloat(price) * 100), // Convert to cents
+            unit_amount: Math.round(parseFloat(price) * 100),
           },
           quantity: 1,
         },
