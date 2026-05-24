@@ -1,40 +1,50 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  // Focus exclusively on the src directory to avoid path conflicts
   content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-
-  // This ensures Tailwind styles override any remaining CSS ghosts
-  important: true,
-
   theme: {
     extend: {
+      // McQueen-inspired color palette
       colors: {
-        "rgrm-red": "#BC2026",
-        "rgrm-black": "#000000",
-        "rgrm-gray": "#1A1A1A",
-        "rgrm-light": "#F5F5F5",
+        black: "#000000",
+        charcoal: "#0a0a0a",
+        darkGray: "#1a1a1a",
+        bloodRed: "#8B0000",
+        concreteGray: "#2a2a2a",
+        boneWhite: "#f5f5f5",
       },
+      // Typography
       fontFamily: {
-        // These match the variables you set in your layout.tsx
-        mono: ["var(--font-mono)", "Menlo", "monospace"],
-        sans: ["var(--font-sans)", "Inter", "sans-serif"],
+        serif: ["var(--font-playfair)", "serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
       },
+      // Letter spacing for that editorial look
       letterSpacing: {
-        tightest: "-.075em",
-        widest: ".25em",
-        registry: ".5em",
+        tighter: "-0.02em",
+        tight: "-0.01em",
+        normal: "0",
+        wide: "0.1em",
+        wider: "0.2em",
+        widest: "0.3em",
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      // Animation easing (McQueen-style dramatic)
+      transitionTimingFunction: {
+        "dramatic": "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
+      // Font sizes for massive headlines
+      fontSize: {
+        "7xl": "5rem",
+        "8xl": "7rem",
+        "9xl": "9rem",
       },
     },
   },
-
-  plugins: [],
+  plugins: [
+    require("@tailwindcss/typography"),
+  ],
 };
-
 export default config;
