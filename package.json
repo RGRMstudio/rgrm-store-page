@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@exodus/bytes": "^1.2.0",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/playfair-display": "^5.2.8",
     "@portabletext/editor": "^6.6.2",
     "@sanity/client": "^6.29.1",
     "@sanity/image-url": "^1.2.0",
@@ -19,7 +21,7 @@
     "autoprefixer": "^10.4.20",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
-    "framer-motion": "^11.0.0",
+    "framer-motion": "^11.18.2",
     "gsap": "^3.12.0",
     "loops": "^6.2.1",
     "lucide-react": "^0.511.0",
@@ -36,6 +38,7 @@
     "vercel": "^52.0.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20.19.41",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
