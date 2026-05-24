@@ -7,7 +7,8 @@ async function getProducts() {
 
   if (!projectId) return [];
 
-  const query = `*[_type == "product" && name match "RGRM*"]{
+  // Filter out products with null/missing prices to prevent crashes
+  const query = `*[_type == "product" && name match "RGRM*" && price != null]{
     _id, 
     name, 
     slug, 
