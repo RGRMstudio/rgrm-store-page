@@ -10,7 +10,7 @@ interface Product {
   name: string;
   slug: { current: string };
   thumbnail: string;
-  price: number;
+  price: number | null;
 }
 
 interface ProductGridProps {
@@ -30,46 +30,53 @@ export default function ProductGrid({ products }: ProductGridProps) {
 
   return (
     <div ref={containerRef} className="grid grid-cols-1 gap-y-20 gap-x-12 md:grid-cols-2 lg:grid-cols-3">
-      {products.map((product, index) => (
-        <motion.div
-          key={product._id}
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ 
-            duration: 0.8, 
-            delay: index * 0.1,
-            ease: [0.22, 1, 0.36, 1]
-          }}
-          className={`group ${index % 3 === 0 ? 'md:mt-20' : ''}`}
-        >
-          <Link href={`/selection/${product.slug.current}`} className="block">
-            <div className="relative mb-6 aspect-[3/4] overflow-hidden bg-darkGray">
-              <Image
-                src={product.thumbnail}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
-              <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/90 p-4 text-center transition-transform duration-500 group-hover:translate-y-0">
-                <span className="text-xs uppercase tracking-[0.2em] text-white">
-                  Quick View
-                </span>
-              </div>
-            </div>
+      {products.map((product, index) => {
+        // Safe price handling
+        const displayPrice = product.price != null 
+          ? `$${Number(product.price).toFixed(2)}` 
+          : 'Contact for Price';
 
-            <div className="text-center">
-              <h3 className="mb-2 text-lg font-serif uppercase tracking-wide">
-                {product.name}
-              </h3>
-              <p className="text-sm text-gray-400">
-                ${product.price.toFixed(2)}
-              </p>
-            </div>
-          </Link>
-        </motion.div>
-      ))}
+        return (
+          <motion.div
+            key={product._id}
+            initial={{ opacity: 0, y: 60 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ 
+              duration: 0.8, 
+              delay: index * 0.1,
+              ease: [0.22, 1, 0.36, 1]
+            }}
+            className={`group ${index % 3 === 0 ? 'md:mt-20' : ''}`}
+          >
+            <Link href={`/selection/${product.slug.current}`} className="block">
+              <div className="relative mb-6 aspect-[3/4] overflow-hidden bg-darkGray">
+                <Image
+                  src={product.thumbnail}
+                  alt={product.name}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
+                <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/90 p-4 text-center transition-transform duration-500 group-hover:translate-y-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white">
+                    Quick View
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <h3 className="mb-2 text-lg font-serif uppercase tracking-wide">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-400">
+                  {displayPrice}
+                </p>
+              </div>
+            </Link>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
