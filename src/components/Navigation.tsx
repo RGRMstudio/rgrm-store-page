@@ -96,9 +96,8 @@ export default function Navigation() {
           >
             <div className="flex flex-col items-center gap-8">
               {navLinks.map((link, index) => (
-                <motionLink
+                <motion.div
                   key={link.href}
-                  href={link.href}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
@@ -106,10 +105,14 @@ export default function Navigation() {
                     e.stopPropagation();
                     setIsMenuOpen(false);
                   }}
-                  className="text-4xl font-serif uppercase tracking-widest hover:text-blood-red transition-colors"
                 >
-                  {link.label}
-                </motionLink>
+                  <Link 
+                    href={link.href}
+                    className="text-4xl font-serif uppercase tracking-widest hover:text-blood-red transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
               ))}
             </div>
           </motion.div>
