@@ -46,18 +46,18 @@ export default async function ProductPage({ params }: { params: { id: string } }
     notFound();
   }
 
-  // Combine main image and additional images
+  // Combine main image + additional images
   const allImages = [
     product.mainImage,
     ...(product.images || [])
   ].filter(Boolean);
 
   return (
-    <main className="min-h-screen bg-black pt-20">
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+    <main className="min-h-screen bg-black pt-24 pb-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Left: Image Gallery */}
-          <div className="lg:sticky lg:top-24 lg:h-fit">
+          <div className="lg:sticky lg:top-28">
             <ProductGallery 
               images={allImages} 
               productName={product.name} 
@@ -65,39 +65,32 @@ export default async function ProductPage({ params }: { params: { id: string } }
           </div>
 
           {/* Right: Product Info */}
-          <div className="flex flex-col justify-center">
-            {/* Category */}
+          <div className="flex flex-col justify-center lg:py-8">
             <p className="mb-4 text-xs uppercase tracking-[0.3em] text-blood-red">
               Brutalist Lineage
             </p>
 
-            {/* Title */}
-            <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[0.9]">
               {product.name}
             </h1>
 
-            {/* Price */}
             <p className="text-2xl font-light mb-8 text-gray-300">
               ${product.price?.toFixed(2) || '0.00'}
             </p>
 
-            {/* Description */}
-            <div className="prose prose-invert mb-12 max-w-none">
-              <p className="text-lg text-gray-400 leading-relaxed">
+            <div className="mb-10 max-w-prose">
+              <p className="text-base text-gray-400 leading-relaxed">
                 {product.description}
               </p>
             </div>
 
             {/* Variant Selector */}
-            {product.variants && product.variants.length > 0 && (
-              <VariantSelector
-                variants={product.variants}
-                onSelectVariant={(variant) => {
-                  // This will be handled by the BuyButton
-                  console.log('Selected variant:', variant);
-                }}
-              />
-            )}
+            <VariantSelector
+              variants={product.variants || []}
+              onSelectVariant={(variant) => {
+                console.log('Selected:', variant);
+              }}
+            />
 
             {/* Buy Button */}
             <BuyButton
@@ -112,28 +105,16 @@ export default async function ProductPage({ params }: { params: { id: string } }
             {/* Trust Badges */}
             <div className="mt-12 grid grid-cols-3 gap-6 border-t border-white/10 pt-8">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-1">
-                  Shipping
-                </p>
-                <p className="text-sm text-gray-400">
-                  Free over $100
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-600 mb-1">Shipping</p>
+                <p className="text-xs text-gray-400">Free over $100</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-1">
-                  Returns
-                </p>
-                <p className="text-sm text-gray-400">
-                  30-day returns
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-600 mb-1">Returns</p>
+                <p className="text-xs text-gray-400">30-day window</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-1">
-                  Security
-                </p>
-                <p className="text-sm text-gray-400">
-                  Secure checkout
-                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-600 mb-1">Security</p>
+                <p className="text-xs text-gray-400">Encrypted checkout</p>
               </div>
             </div>
           </div>
