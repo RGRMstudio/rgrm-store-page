@@ -31,7 +31,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
   return (
     <div ref={containerRef} className="grid grid-cols-1 gap-y-20 gap-x-12 md:grid-cols-2 lg:grid-cols-3">
       {products.map((product, index) => {
-        // Safe price handling
         const displayPrice = product.price != null 
           ? `$${Number(product.price).toFixed(2)}` 
           : 'Contact for Price';
@@ -50,7 +49,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
             className={`group ${index % 3 === 0 ? 'md:mt-20' : ''}`}
           >
             <Link href={`/selection/${product.slug.current}`} className="block">
-              {/* Image Container - Optimized size */}
               <div className="relative mb-6 aspect-[3/4] overflow-hidden bg-darkGray">
                 <Image
                   src={product.thumbnail}
@@ -58,4 +56,27 @@ export default function ProductGrid({ products }: ProductGridProps) {
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  priority={index < 3} // Load first
+                  priority={index < 3}
+                />
+                <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
+                <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/90 p-4 text-center transition-transform duration-500 group-hover:translate-y-0">
+                  <span className="text-xs uppercase tracking-[0.2em] text-white">
+                    Quick View
+                  </span>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="mb-2 text-lg font-serif uppercase tracking-wide">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-400">
+                  {displayPrice}
+                </p>
+              </div>
+            </Link>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
