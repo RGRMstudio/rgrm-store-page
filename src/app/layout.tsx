@@ -1,36 +1,54 @@
 import type { Metadata } from "next";
-import dynamic from 'next/dynamic';
+import { Playfair_Display, Inter } from "next/font/google";
+import "./globals.css";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import LuccaWidget from "@/components/LuccaWidget";
 
-// Dynamically import components to prevent server-side crashes
-const Navbar = dynamic(() => import('@/components/Navbar'), { 
-  ssr: false, // Render only on client
-  loading: () => <div className="h-16 bg-black" /> // Fallback while loading
+// Load McQueen-style fonts
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  variable: "--font-playfair",
+  display: "swap",
 });
 
-const Footer = dynamic(() => import('@/components/Footer'), { 
-  ssr: false, // Render only on client
-  loading: () => <div className="h-24 bg-black" /> // Fallback while loading
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "RaGuiRoMo | Industrial Art Machine",
-  description: "Structural Studies by RaGuiRoMo Studio",
+  title: "RaGuiRoMo | Brutalist Lineage",
+  description: "Wearable architecture. Phase 01: Where Bauhaus geometry meets monolithic mass.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en">
-      {/* Using inline styles to guarantee no CSS build errors */}
-      <body style={{ background: '#050505', color: '#f5f5f5', fontFamily: 'monospace', margin: 0 }}>
-        <Navbar />
-        <main style={{ minHeight: '80vh', padding: '2rem' }}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+      <body className="bg-black text-white antialiased">
+        {/* Subtle brutalist texture overlay */}
+        <div className="brutalist-noise" aria-hidden="true" />
+        
+        {/* Navigation */}
+        <Navigation />
+        
+        {/* Main Content */}
+        <main className="relative z-10">
           {children}
         </main>
+        
+        {/* Footer */}
         <Footer />
+        
+        {/* Lucca AI Widget */}
+        <LuccaWidget />
       </body>
     </html>
   );
