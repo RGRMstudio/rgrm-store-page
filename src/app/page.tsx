@@ -1,46 +1,52 @@
-export default function HomePage() {
+import Hero from '@/components/Hero';
+import ProductGrid from '@/components/ProductGrid';
+
+export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-12">
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6">
-          NOT STYLE.<br />IDENTITY.
-        </h1>
-        
-        <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-          RaGuiRoMo Studio — where industrial aesthetics meet digital expression. 
-          Exploring the intersection of structure, form, and creative disruption.
-        </p>
-
-        <a 
-          href="/selection"
-          className="inline-block px-8 py-4 border-2 border-[#BC2026] text-[#BC2026] hover:bg-[#BC2026] hover:text-white transition-all duration-300 font-mono uppercase tracking-wider"
-        >
-          INITIATE COLLECTION →
-        </a>
-
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-          <div className="border border-white/10 p-6">
-            <h3 className="text-xl font-bold mb-2 text-[#BC2026]">STRUCTURE</h3>
-            <p className="text-gray-400 text-sm">
-              Deconstructing visual language through geometric precision and raw materiality.
+    <>
+      <Hero />
+      
+      {/* Featured Collection Section */}
+      <section className="bg-black px-6 py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-20">
+            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-gray-500">
+              The Collection
             </p>
+            <h2 className="text-5xl font-black md:text-7xl">
+              STRUCTURAL<br />ARTIFACTS
+            </h2>
           </div>
           
-          <div className="border border-white/10 p-6">
-            <h3 className="text-xl font-bold mb-2 text-[#BC2026]">DISRUPTION</h3>
-            <p className="text-gray-400 text-sm">
-              Challenging conventional design paradigms with glitch aesthetics and digital decay.
-            </p>
-          </div>
-          
-          <div className="border border-white/10 p-6">
-            <h3 className="text-xl font-bold mb-2 text-[#BC2026]">EXPRESSION</h3>
-            <p className="text-gray-400 text-sm">
-              Transforming industrial concepts into wearable art and collectible pieces.
-            </p>
-          </div>
+          {/* Product Grid will load products from Sanity */}
+          <ProductGrid />
         </div>
-      </div>
-    </main>
+      </section>
+
+      {/* Manifesto Teaser */}
+      <section className="bg-charcoal px-6 py-32">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="mb-8 text-sm uppercase tracking-[0.3em] text-blood-red">
+            The Philosophy
+          </p>
+          <h2 className="text-4xl md:text-6xl font-black mb-8">
+            TRUTH TO<br />MATERIALS
+          </h2>
+          <p className="text-lg text-gray-400 leading-relaxed mb-12">
+            We strip away digital gloss to reveal raw, physical presence. 
+            Every piece is an artifact from the RGRM Studio—built for the modern grid, 
+            inspired by the theatrical drama of high fashion and the uncompromising 
+            integrity of brutalist architecture.
+          </p>
+          <a 
+            href="/manifesto"
+            className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] border-b border-white pb-1 hover:border-blood-red transition-colors"
+          >
+            Read the Manifesto
+            <span className="text-blood-red">→</span>
+          </a>
+        </div>
+      </section>
+    </>
   );
 }
