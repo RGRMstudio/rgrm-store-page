@@ -1,12 +1,40 @@
 import Hero from '@/components/Hero';
 import ProductGrid from '@/components/ProductGrid';
 
-export default function Home() {
+async function getProducts() {
+  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+
+  if (!projectId) return [];
+
+  const query = `*[_type == "product" && name match "RGRM*"]{
+    _id, 
+    name, 
+    slug, 
+    thumbnail, 
+    price
+  }`;
+  
+  const url = new URL(`https://${projectId}.api.sanity.io/v2024-01-01/data/query/${dataset}`);
+  url.searchParams.append('query', query);
+
+  try {
+    const res = await fetch(url.toString(), { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.result || [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const products = await getProducts();
+
   return (
     <>
       <Hero />
       
-      {/* Featured Collection Section */}
       <section className="bg-black px-6 py-32">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-20">
@@ -18,12 +46,10 @@ export default function Home() {
             </h2>
           </div>
           
-          {/* Product Grid will load products from Sanity */}
-          <ProductGrid />
+          <ProductGrid products={products} />
         </div>
       </section>
 
-      {/* Manifesto Teaser */}
       <section className="bg-charcoal px-6 py-32">
         <div className="mx-auto max-w-4xl text-center">
           <p className="mb-8 text-sm uppercase tracking-[0.3em] text-blood-red">
