@@ -1,170 +1,244 @@
-import React from 'react';
-import Link from 'next/link';
-import { RGRM_IDENTITY, RGRM_PHASES } from '@/lib/constants';
+'use client';
 
-// --- SEO CONFIGURATION ---
-export const metadata = {
-  title: 'MANIFESTO // PROTOCOL',
-  description: 'The underlying philosophy of structural integrity. We do not design clothes; we engineer silhouettes.',
-};
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import Link from 'next/link';
 
 export default function ManifestoPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+  const y = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
+
+  const sections = [
+    {
+      title: "THE ROOT",
+      subtitle: "Geometric Harmony",
+      content: "RaGuiRoMo begins at the Bauhaus root. We celebrate the foundational geometry of the circle, the square, and the triangle—the essential building blocks of the modern grid. Following the ethos of 'Form Follows Function,' we utilize primary colors to create a visual language that is both timeless and functionally rigid. Every abstract composition is a tribute to the architects of the modernist movement.",
+      image: "https://images.unsplash.com/photo-1508193637792-a980e5166990?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+      title: "THE EVOLUTION",
+      subtitle: "Architectural Mass",
+      content: "As we move into Phase 01: Brutalist Lineage, the grid undergoes a structural evolution. We embrace the uncompromising, monolithic weight of Brutalist architecture. The primary shapes are now anchored by heavy black arches, functioning as concrete monuments that frame our modernist vision. We follow the philosophy of 'Truth to Materials,' utilizing raw, tactile textures to give our digital presence a physical, structural mass. This is not just graphic design. It is wearable architecture.",
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+      title: "THE THEATER",
+      subtitle: "The Masters",
+      content: "The RGRM Studio is fueled by the theatrical drama of the masters. We draw inspiration from the hyper-structured, architectural silhouettes of Thierry Mugler and the raw, emotional storytelling of Alexander McQueen. We take the bold, uninhibited graphic statements of high fashion and ground them in the high-energy, rebellious spirit of modern streetwear. This synthesis creates a unique voice—where the theme is Modernist Architecture meets Abstract Chaos.",
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1964&auto=format&fit=crop"
+    },
+    {
+      title: "THE LINEAGE",
+      subtitle: "Structural vs. Rebellious",
+      content: "Within this lineage, two distinct paths emerge. The Structural Core: a celebration of rigid integrity, focusing on monolithic arches and clean, monumental typography. The Rebellious Distortion: a maximalist deviation where we break our own rules. Here, the grid is subverted by high-energy collage, psychedelic textures, and the fun, loud attitude of the modern street. Both paths honor the same root—just expressed through different architectural languages.",
+      image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1974&auto=format&fit=crop"
+    },
+    {
+      title: "THE STUDIO",
+      subtitle: "Creativity × Code",
+      content: "RaGuiRoMo is a dream come true—a launchpad where creativity and code collide. As a solo-operated studio, we have engineered a custom, headless architecture to ensure that every garment is a direct artifact of our personal design journey. From the first geometric sketch to the final automated stitch, this is an unapologetic pursuit of structural excellence. Designed in the RGRM Studio. Built for the modern grid.",
+      image: "https://images.unsplash.com/photo-1550751863-88478f6a9665?q=80&w=2070&auto=format&fit=crop"
+    }
+  ];
+
   return (
-    <main className="min-h-screen pt-32 pb-24 px-6 md:px-12 relative flex justify-center bg-black overflow-hidden">
-      
-      {/* --- BACKGROUND WATERMARK (Fixed & Subtle) --- */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[40vw] font-black text-white/[0.02] pointer-events-none select-none z-0 font-[family-name:var(--font-headline)] leading-none">
-        001
-      </div>
+    <main ref={containerRef} className="min-h-screen bg-black">
+      {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <motion.div 
+          style={{ opacity, scale }}
+          className="absolute inset-0"
+        >
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: "url('https://images.unsplash.com/photo-1486325212027-8081e485255e?q=80&w=2070&auto=format&fit=crop')",
+            }}
+          />
+          <div className="absolute inset-0 bg-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black" />
+        </motion.div>
 
-      <div className="max-w-3xl w-full relative z-10 space-y-24">
-        
-        {/* --- SECTION 1: THE PREAMBLE --- */}
-        <header className="border-l-4 border-rgrm-red pl-8 md:pl-12 py-2">
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-rgrm-red mb-6 animate-pulse">
-            Directives // {RGRM_IDENTITY.founder}
-          </p>
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-[0.9] font-[family-name:var(--font-headline)] text-white">
-            We do not design clothes. <br />
-            <span className="text-white/50">We engineer silhouettes.</span>
-          </h1>
-        </header>
-
-        {/* --- SECTION 2: THE CORE TENETS --- */}
-        <section className="space-y-16">
+        <motion.div 
+          style={{ y }}
+          className="relative z-10 text-center px-6 max-w-4xl"
+        >
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-6 text-xs uppercase tracking-[0.3em] text-blood-red"
+          >
+            Phase 01
+          </motion.p>
           
-          {/* Tenet 01 */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start group">
-            <span className="text-rgrm-red font-mono text-xl font-bold pt-1 opacity-50 group-hover:opacity-100 transition-opacity">
-              01.
-            </span>
-            <div className="space-y-4">
-              <h3 className="text-xl uppercase font-bold tracking-widest text-white border-b border-white/10 pb-2 inline-block">
-                Function is Absolute
-              </h3>
-              <p className="text-white/70 leading-loose font-[family-name:var(--font-body)] text-sm md:text-base max-w-lg">
-                A garment without purpose is merely decoration. Every stitch, seam, and pocket must serve a structural or utility-based function. We reject ornamentation. We embrace the raw data of the material.
-              </p>
-            </div>
-          </div>
-
-          {/* Tenet 02 */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start group">
-            <span className="text-rgrm-red font-mono text-xl font-bold pt-1 opacity-50 group-hover:opacity-100 transition-opacity">
-              02.
-            </span>
-            <div className="space-y-4">
-              <h3 className="text-xl uppercase font-bold tracking-widest text-white border-b border-white/10 pb-2 inline-block">
-                Structural Integrity
-              </h3>
-              <p className="text-white/70 leading-loose font-[family-name:var(--font-body)] text-sm md:text-base max-w-lg">
-                Fabric is not soft; it is a flexible building material. Our patterns are derived from architectural blueprints, not traditional tailoring. We build for the urban environment—concrete, steel, and glass.
-              </p>
-            </div>
-          </div>
-
-          {/* Tenet 03 */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start group">
-            <span className="text-rgrm-red font-mono text-xl font-bold pt-1 opacity-50 group-hover:opacity-100 transition-opacity">
-              03.
-            </span>
-            <div className="space-y-4">
-              <h3 className="text-xl uppercase font-bold tracking-widest text-white border-b border-white/10 pb-2 inline-block">
-                The Uniform
-              </h3>
-              <p className="text-white/70 leading-loose font-[family-name:var(--font-body)] text-sm md:text-base max-w-lg">
-                Identity is distraction. The RGRM uniform is designed to anonymize the wearer while amplifying their capability. It is armor for the modern operator.
-              </p>
-            </div>
-          </div>
-
-        </section>
-
-        {/* --- SECTION 3: THE TIMELINE --- */}
-        <section className="pt-12 border-t border-white/10">
-          <div className="flex justify-between items-end mb-12">
-            <h2 className="text-3xl font-black uppercase tracking-tighter font-[family-name:var(--font-headline)]">
-              Operational Phases
-            </h2>
-            <span className="text-[10px] uppercase tracking-widest text-rgrm-red animate-pulse border border-rgrm-red px-2 py-1">
-              System Active
-            </span>
-          </div>
-
-          {/* Timeline Graphic */}
-          <div className="relative border-l border-white/20 ml-2 space-y-12 pb-12">
-            
-            {/* Phase 1 (Active) */}
-            <div className="relative pl-8 group">
-              {/* Dot Indicator */}
-              <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 bg-rgrm-red rounded-full shadow-[0_0_15px_#BC2026]" />
-              
-              <div className="space-y-2">
-                <span className="text-[10px] font-mono text-rgrm-red block tracking-widest">
-                  CURRENT STATUS: {RGRM_PHASES.current.status}
-                </span>
-                <h4 className="text-lg font-bold uppercase tracking-widest text-white">
-                  Phase {RGRM_PHASES.current.id}: {RGRM_PHASES.current.name}
-                </h4>
-                <p className="text-sm text-white/50 max-w-md font-[family-name:var(--font-body)]">
-                  {RGRM_PHASES.current.description}
-                </p>
-              </div>
-            </div>
-
-            {/* Phase 2 (Future) */}
-            <div className="relative pl-8 opacity-50 hover:opacity-100 transition-opacity duration-500">
-              <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 bg-black border border-white rounded-full" />
-              <div className="space-y-2">
-                <span className="text-[10px] font-mono block tracking-widest text-white/50">
-                  STATUS: PENDING
-                </span>
-                <h4 className="text-lg font-bold uppercase tracking-widest text-white">
-                  Phase 002: Expansion
-                </h4>
-                <p className="text-sm text-white/50 max-w-md font-[family-name:var(--font-body)]">
-                  Integration of technical outerwear and modular luggage systems.
-                </p>
-              </div>
-            </div>
-
-            {/* Phase 3 (Future - Redacted) */}
-            <div className="relative pl-8 opacity-30 hover:opacity-60 transition-opacity duration-500">
-              <div className="absolute -left-[5px] top-2 w-2.5 h-2.5 bg-black border border-white rounded-full" />
-              <div className="space-y-2">
-                <span className="text-[10px] font-mono block tracking-widest text-white/50">
-                  STATUS: LOCKED
-                </span>
-                <h4 className="text-lg font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                  Phase 003: <span className="bg-white/20 text-transparent select-none px-1">REDACTED</span>
-                </h4>
-                <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">
-                  Access Denied. Clearance Level 5 Required.
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* --- FOOTER SIGNOFF --- */}
-        <div className="text-center pt-16 pb-12">
-          <p className="text-[10px] uppercase tracking-[0.5em] text-white/30 mb-8">
-            End of Protocol
-          </p>
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 leading-[0.85]"
+          >
+            BRUTALIST<br />LINEAGE<br />MANIFESTO
+          </motion.h1>
           
-          <div className="h-24 w-[1px] bg-gradient-to-b from-white/30 to-transparent mx-auto" />
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="text-lg md:text-xl text-gray-400 font-light leading-relaxed"
+          >
+            Wearable architecture. Where Bauhaus geometry meets monolithic mass.
+          </motion.p>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2"
+        >
+          <div className="h-20 w-px bg-gradient-to-b from-white to-transparent" />
+        </motion.div>
+      </section>
+
+      {/* Manifesto Sections */}
+      {sections.map((section, index) => (
+        <ManifestoSection 
+          key={index}
+          section={section}
+          index={index}
+          isReversed={index % 2 === 1}
+        />
+      ))}
+
+      {/* Final CTA Section */}
+      <section className="bg-charcoal px-6 py-32 text-center">
+        <div className="mx-auto max-w-3xl">
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8 text-sm uppercase tracking-[0.3em] text-blood-red"
+          >
+            Join the Lineage
+          </motion.p>
           
-          <div className="mt-8">
-             <Link href="/">
-               <button className="text-xs font-bold uppercase tracking-widest border border-white/20 px-8 py-3 hover:bg-white hover:text-black transition-all duration-300">
-                 Return to Base
-               </button>
-             </Link>
-          </div>
+          <motion.h2 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-6xl font-black mb-8"
+          >
+            ACQUIRE YOUR<br />ARTIFACT
+          </motion.h2>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-gray-400 mb-12 leading-relaxed"
+          >
+            Every piece is a direct artifact from the RGRM Studio—crafted with intention, built for the modern grid, and designed to become part of your personal architecture.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <Link 
+              href="/selection"
+              className="group relative inline-flex items-center gap-4 overflow-hidden px-10 py-5 text-sm uppercase tracking-[0.3em] border border-white/30 hover:border-blood-red transition-all"
+            >
+              <span className="absolute inset-0 h-full w-0 bg-white transition-all duration-300 group-hover:w-full" />
+              <span className="relative group-hover:text-black transition-colors">
+                Explore the Collection
+              </span>
+            </Link>
+          </motion.div>
         </div>
+      </section>
 
-      </div>
+      {/* Footer Note */}
+      <footer className="bg-black border-t border-white/10 px-6 py-12 text-center">
+        <p className="text-xs text-gray-600 uppercase tracking-widest">
+          Form Follows Function
+        </p>
+        <p className="text-xs text-gray-700 mt-2">
+          © {new Date().getFullYear()} RaGuiRoMo Studio
+        </p>
+      </footer>
     </main>
+  );
+}
+
+// Sub-component for each manifesto section
+function ManifestoSection({ section, index, isReversed }: { 
+  section: any; 
+  index: number; 
+  isReversed: boolean;
+}) {
+  return (
+    <section className={`px-6 py-24 md:py-32 ${index % 2 === 0 ? 'bg-black' : 'bg-charcoal'}`}>
+      <div className={`mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
+        
+        {/* Image */}
+        <motion.div
+          initial={{ opacity: 0, x: isReversed ? 50 : -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="relative aspect-[4/5] overflow-hidden bg-darkGray"
+        >
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('${section.image}')` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          
+          {/* Section Label */}
+          <div className="absolute bottom-6 left-6">
+            <p className="text-xs uppercase tracking-[0.3em] text-blood-red mb-1">
+              {section.subtitle}
+            </p>
+            <h3 className="text-3xl md:text-4xl font-black text-white">
+              {section.title}
+            </h3>
+          </div>
+        </motion.div>
+
+        {/* Text */}
+        <motion.div
+          initial={{ opacity: 0, x: isReversed ? -50 : 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:pl-8"
+        >
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-500 mb-6 hidden lg:block">
+            0{index + 1}
+          </p>
+          
+          <h3 className="text-3xl md:text-4xl font-black mb-6 lg:hidden">
+            {section.title}
+          </h3>
+          
+          <p className="text-lg text-gray-400 leading-relaxed font-light">
+            {section.content}
+          </p>
+        </motion.div>
+      </div>
+    </section>
   );
 }
