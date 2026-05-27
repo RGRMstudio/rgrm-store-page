@@ -14,7 +14,7 @@ export default function LuccaWidget() {
       theme: 'dark', // Matches your brutalist black design
       title: 'Lucca - RGRM Studio',
       subtitle: 'Architectural assistance',
-      primaryColor: '#8B0000', // Blood red accent (your brand color!)
+      primaryColor: '#BC2026', // Blood red accent (your brand color!)
     };
     
     // Load the widget script
