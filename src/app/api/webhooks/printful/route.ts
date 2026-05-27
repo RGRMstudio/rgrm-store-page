@@ -1,29 +1,68 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-    const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_API_TOKEN;
-
-    if (!projectId) {
-      return NextResponse.json({ error: 'Missing projectId' }, { status: 500 });
+    // Get the webhook data from Printful
+    const data = await request.json();
+    
+    // Log it for debugging (you can remove this later)
+    console.log('🔔 Printful Webhook Received:', data.type);
+    
+    // Handle different event types
+    switch (data.type) {
+      case 'package_shipped':
+        // Order shipped! Send tracking to customer
+        await handleShipped(data.data);
+        break;
+        
+      case 'order_failed':
+        // Order failed! Alert you to fix it
+        await handleFailed(data.data);
+        break;
+        
+      case 'order_updated':
+        // Order status changed
+        await handleUpdated(data.data);
+        break;
+        
+      default:
+        console.log('Unhandled webhook type:', data.type);
     }
-
-    const { createClient } = await import('@sanity/client');
-    const client = createClient({ projectId, dataset, token, useCdn: false, apiVersion: '2026-03-25' });
-
-    const body = await req.json().catch(() => ({}));
-    console.log('Printful webhook received:', body?.type);
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Printful webhook error:', message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    
+    // Always return 200 to tell Printful we got it
+    return NextResponse.json({ success: true }, { status: 200 });
+    
+  } catch (error) {
+    console.error('❌ Webhook error:', error);
+    return NextResponse.json({ error: 'Webhook failed' }, { status: 500 });
   }
+}
+
+// Handle shipped orders
+async function handleShipped(data: any) {
+  const { order, shipment } = data;
+  
+  console.log(`📦 Order ${order.id} shipped! Tracking: ${shipment.tracking_number}`);
+  
+  // TODO: Send email to customer with tracking info
+  // Example: await sendTrackingEmail(order.recipient.email, shipment.tracking_url);
+}
+
+// Handle failed orders
+async function handleFailed(data: any) {
+  const { order, reason } = data;
+  
+  console.error(`❌ Order ${order.id} failed: ${reason}`);
+  
+  // TODO: Alert you via Discord/email
+  // Example: await sendAlert(`Order ${order.id} failed: ${reason}`);
+}
+
+// Handle order updates
+async function handleUpdated(data: any) {
+  const { order } = data;
+  
+  console.log(`🔄 Order ${order.id} updated to status: ${order.status}`);
+  
+  // TODO: Update your database if needed
 }
