@@ -4,6 +4,7 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import LuccaWidget from "@/components/LuccaWidget";
+import PageTransition from "@/components/PageTransition";
 
 // Load McQueen-style fonts
 const playfair = Playfair_Display({
@@ -22,7 +23,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "RaGuiRoMo | Brutalist Lineage",
-  description: "Wearable architecture. Phase 01: Where Bauhaus geometry meets monolithic mass.",
+  description: "Wearable architecture. Phase 01.",
 };
 
 export default function RootLayout({
@@ -39,9 +40,9 @@ export default function RootLayout({
         {/* Navigation */}
         <Navigation />
         
-        {/* Main Content */}
-        <main className="relative z-10">
-          {children}
+        {/* Main Content with Transitions */}
+        <main className="relative z-10 min-h-screen">
+          <PageTransition>{children}</PageTransition>
         </main>
         
         {/* Footer */}
