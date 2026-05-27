@@ -11,10 +11,10 @@ export default function LuccaWidget() {
     window.elevenlabsWidget = {
       agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID,
       position: 'bottom-right',
-      theme: 'dark', // Matches brutalist aesthetic
+      theme: 'dark', // Matches your brutalist black design
       title: 'Lucca - RGRM Studio',
       subtitle: 'Architectural assistance',
-      primaryColor: '#8B0000', // Blood red accent
+      primaryColor: '#8B0000', // Blood red accent (your brand color!)
     };
     
     // Load the widget script
@@ -24,11 +24,11 @@ export default function LuccaWidget() {
     script.defer = true;
     document.body.appendChild(script);
 
-    // Cleanup
+    // Cleanup when component unmounts
     return () => {
       document.body.removeChild(script);
     };
   }, []);
 
-  return null; // Widget injects itself
+  return null; // Widget injects itself automatically
 }
