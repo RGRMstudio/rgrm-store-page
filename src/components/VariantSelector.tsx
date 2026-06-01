@@ -21,6 +21,7 @@ export default function VariantSelector({ variants, onSelectVariant }: VariantSe
 
   const handleSelect = (variant: Variant) => {
     if (!variant.inStock) return;
+    
     setSelectedVariant(variant.size);
     onSelectVariant(variant);
   };
@@ -61,7 +62,7 @@ export default function VariantSelector({ variants, onSelectVariant }: VariantSe
               className={`
                 relative h-12 border text-sm font-medium tracking-wider transition-all duration-300
                 ${isSelected 
-                  ? 'border-blood-red bg-bloodRed/10 text-white' 
+                  ? 'border-[#BC2026] bg-[#BC2026]/10 text-white' 
                   : isOutOfStock
                   ? 'border-gray-800 text-gray-700 cursor-not-allowed'
                   : 'border-white/20 text-gray-300 hover:border-white hover:text-white'
