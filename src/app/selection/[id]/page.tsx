@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import ProductGallery from '@/components/ProductGallery';
-import VariantSelector from '@/components/VariantSelector';
-import BuyButton from '@/components/BuyButton';
+import ProductBuySection from '@/components/ProductBuySection'; // Import the new component
 
 async function getProduct(id: string) {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -46,7 +45,6 @@ export default async function ProductPage({ params }: { params: { id: string } }
     notFound();
   }
 
-  // Combine main image + additional images
   const allImages = [
     product.mainImage,
     ...(product.images || [])
@@ -84,22 +82,13 @@ export default async function ProductPage({ params }: { params: { id: string } }
               </p>
             </div>
 
-            {/* Variant Selector */}
-            <VariantSelector
+            {/* Use the new Client Component Wrapper here */}
+            <ProductBuySection
               variants={product.variants || []}
-              onSelectVariant={(variant) => {
-                console.log('Selected:', variant);
-              }}
-            />
-
-            {/* Buy Button */}
-            <BuyButton
               productId={product._id}
-              variantId={product.variants?.[0]?.printfulVariantId || ''}
               price={product.price}
               name={product.name}
               thumbnail={allImages[0]}
-              size={product.variants?.[0]?.size || 'One Size'}
             />
 
             {/* Trust Badges */}
