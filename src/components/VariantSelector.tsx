@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface Variant {
@@ -13,18 +12,11 @@ interface Variant {
 
 interface VariantSelectorProps {
   variants: Variant[];
+  selectedSize: string | null;
   onSelectVariant: (variant: Variant) => void;
 }
 
-export default function VariantSelector({ variants, onSelectVariant }: VariantSelectorProps) {
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
-
-  const handleSelect = (variant: Variant) => {
-    if (!variant.inStock) return;
-    
-    setSelectedVariant(variant.size);
-    onSelectVariant(variant);
-  };
+export default function VariantSelector({ variants, selectedSize, onSelectVariant }: VariantSelectorProps) {
 
   if (!variants || variants.length === 0) {
     return (
@@ -48,7 +40,7 @@ export default function VariantSelector({ variants, onSelectVariant }: VariantSe
 
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
         {variants.map((variant, index) => {
-          const isSelected = selectedVariant === variant.size;
+          const isSelected = selectedSize === variant.size;
           const isOutOfStock = !variant.inStock;
 
           return (
@@ -57,7 +49,7 @@ export default function VariantSelector({ variants, onSelectVariant }: VariantSe
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              onClick={() => handleSelect(variant)}
+              onClick={() => !isOutOfStock && onSelectVariant(variant)}
               disabled={isOutOfStock}
               className={`
                 relative h-12 border text-sm font-medium tracking-wider transition-all duration-300
@@ -79,16 +71,6 @@ export default function VariantSelector({ variants, onSelectVariant }: VariantSe
           );
         })}
       </div>
-
-      {selectedVariant && (
-        <motion.p
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-3 text-xs text-green-400 font-mono"
-        >
-          ✓ Size available
-        </motion.p>
-      )}
     </div>
   );
 }
