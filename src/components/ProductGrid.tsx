@@ -31,6 +31,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   return (
     <div ref={containerRef} className="grid grid-cols-1 gap-y-20 gap-x-12 md:grid-cols-2 lg:grid-cols-3">
       {products.map((product, index) => {
+        // Safe price handling
         const displayPrice = product.price != null 
           ? `$${Number(product.price).toFixed(2)}` 
           : 'Contact for Price';
@@ -49,6 +50,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
             className={`group ${index % 3 === 0 ? 'md:mt-20' : ''}`}
           >
             <Link href={`/selection/${product.slug.current}`} className="block">
+              {/* Image Container */}
               <div className="relative mb-6 aspect-[3/4] overflow-hidden bg-darkGray">
                 <Image
                   src={product.thumbnail}
@@ -59,12 +61,16 @@ export default function ProductGrid({ products }: ProductGridProps) {
                   priority={index < 3}
                 />
                 <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
+                
+                {/* Quick View Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/90 p-4 text-center transition-transform duration-500 group-hover:translate-y-0">
                   <span className="text-xs uppercase tracking-[0.2em] text-white">
                     Quick View
                   </span>
                 </div>
               </div>
+
+              {/* Product Info */}
               <div className="text-center">
                 <h3 className="mb-2 text-lg font-serif uppercase tracking-wide">
                   {product.name}
