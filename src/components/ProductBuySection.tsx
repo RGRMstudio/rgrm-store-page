@@ -33,8 +33,11 @@ export default function ProductBuySection({ variants, productId, price, name, th
     return <p className="text-gray-500">No variants available.</p>;
   }
 
-  // Default to the first variant if none selected (or keep null if you want to force selection)
+  // Default to the first variant if none selected
   const currentVariant = selectedVariant || variants[0];
+
+  // Handle null price - use 0 or variant price if available
+  const displayPrice = price ?? currentVariant.price ?? 0;
 
   return (
     <div className="w-full space-y-6">
@@ -48,7 +51,7 @@ export default function ProductBuySection({ variants, productId, price, name, th
       <BuyButton
         productId={productId}
         variantId={currentVariant.printfulVariantId}
-        price={price}
+        price={displayPrice}
         name={name}
         thumbnail={thumbnail}
         size={currentVariant.size}
