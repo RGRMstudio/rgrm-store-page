@@ -2,12 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================
+   1. CSS VARIABLES & ROOT SETTINGS
+   ========================================= */
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 0, 0, 0;
+  
+  /* Brand Colors */
+  --brand-red: #BC2026; /* Blood Red Accent */
+  --dark-gray: #111111; /* Dark Gray for Skeletons */
 }
 
+/* =========================================
+   2. BASE STYLES & TYPOGRAPHY
+   ========================================= */
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
@@ -16,9 +26,21 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+/* Custom Text Selection (Matches Brand Red) */
+::selection {
+  background-color: var(--brand-red);
+  color: white;
+}
+
+/* =========================================
+   3. CUSTOM SCROLLBAR (Dark Theme)
+   ========================================= */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -36,7 +58,15 @@ body {
   background: #555;
 }
 
-/* Shimmer animation */
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333 #000;
+}
+
+/* =========================================
+   4. ANIMATIONS (For Loading Skeletons)
+   ========================================= */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -47,10 +77,14 @@ body {
 }
 
 .animate-shimmer {
-  animation: shimmer 2s infinite;
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
 }
 
-/* Brutalist noise texture */
+/* =========================================
+   5. BRUTALIST NOISE TEXTURE OVERLAY
+   ========================================= */
+/* Adds a subtle, high-fashion concrete grain to the entire site */
 .brutalist-noise {
   position: fixed;
   top: 0;
@@ -63,6 +97,9 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+/* =========================================
+   6. TAILWIND UTILITIES
+   ========================================= */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
