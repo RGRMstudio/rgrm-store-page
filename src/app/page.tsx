@@ -1,7 +1,5 @@
-import { Suspense } from 'react';
 import Hero from '@/components/Hero';
 import ProductGrid from '@/components/ProductGrid';
-import ProductGridSkeleton from '@/components/ProductGridSkeleton';
 
 async function getProducts() {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -51,10 +49,8 @@ export default async function Home() {
             </h2>
           </div>
 
-          {/* Product Grid with Loading Skeleton */}
-          <Suspense fallback={<ProductGridSkeleton />}>
-            <ProductGrid products={products} />
-          </Suspense>
+          {/* Product Grid - No Suspense needed! Server already waits for data. */}
+          <ProductGrid products={products} />
         </div>
       </section>
     </main>
