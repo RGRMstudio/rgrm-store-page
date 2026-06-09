@@ -1,34 +1,26 @@
 'use client';
 
-import { useEffect } from 'react';
+import Script from 'next/script';
 
 export default function LuccaWidget() {
-  useEffect(() => {
-    // Only load if we have the agent ID
-    if (!process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID) return;
+  // Get the Agent ID from environment variables, or paste it directly here
+  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID || 'YOUR_ELEVENLABS_AGENT_ID';
 
-    // @ts-ignore - ElevenLabs widget types
-    window.elevenlabsWidget = {
-      agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID,
-      position: 'bottom-right',
-      theme: 'dark', // Matches your brutalist black design
-      title: 'Lucca - RGRM Studio',
-      subtitle: 'Architectural assistance',
-      primaryColor: '#BC2026', // Blood red accent (your brand color!)
-    };
-    
-    // Load the widget script
-    const script = document.createElement('script');
-    script.src = 'https://elevenlabs.io/widget.js';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
-    // Cleanup when component unmounts
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  return null; // Widget injects itself automatically
+  return (
+    <>
+      {/* ElevenLabs Conversational AI Custom Element */}
+      <elevenlabs-convai 
+        agent-id={agentId}
+        style={{ zIndex: 9998 }} // Ensure it sits above the noise overlay but below modals
+      />
+      
+      {/* Load the ElevenLabs Widget Script safely after page interaction */}
+      <Script
+        src="https://elevenlabs.io/convai-widget/index.js"
+        strategy="afterInteractive"
+        async
+        type="text/javascript"
+      />
+    </>
+  );
 }
