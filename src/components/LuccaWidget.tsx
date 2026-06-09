@@ -1,6 +1,22 @@
 'use client';
 
 import Script from 'next/script';
+import React from 'react';
+
+// 👇 THIS FIXES THE TYPESCRIPT ERROR 👇
+// Tell TypeScript about the ElevenLabs custom HTML element
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          'agent-id'?: string;
+        },
+        HTMLElement
+      >;
+    }
+  }
+}
 
 export default function LuccaWidget() {
   // Get the Agent ID from environment variables, or paste it directly here
