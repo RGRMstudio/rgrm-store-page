@@ -1,3 +1,5 @@
+'use client';
+
 import { motion } from 'framer-motion';
 
 export default function ProductGridSkeleton() {
@@ -23,11 +25,12 @@ export default function ProductGridSkeleton() {
             <div className="absolute inset-0 bg-gray-900 animate-pulse" />
             
             {/* Skeleton overlay with shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800 to-transparent animate-shimmer" 
-                 style={{
-                   backgroundSize: '200% 100%',
-                   animation: 'shimmer 2s infinite'
-                 }} 
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-800 to-transparent animate-shimmer" 
+              style={{
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 2s infinite'
+              }} 
             />
           </div>
 
