@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import dynamic from "next/dynamic";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-
-// Dynamically import Lucca with SSR disabled to prevent browser API errors during build
-const LuccaWidget = dynamic(() => import("@/components/LuccaWidget"), { ssr: false });
 
 // Brutalist Typography
 const inter = Inter({ 
@@ -31,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "RaGuiRoMo",
     images: [
       {
-        url: "/og-image.jpg", // Make sure you have an og-image.jpg in your /public folder
+        url: "/og-image.jpg", 
         width: 1200,
         height: 630,
       },
@@ -63,8 +59,9 @@ export default function RootLayout({
         {/* Footer */}
         <Footer />
         
-        {/* Lucca AI Chat Widget (Client-Side Only) */}
-        <LuccaWidget />
+        {/* LUCCA AI WIDGET: TEMPORARILY DISABLED TO FIX BUILD */}
+        {/* We will add this back once the store is live! */}
+        
       </body>
     </html>
   );
