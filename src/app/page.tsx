@@ -1,3 +1,7 @@
+// src/app/page.tsx
+
+"use client"; // <-- Add this line at the very top
+
 import { useState } from 'react'; // Need this for the interactive spectrum nav
 
 export default function HomePage() {
@@ -32,20 +36,11 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-black text-white font-sans">
-      {/* GRID OVERLAY */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-25 z-[-1]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)
-          `,
-          backgroundSize: '24px 24px',
-        }}
-      />
+      {/* GRID OVERLAY - Utilizes the .brutalist-noise class defined in globals.css */}
+      <div className="brutalist-noise" aria-hidden="true" />
 
       {/* NEW HERO SECTION - Replaces the old Hero component */}
-      <section className="py-16 md:py-24 px-6 text-center max-w-4xl mx-auto">
+      <section className="py-16 md:py-24 px-6 text-center max-w-4xl mx-auto relative z-10">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tighter">
           WEARABLE ARCHITECTURE
         </h1>
@@ -70,7 +65,7 @@ export default function HomePage() {
       </section>
 
       {/* SPECTRUM SECTIONS - Replaces the old Product section */}
-      <section id="the-spectrum" className="py-16 px-6">
+      <section id="the-spectrum" className="py-16 px-6 relative z-10">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">NAVIGATE THE SPECTRUM</h2>
 
         {/* Structure Section */}
@@ -169,7 +164,7 @@ export default function HomePage() {
                   <div className="flex justify-between items-center">
                     <span className="font-bold">{p.price}</span>
                     <button className="bg-gradient-to-r from-[#c44569] to-[#0c2461] text-white px-4 py-2 rounded text-sm font-medium hover:opacity-90">
-                      ADD TO CART
+                      ADD TO_CART
                     </button>
                   </div>
                 </div>
@@ -180,7 +175,7 @@ export default function HomePage() {
       </section>
 
       {/* MODULES SECTION */}
-      <section id="modules" className="py-20 px-6">
+      <section id="modules" className="py-20 px-6 relative z-10">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">ACTIVE MODULES</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {modulesData.map((m, i) => (
