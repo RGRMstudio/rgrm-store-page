@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // No apiVersion - Stripe will use the default version for your SDK
+  // Uses the default API version for your SDK
 });
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -22,50 +22,58 @@ export async function POST(req: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    
+    console.log(`Received checkout completion for session: ${session.id}`);
+
     // Create Printful order
     await createPrintfulOrder(session);
   }
 
+  // Return a 200 response to acknowledge receipt of the event
   return NextResponse.json({ received: true });
 }
 
 async function createPrintfulOrder(session: Stripe.Checkout.Session) {
   const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
-  const STORE_ID = process.env.PRINTFUL_STORE_ID || '17181557';
-  
-  const variantId = session.metadata?.variantId;
-  
+  const STORE_ID = process.env.PRINTFUL_STORE_ID || '17181557'; // Default to your store ID
+
+  const variantId = session.metadata?.variantId; // Retrieve the variant ID from session metadata
+
   if (!variantId) {
-    console.error('No variant ID found in session metadata');
+    console.error(`[Webhook Error] No variant ID found in session metadata for session: ${session.id}`);
     return;
   }
 
-  // Safe access using type assertion for optional properties
-  const sessionAny = session as any;
-  const shippingAddress = sessionAny.shipping?.address || sessionAny.customer_details?.address;
-  const customerEmail = session.customer_details?.email || '';
-  const customerName = session.customer_details?.name || 'Customer';
-  const customerPhone = session.customer_details?.phone || '';
+  // Extract customer and shipping details safely
+  const customerDetails = session.customer_details;
+  const shippingAddress = session.shipping_details?.address; // Prefer shipping_details if available
+
+  // Fallback to customer_details address if shipping_details is not present
+  const addressToUse = shippingAddress || customerDetails?.address;
+
+  if (!addressToUse) {
+    console.error(`[Webhook Error] No address found for session: ${session.id}`);
+    return;
+  }
 
   const orderPayload = {
     recipient: {
-      name: customerName,
-      address1: shippingAddress?.line1 || '',
-      city: shippingAddress?.city || '',
-      state_code: shippingAddress?.state || '',
-      country_code: shippingAddress?.country || '',
-      zip: shippingAddress?.postal_code || '',
-      email: customerEmail,
-      phone: customerPhone,
+      name: customerDetails?.name || 'Unknown Customer',
+      address1: addressToUse.line1 || '',
+      address2: addressToUse.line2 || '', // Include line2 if available
+      city: addressToUse.city || '',
+      state_code: addressToUse.state || '',
+      country_code: addressToUse.country || '',
+      zip: addressToUse.postal_code || '',
+      email: customerDetails?.email || '',
+      phone: customerDetails?.phone || '',
     },
     items: [
       {
-        sync_variant_id: parseInt(variantId),
-        quantity: 1,
+        sync_variant_id: parseInt(variantId, 10), // Ensure it's parsed as an integer
+        quantity: session.metadata?.quantity ? parseInt(session.metadata.quantity, 10) : 1, // Use quantity from metadata if available, default to 1
       },
     ],
-    external_id: session.id,
+    external_id: session.id, // Link this Printful order to the Stripe session ID
   };
 
   try {
@@ -80,14 +88,16 @@ async function createPrintfulOrder(session: Stripe.Checkout.Session) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Printful API error: ${response.status} - ${error}`);
+      const errorText = await response.text();
+      console.error(`[Printful API Error] Status: ${response.status}, Body: ${errorText}`);
+      throw new Error(`Printful API error: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
-    console.log(`✅ Printful order created: ${result.result.id}`);
+    console.log(`✅ Successfully created Printful order: ${result.result.id} for Stripe session: ${session.id}`);
+    // Optionally, you could add more logic here, like triggering an email via Loops.so
     return result;
   } catch (error: any) {
-    console.error('Error creating Printful order:', error.message);
+    console.error('[Webhook Error] Failed to create Printful order:', error.message);
   }
 }
