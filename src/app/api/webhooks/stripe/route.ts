@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // Uses the default API version for your SDK
+  apiVersion: '2026-03-25.dahlia', // Use the correct API version
 });
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -43,29 +43,27 @@ async function createPrintfulOrder(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Extract customer and shipping details safely
+  // Extract customer and address details safely using customer_details
   const customerDetails = session.customer_details;
-  const shippingAddress = session.shipping_details?.address; // Prefer shipping_details if available
 
-  // Fallback to customer_details address if shipping_details is not present
-  const addressToUse = shippingAddress || customerDetails?.address;
-
-  if (!addressToUse) {
-    console.error(`[Webhook Error] No address found for session: ${session.id}`);
+  if (!customerDetails?.address) {
+    console.error(`[Webhook Error] No address found in customer_details for session: ${session.id}`);
     return;
   }
 
+  const address = customerDetails.address;
+
   const orderPayload = {
     recipient: {
-      name: customerDetails?.name || 'Unknown Customer',
-      address1: addressToUse.line1 || '',
-      address2: addressToUse.line2 || '', // Include line2 if available
-      city: addressToUse.city || '',
-      state_code: addressToUse.state || '',
-      country_code: addressToUse.country || '',
-      zip: addressToUse.postal_code || '',
-      email: customerDetails?.email || '',
-      phone: customerDetails?.phone || '',
+      name: customerDetails.name || 'Unknown Customer',
+      address1: address.line1 || '',
+      address2: address.line2 || '', // Include line2 if available
+      city: address.city || '',
+      state_code: address.state || '',
+      country_code: address.country || '',
+      zip: address.postal_code || '',
+      email: customerDetails.email || '',
+      phone: customerDetails.phone || '',
     },
     items: [
       {
