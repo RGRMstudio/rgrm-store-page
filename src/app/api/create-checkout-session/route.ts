@@ -2,17 +2,24 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  // No apiVersion - Stripe will use the default version for your SDK
+  apiVersion: '2024-06-20', // Explicitly set latest stable version
 });
 
 export async function POST(req: Request) {
   try {
-    const { productId, variantId, price, name, thumbnail, size } = await req.json();
+    const { variantId, quantity = 1, successUrl, cancelUrl } = await req.json();
 
-    // Determine the base URL based on environment
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://www.raguiromo.store'
-      : 'http://localhost:3000';
+    if (!variantId) {
+      return NextResponse.json(
+        { error: 'Missing required parameter: variantId' },
+        { status: 400 }
+      );
+    }
+
+    // Optional: Fetch product name/price from Sanity or hardcode for now
+    // For simplicity, we'll use a default price. Replace with dynamic fetch later.
+    const unitAmountCents = 3500; // $35.00 — adjust per product!
+    const productName = 'FACE SERIES T-SHIRT'; // You can make this dynamic
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -20,31 +27,31 @@ export async function POST(req: Request) {
         {
           price_data: {
             currency: 'usd',
+            unit_amount: unitAmountCents,
             product_data: {
-              name: name,
-              images: thumbnail ? [thumbnail] : [],
+              name: productName,
+              // description: 'Geometric facial mapping. Diagnostic overlay.', // optional
             },
-            unit_amount: Math.round(Number(price) * 100), // Convert to cents
           },
-          quantity: 1,
+          quantity: parseInt(quantity as string, 10) || 1,
         },
       ],
       mode: 'payment',
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/selection/${productId}`,
+      success_url: successUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
       metadata: {
-        productId: productId,
-        variantId: variantId,
-        size: size || 'One Size',
-      },
-      shipping_address_collection: {
-        allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'ES', 'IT'],
+        variantId: variantId.toString(),
+        quantity: quantity.toString(),
+        // You can add more here later: customer_id, product_slug, etc.
       },
     });
 
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+    return NextResponse.json({ id: session.id });
   } catch (error: any) {
     console.error('Error creating checkout session:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
