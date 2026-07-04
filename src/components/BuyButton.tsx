@@ -1,33 +1,31 @@
 // src/components/BuyButton.tsx
 'use client';
 
+import { loadStripe } from '@stripe/stripe-js';
+
 export default function BuyButton({ 
   productId, 
-  variantId, // This is the crucial prop we need to verify
+  variantId, 
   price, 
   name, 
   thumbnail, 
   size 
 }: { 
   productId: string; 
-  variantId: string; // Comes from currentVariant.printfulVariantId
+  variantId: string; 
   price: number; 
   name: string; 
   thumbnail: string;
   size: string;
 }) {
   const handleBuyNow = async () => {
-    // 👈 ADDED: Debug alert to confirm variantId
-    alert(`DEBUG: Attempting checkout with variantId: ${variantId}`);
-    // 👆 REMOVE this alert after confirming it's correct
-
     try {
       const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId,
-          variantId, // ✅ This is what the API route expects
+          variantId,
           price,
           name,
           thumbnail,
@@ -37,10 +35,16 @@ export default function BuyButton({
 
       const data = await res.json();
       
-      if (data.url) {
-        window.location.href = data.url;
+      if (data.id) {
+        // ✅ Correct: Use `data.id` with stripe.redirectToCheckout
+        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+        if (stripe) {
+          stripe.redirectToCheckout({ sessionId: data.id });
+        } else {
+          alert('Stripe failed to load.');
+        }
       } else {
-        alert('Error: ' + (data.error || 'Could not create checkout session'));
+        alert('Error: ' + (data.error || 'No session ID returned'));
       }
     } catch (error) {
       console.error('Checkout error:', error);
