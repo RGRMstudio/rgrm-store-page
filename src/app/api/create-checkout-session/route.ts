@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20', // Use stable version to avoid dahlia issues
+  apiVersion: '2026-03-25.dahlia', // Corrected API version based on the Stripe library error
 });
 
 export async function POST(req: Request) {
