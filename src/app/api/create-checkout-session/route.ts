@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia', // Corrected API version based on the Stripe library error
+  apiVersion: '2026-03-25.dahlia', // Use the same API version as the checkout session creation
 });
 
 export async function POST(req: Request) {
@@ -54,8 +54,9 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log(`✅ Session created: ${session.id}`);
-    return NextResponse.json({ id: session.id });
+    console.log(`✅ Session created: ${session.id}, URL: ${session.url}`);
+    // Return both the session ID and the URL
+    return NextResponse.json({ id: session.id, url: session.url });
 
   } catch (error: any) {
     console.error('💥 Checkout API Error:', error.message, error.stack);
