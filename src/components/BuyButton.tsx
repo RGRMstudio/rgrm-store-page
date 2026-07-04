@@ -1,8 +1,6 @@
 // src/components/BuyButton.tsx
 'use client';
 
-import { loadStripe } from '@stripe/stripe-js';
-
 export default function BuyButton({ 
   productId, 
   variantId, 
@@ -35,16 +33,11 @@ export default function BuyButton({
 
       const data = await res.json();
       
-      if (data.id) {
-        // ✅ Correct: Use `data.id` with stripe.redirectToCheckout
-        const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-        if (stripe) {
-          stripe.redirectToCheckout({ sessionId: data.id });
-        } else {
-          alert('Stripe failed to load.');
-        }
+      if (data.url) {
+        // ✅ Redirect to the URL provided by the API
+        window.location.href = data.url;
       } else {
-        alert('Error: ' + (data.error || 'No session ID returned'));
+        alert('Error: ' + (data.error || 'No checkout URL received'));
       }
     } catch (error) {
       console.error('Checkout error:', error);
