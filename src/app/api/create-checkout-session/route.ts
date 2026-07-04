@@ -2,96 +2,63 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-// Initialize Stripe with the secret key from environment variables
-// Uses the API version compatible with your installed stripe library
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia',
+  apiVersion: '2024-06-20', // Use stable version to avoid dahlia issues
 });
 
 export async function POST(req: Request) {
   try {
-    // Log the raw request for debugging
-    console.log('📥 Received POST to /api/create-checkout-session');
-    
-    const contentType = req.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-      console.error('❌ Request is not JSON');
-      return NextResponse.json(
-        { error: 'Content-Type must be application/json' },
-        { status: 400 }
-      );
-    }
-
     const body = await req.json();
-    console.log('📦 Request body:', body);
+    console.log('🔍 Checkout request body:', body);
 
-    const { variantId, quantity = 1, successUrl, cancelUrl, price, name } = body;
+    const { variantId, price, quantity = 1, successUrl, cancelUrl } = body;
 
+    // ✅ Validate required fields
     if (!variantId) {
-      console.error('❌ Missing variantId in request body');
-      return NextResponse.json(
-        { error: 'Missing required parameter: variantId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required parameter: variantId' }, { status: 400 });
+    }
+    if (typeof price !== 'number' && typeof price !== 'string') {
+      return NextResponse.json({ error: 'Invalid price format' }, { status: 400 });
     }
 
-    // Validate Stripe key is present
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('❌ STRIPE_SECRET_KEY is missing from environment variables');
-      return NextResponse.json(
-        { error: 'Server configuration error: Stripe key missing' },
-        { status: 500 }
-      );
+    // ✅ Safely parse price to cents
+    const priceNum = parseFloat(price as string);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      return NextResponse.json({ error: 'Invalid price value' }, { status: 400 });
+    }
+    const unitAmountCents = Math.round(priceNum * 100);
+
+    // ✅ Validate base URL
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    if (!baseUrl) {
+      return NextResponse.json({ error: 'NEXT_PUBLIC_BASE_URL not configured' }, { status: 500 });
     }
 
-    // Validate NEXT_PUBLIC_BASE_URL is present
-    if (!process.env.NEXT_PUBLIC_BASE_URL) {
-      console.error('❌ NEXT_PUBLIC_BASE_URL is missing from environment variables');
-      return NextResponse.json(
-        { error: 'Server configuration error: Base URL missing' },
-        { status: 500 }
-      );
-    }
-
-    // Use the price and name from the request body if provided, otherwise use defaults
-    // These should ideally come from your product database/Sanity based on productId/variantId
-    const unitAmountCents = typeof price === 'number' ? Math.round(price * 100) : 3500; // Default to $35.00 if not provided
-    const productName = typeof name === 'string' ? name : 'Default Product Name'; // Default name if not provided
-
+    // Create session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'], // Accept card payments
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd', // Set currency
-            unit_amount: unitAmountCents, // Price in cents
-            product_data: {
-              name: productName, // Product name
-              // description: 'Brief description', // Optional
-            },
-          },
-          quantity: parseInt(quantity as string, 10) || 1, // Ensure quantity is a number
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          unit_amount: unitAmountCents,
+          product_data: { name: 'RGRM Product' },
         },
-      ],
-      mode: 'payment', // Single payment mode
-      // Use provided URLs or fallback to default success/cancel pages on your site
-      success_url: successUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
-      // Crucially, pass the Printful variantId and quantity in metadata
+        quantity: parseInt(quantity as string, 10) || 1,
+      }],
+      mode: 'payment',
+      success_url: successUrl || `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${baseUrl}/cancel`,
       metadata: {
-        variantId: variantId.toString(), // Pass the Printful variant ID
-        quantity: quantity.toString(), // Pass the quantity
-        // Add other relevant data here if needed, e.g., customer_email if collected elsewhere
+        variantId: variantId.toString(),
+        quantity: quantity.toString(),
       },
     });
 
-    console.log(`✅ Checkout session created: ${session.id}`);
-    // Return the session ID so the frontend can redirect the user to Stripe Checkout
-    return NextResponse.json({ id: session.id, url: session.url }); // Include URL for convenience if needed on frontend
+    console.log(`✅ Session created: ${session.id}`);
+    return NextResponse.json({ id: session.id });
+
   } catch (error: any) {
-    // Log the error for debugging
-    console.error('💥 Critical error in create-checkout-session:', error.message, error.stack);
-    // Return a 500 error response
+    console.error('💥 Checkout API Error:', error.message, error.stack);
     return NextResponse.json(
       { error: error.message || 'Internal Server Error' },
       { status: 500 }
