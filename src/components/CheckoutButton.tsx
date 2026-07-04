@@ -1,3 +1,4 @@
+// src/components/CheckoutButton.tsx
 'use client';
 
 import { useState } from 'react';
@@ -6,14 +7,14 @@ interface Props {
   productName: string;
   price: number;
   priceId?: string | null;
-  variantId?: string;
+  variantId?: string; // Ensure variantId is part of the Props interface
 }
 
 export default function CheckoutButton({ 
   productName, 
   price, 
-  priceId, 
-  variantId 
+  priceId, // This might be unused now, depending on your backend logic
+  variantId // Accept variantId as a prop
 }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,7 +32,9 @@ export default function CheckoutButton({
           productName, 
           price: price.toString(),
           quantity: 1,
-          email: undefined
+          email: undefined,
+          // Add the variantId here, which is required by the API route
+          variantId: variantId || null, // Send the variantId received as prop, or null if not provided
         }),
       });
       
