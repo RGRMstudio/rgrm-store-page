@@ -1,10 +1,10 @@
+// src/app/api/webhooks/stripe/route.ts
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia', // Use the correct API version
+  apiVersion: '2026-03-25.dahlia', // Use the same API version as the checkout session creation
 });
-
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
@@ -20,6 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
+  // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
     console.log(`Received checkout completion for session: ${session.id}`);
