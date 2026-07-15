@@ -1,28 +1,21 @@
-/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ===== RAGUIROMO VISUAL IDENTITY SYSTEM ===== */
 :root {
-  /* PILLAR COLORS */
-  --structure-blue: #0c2461;
-  --disruption-orange: #ff6b35;
-  --expression-red: #c44569;
-
-  /* NEUTRAL PALETTE */
+  --accent-red: #BC2026;
   --dark-bg: #0a0a0a;
   --light-bg: #121212;
   --text-primary: #f5f5f5;
   --text-secondary: #b0b0b0;
   --text-accent: #ffffff;
 
-  /* GRID SYSTEM */
   --grid-stroke: rgba(255, 255, 255, 0.08);
   --grid-stroke-hover: rgba(255, 255, 255, 0.15);
 
-  /* TYPOGRAPHY */
-  --font-display: 'Playfair Display', serif; /* Using your Playfair_Display font */
-  --font-body: 'Inter', sans-serif; /* Using your Inter font */
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
 
-  /* SPACING (8px grid) */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -30,50 +23,28 @@
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
 
-  /* TRANSITIONS */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Ensure body uses your dark theme */
 body {
-  background: var(--dark-bg);
+  background-color: var(--dark-bg);
   color: var(--text-primary);
   font-family: var(--font-body);
-  line-height: 1.6;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
 }
 
-/* GRID OVERLAY (subtle diagnostic texture) */
-.brutalist-noise {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(var(--grid-stroke) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-stroke) 1px, transparent 1px);
-  background-size: 24px 24px;
-  pointer-events: none;
-  opacity: 0.25;
-  z-index: -1;
-  /* This class now uses the global CSS variable for the grid stroke */
-}
-
-/* Add any other global styles you might need here */
-
-
-/* Optional: Specific styles for headings using Playfair Display */
-h1, h2, h3, h4, h5, h6 {
+.hero-title {
   font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 9rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
 }
 
-/* Optional: Adjustments for the new homepage elements if needed */
-main.min-h-screen.bg-black.text-white.font-sans {
-  position: relative; /* Ensure main content is above the noise overlay */
-  z-index: 1;
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  line-height: 1.6;
 }
