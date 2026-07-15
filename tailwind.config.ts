@@ -13,7 +13,7 @@ const config: Config = {
         black: "#000000",
         charcoal: "#0a0a0a",
         darkGray: "#1a1a1a",
-        bloodRed: "#8B0000",
+        accentRed: "#BC2026",
         concreteGray: "#2a2a2a",
         boneWhite: "#f5f5f5",
       },
