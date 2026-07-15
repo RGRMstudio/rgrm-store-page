@@ -1,4 +1,4 @@
-import { client } from '@/sanity/client';
+import { client } from '@/sanity/lib/client';
 import Hero from '@/components/Hero';
 import ProductGrid from '@/components/ProductGrid';
 
