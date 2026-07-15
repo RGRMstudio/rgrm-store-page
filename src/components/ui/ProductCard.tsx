@@ -1,85 +1,50 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-// --- 1. TYPE DEFINITIONS ---
-interface ProductProps {
-  id: string;
-  name: string;
-  price: number;
-  status: string; // 'AVAILABLE' | 'LOW STOCK' | 'SOLD OUT'
-  image: string;  // The fully resolved URL string
+:root {
+  --accent-red: #BC2026;
+  --dark-bg: #0a0a0a;
+  --light-bg: #121212;
+  --text-primary: #f5f5f5;
+  --text-secondary: #b0b0b0;
+  --text-accent: #ffffff;
+
+  --grid-stroke: rgba(255, 255, 255, 0.08);
+  --grid-stroke-hover: rgba(255, 255, 255, 0.15);
+
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-export default function ProductCard({ id, name, price, status, image }: ProductProps) {
-  const isSoldOut = status === 'SOLD OUT';
-  const isLowStock = status === 'LOW STOCK';
+body {
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
 
-  return (
-    <Link 
-      href={`/selection/${id}`} 
-      className={`group relative block border border-white/10 bg-black overflow-hidden transition-all duration-300 hover:border-accentRed ${isSoldOut ? 'opacity-60 grayscale' : ''}`}
-    >
-      
-      {/* --- 2. IMAGE CONTAINER --- */}
-      <div className="aspect-[3/4] relative w-full overflow-hidden bg-neutral-900 border-b border-white/5">
-        
-        {image ? (
-          <Image 
-            src={image} 
-            alt={name} 
-            fill 
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-white/10 font-black text-4xl rotate-[-45deg] select-none">
-              NO_IMG
-            </span>
-          </div>
-        )}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 9rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
 
-        {status !== 'AVAILABLE' && (
-          <div className="absolute top-2 right-2 bg-black/90 backdrop-blur-sm border border-white/20 px-2 py-1 z-10">
-            <span className={`text-[9px] font-bold tracking-widest uppercase ${isLowStock ? 'text-yellow-500' : 'text-white/50'}`}>
-              {status}
-            </span>
-          </div>
-        )}
-
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-      </div>
-
-      {/* --- 3. DATA PANEL --- */}
-      <div className="p-4 relative bg-black">
-        
-        <div className="flex justify-between items-start mb-1">
-          <p className="text-[9px] text-accentRed font-mono tracking-widest uppercase opacity-80 group-hover:opacity-100 transition-opacity">
-            {id}
-          </p>
-          <p className="text-xs font-bold font-mono text-white tracking-widest">
-            ${price}
-          </p>
-        </div>
-
-        <div className="relative overflow-hidden h-8"> 
-          <h3 className="text-sm font-bold uppercase tracking-tighter leading-none text-white/90 transition-transform duration-300 group-hover:-translate-y-full">
-            {name}
-          </h3>
-
-          <div className="absolute top-0 left-0 w-full h-full flex items-center translate-y-full transition-transform duration-300 group-hover:translate-y-0">
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isSoldOut ? 'text-white/30' : 'text-accentRed'}`}>
-              {isSoldOut ? 'ARCHIVED' : 'ACQUIRE >>'}
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      {/* --- 4. CORNER DECORATION --- */}
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-accentRed transition-colors duration-300" />
-
-    </Link>
-  );
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  line-height: 1.6;
 }
