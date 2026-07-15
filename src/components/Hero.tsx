@@ -21,7 +21,6 @@ export default function Hero() {
         style={{ y }}
         className="absolute inset-0"
       >
-        {/* Replace with your actual hero image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -72,7 +71,7 @@ export default function Hero() {
         >
           <Link 
             href="/selection"
-            className="group relative inline-flex items-center gap-4 overflow-hidden px-8 py-4 text-sm uppercase tracking-[0.3em] border border-white/30 hover:border-blood-red transition-all"
+            className="group relative inline-flex items-center gap-4 overflow-hidden px-8 py-4 text-sm uppercase tracking-[0.3em] border border-white/30 hover:border-accentRed transition-all"
           >
             <span className="absolute inset-0 h-full w-0 bg-white transition-all duration-300 group-hover:w-full" />
             <span className="relative group-hover:text-black transition-colors">Enter the Exhibition</span>
