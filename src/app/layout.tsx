@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+// Self-hosted fonts (no build-time fetch from Google Fonts)
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
+import "@fontsource/playfair-display/400.css";
+import "@fontsource/playfair-display/600.css";
+import "@fontsource/playfair-display/700.css";
+import "@fontsource/playfair-display/900.css";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-
-// Brutalist Typography
-const inter = Inter({ 
-  subsets: ["latin"], 
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({ 
-  subsets: ["latin"], 
-  variable: "--font-playfair",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "RaGuiRoMo | Brutalist Lineage",
@@ -45,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body 
-        className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black text-white overflow-x-hidden`}
+        className="font-sans antialiased bg-black text-white overflow-x-hidden"
       >
         {/* Brutalist Concrete Noise Overlay */}
         <div className="brutalist-noise" aria-hidden="true" />

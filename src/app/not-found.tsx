@@ -1,15 +1,10 @@
 import Link from 'next/link';
-import { JetBrains_Mono } from 'next/font/google';
-
-// Define the font so the build doesn't crash
-const mono = JetBrains_Mono({ 
-  subsets: ['latin'], 
-  variable: '--font-mono' 
-});
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/700.css";
 
 export default function NotFound() {
   return (
-    <main className={`${mono.variable} font-mono flex flex-col items-center justify-center min-h-[80vh] px-6 text-center bg-black text-white`}>
+    <main className="font-mono flex flex-col items-center justify-center min-h-[80vh] px-6 text-center bg-black text-white">
       <h2 className="hero-title text-6xl font-black mb-4">404</h2>
       <p className="text-accentRed tracking-widest uppercase text-xs mb-8">
         [ SIGNAL_LOST // LINK_DEAD ]

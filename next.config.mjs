@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enables the use of images from Sanity's CDN
+  // Enables the use of images from Sanity, Printful and Unsplash CDNs
   images: {
     remotePatterns: [
       {
@@ -11,26 +11,12 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'files.cdn.printful.com',
       },
-    ],
-  },
-
-  // FORCE ROUTING RESET: 
-  // This section ensures the /admin path is isolated from your /selection gallery
-  async rewrites() {
-    return [
       {
-        source: '/admin/:path*',
-        destination: '/admin/:path*',
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
-    ];
-  },
-
-  // Optional: Add this if you want to ensure clean builds every time on Vercel
-  typescript: {
-    ignoreBuildErrors: true, 
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+    ],
+    formats: ['image/avif', 'image/webp'],
   },
 };
 

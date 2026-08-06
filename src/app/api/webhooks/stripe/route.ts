@@ -1,19 +1,20 @@
 // src/app/api/webhooks/stripe/route.ts
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia', // Use the same API version as the checkout session creation
-});
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+import { getStripe } from '@/lib/stripe';
 
 export async function POST(req: Request) {
   const body = await req.text();
   const signature = req.headers.get('stripe-signature')!;
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   let event: Stripe.Event;
 
   try {
+    if (!endpointSecret) {
+      throw new Error('STRIPE_WEBHOOK_SECRET is not configured');
+    }
+    const stripe = getStripe();
     event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
   } catch (err: any) {
     console.error('Webhook signature verification failed:', err.message);

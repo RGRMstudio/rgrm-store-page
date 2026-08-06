@@ -1,8 +1,12 @@
-import { defineConfig } from 'eslint/config';
-import nextVitals from 'eslint-config-next/core-web-vitals';
+import { FlatCompat } from '@eslint/eslintrc';
 
-export default defineConfig([
-  ...nextVitals,
+// eslint-config-next@14 ships a legacy (eslintrc) config — bridge it to flat config.
+const compat = new FlatCompat({
+  baseDirectory: import.meta.dirname,
+});
+
+export default [
+  ...compat.extends('next/core-web-vitals'),
   {
     rules: {
       // Add custom Bauhaus strictness rules here
@@ -11,6 +15,6 @@ export default defineConfig([
   },
   {
     // Ensure build artifacts are never linted
-    ignores: [".next/*", "out/*", "build/*"]
+    ignores: [".next/*", "out/*", "build/*", "node_modules/*"]
   }
-]);
+];

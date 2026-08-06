@@ -1,21 +1,19 @@
 "use server";
 
-import { stripe } from "@/lib/stripe"; // We'll initialize this in Step 2
+import { getStripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { LoopsClient } from 'loops';
-
-const loops = new LoopsClient(process.env.LOOPS_API_KEY!);
 
 export async function createCheckout(variantId: number, productName: string, price: number) {
   const host = (await headers()).get("host");
   const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
   const origin = `${protocol}://${host}`;
 
-  // 1. Create a "Shadow" contact in Loops to track potential abandonment
-  // Note: This works best if you collect email before this step, 
-  // but for now, it prepares the system for the Stripe data.
-  
+  // 1. (Reserved) Create a "Shadow" contact in Loops to track potential abandonment.
+  // This works best if you collect the email before this step, but for now it
+  // prepares the system for the Stripe data.
+
+  const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {

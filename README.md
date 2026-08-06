@@ -1,5 +1,5 @@
 # ⬛ RGRM // IDENTITY REGISTRY [MODULE_002]
-**Architecture:** Next.js 15 (App Router) | Sanity.io | Stripe | Printful | Loops.so
+**Architecture:** Next.js 14 (App Router) | Sanity.io | Stripe | Printful | Loops.so
 
 ## 01 // SYSTEM OVERVIEW
 RGRM Studio is a high-performance digital ecosystem designed for the acquisition of "Structural Studies." This repository manages the end-to-end flow from content modeling in Sanity to automated fulfillment via Printful and identity registration via Loops.
@@ -14,8 +14,10 @@ The engine is powered by a tri-sector handshake:
 
 ## 03 // FILE MANIFEST
 ### Command & Control
-- `/src/app/api/checkout/route.ts` — Stripe session initialization.
-- `/src/app/api/webhook/route.ts` — Autonomous fulfillment & registration trigger.
+- `/src/app/api/create-checkout-session/route.ts` — Stripe session initialization.
+- `/src/app/api/webhooks/route.ts` — Autonomous fulfillment & registration trigger.
+- `/src/app/api/cron/sync/printful/route.ts` — Printful → Sanity inventory sync (Bearer `SYNC_SECRET`).
+- `/src/app/api/revalidate/route.ts` — Sanity webhook (POST) + daily Vercel cron (GET, Bearer `CRON_SECRET`).
 - `/scripts/health-check.ts` — API diagnostic utility.
 - `/scripts/backup-env.sh` — Encrypted environment security.
 
@@ -52,4 +54,4 @@ This project stores the Sanity Studio in `/studio`, so run manifest extraction f
 npm run sanity:manifest
 ```
 
-Also note: the repo is pinned to Node `20.x` in `package.json`. Running Node 24+ can trigger `npm warn EBADENGINE`.
+Also note: `package.json` declares `engines.node >= 20`. Running Node 24+ can trigger `npm warn EBADENGINE`.

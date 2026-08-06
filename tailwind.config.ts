@@ -21,6 +21,7 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-playfair)", "serif"],
         sans: ["var(--font-inter)", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       // Letter spacing for that editorial look
       letterSpacing: {
