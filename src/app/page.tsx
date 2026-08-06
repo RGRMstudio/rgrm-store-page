@@ -22,7 +22,14 @@ async function getProducts(): Promise<Product[]> {
     thumbnail,
     "status": coalesce(status, "AVAILABLE")
   }`;
-  return client.fetch(query, {}, { next: { tags: ['product'] } });
+  try {
+    return await client.fetch(query, {}, { next: { tags: ['product'] } });
+  } catch (error) {
+    // Graceful degradation: if Sanity is unreachable, show the empty state
+    // instead of crashing the storefront.
+    console.error('Failed to fetch products from Sanity:', error);
+    return [];
+  }
 }
 
 export default async function HomePage() {

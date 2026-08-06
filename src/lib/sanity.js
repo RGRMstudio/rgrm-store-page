@@ -24,3 +24,4 @@ export async function getProducts() {
     }
   }`;
   return await client.fetch(query);
+}

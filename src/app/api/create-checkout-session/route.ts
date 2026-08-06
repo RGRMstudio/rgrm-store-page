@@ -1,10 +1,6 @@
 // src/app/api/create-checkout-session/route.ts
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-03-25.dahlia', // Use the same API version as the checkout session creation
-});
+import { getStripe } from '@/lib/stripe';
 
 export async function POST(req: Request) {
   try {
@@ -35,6 +31,7 @@ export async function POST(req: Request) {
     }
 
     // Create session
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{

@@ -28,3 +28,14 @@ Thumbs.db
 .vercel
 .env*.local
 .env.local
+
+# ----- BUILD ARTIFACTS -----
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# ----- BACKUPS & JUNK -----
+*.backup
+*.bak
+
+# ----- VERCEL LOCAL ARTIFACTS -----
+.env.vercel.check
